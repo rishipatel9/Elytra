@@ -1,9 +1,6 @@
-"use client";
-
 import { useState } from "react";
 import { useFormik } from "formik";
 import { useToast } from "@/hooks/use-toast";
-
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -23,14 +20,30 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-
 import { validateEmail, validatePhone } from "@/utils/validation";
+
+import { createStudent } from "../../helper/student/index";
+
+interface StudentData {
+  name: string;
+  email: string;
+  phone: string;
+  age: number; // Note: age is a number
+  nationality: string;
+  previousDegree: string;
+  grades: string;
+  currentEducationLevel: string;
+  preferredCountries: string;
+  preferredPrograms: string;
+  careerAspirations: string;
+  visaQuestions?: string;
+}
 
 interface FormValues {
   name: string;
   email: string;
   phone: string;
-  age: string;
+  age: string; // Formik will treat all inputs as strings
   nationality: string;
   previousDegree: string;
   grades: string;
@@ -102,16 +115,38 @@ export default function StudentInformationForm() {
     },
     onSubmit: async (values) => {
       setIsLoading(true);
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 2000));
-      setIsLoading(false);
 
-      // Simulate successful submission (you would replace this with actual API call)
-      console.log("Form submitted:", values);
-      toast({
-        title: "Form Submitted Successfully",
-        description: "Thank you for your interest. We'll be in touch soon!",
-      });
+      try {
+        // Convert FormValues to StudentData
+        const studentData: StudentData = {
+          ...values,
+          age: Number(values.age), // Convert age to a number
+        };
+
+        // Call the createStudent function
+        const response = await createStudent(studentData);
+
+        if (response.success) {
+          toast({
+            title: "Form Submitted Successfully",
+            description: "Thank you for your interest. We'll be in touch soon!",
+          });
+        } else {
+          toast({
+            title: "Submission Failed",
+            description: response.message || "Something went wrong!",
+            variant: "destructive",
+          });
+        }
+      } catch (error) {
+        toast({
+          title: "Error",
+          description: "Something went wrong with the submission!",
+          variant: "destructive",
+        });
+      } finally {
+        setIsLoading(false);
+      }
     },
   });
 
