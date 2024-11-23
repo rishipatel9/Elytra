@@ -6,7 +6,7 @@ const Dashboard = () => {
 
   return (
     <div>
-      Dashboard
+      
       <button onClick={()=>signOut()}>
         Logout
       </button>

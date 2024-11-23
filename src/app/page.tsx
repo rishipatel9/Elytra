@@ -1,5 +1,6 @@
 "use client";
 
+import LandingPage from "@/components/Landing/LandingPage";
 import { getSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 
@@ -11,9 +12,6 @@ export default function Home() {
   };
 
   return (
-    <div>
-      {JSON.stringify(session)}
-      <button onClick={handleClick}>Create Account</button>
-    </div>
+      <LandingPage/>
   );
 }
