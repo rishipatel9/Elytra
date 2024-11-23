@@ -181,6 +181,7 @@ export default function StudentLoginForm() {
             className="w-full flex items-center justify-center space-x-2"
             onClick={handleLogin}
           >
+            {/* <Google className="h-4 w-4" /> */}
             <span>Log in with Google</span>
           </Button>
         </form>

@@ -1,9 +1,9 @@
+"use client";
+
 import React from "react";
 import StudentInformationForm from "../_components/StudentInformation";
 
-type Props = {};
-
-const StudentInfo = (props: Props) => {
+const StudentInfo = () => {
   return (
     <div>
       <StudentInformationForm />

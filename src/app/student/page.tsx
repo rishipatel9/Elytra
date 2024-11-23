@@ -1,10 +1,13 @@
 import React from "react";
-import StudentInformationForm from "./_components/StudentInformation";
+import StudentLogin from "./signin/page";
 
-export default function Student() {
+const StudentPage = () => {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100 p-4">
-      <StudentInformationForm />
+    <div>
+      <h1>Welcome to the Student Portal</h1>
+      <StudentLogin />
     </div>
   );
-}
+};
+
+export default StudentPage;
