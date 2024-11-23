@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Eye, EyeOff } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { signIn } from "next-auth/react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -60,7 +61,6 @@ export default function StudentLoginForm() {
       await new Promise((resolve) => setTimeout(resolve, 2000));
       setIsLoading(false);
 
-      // Simulate successful login (you would replace this with actual API call)
       if (
         values.email === "student@example.com" &&
         values.password === "password123"
@@ -69,7 +69,7 @@ export default function StudentLoginForm() {
           title: "Login Successful",
           description: "Welcome back!",
         });
-        router.push("/dashboard");
+        router.push("/student/student-info");
       } else {
         toast({
           title: "Login Failed",
@@ -80,6 +80,15 @@ export default function StudentLoginForm() {
     },
   });
 
+  const handleLogin = async () => {
+    const result = await signIn("google", { redirect: false });
+    if (result?.error) {
+      console.error(result.error);
+    } else {
+      router.push("/student/student-info");
+    }
+  };
+
   return (
     <Card className="w-full max-w-md mx-auto">
       <CardHeader>
@@ -89,7 +98,13 @@ export default function StudentLoginForm() {
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <form onSubmit={formik.handleSubmit} className="space-y-4">
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            handleLogin();
+          }}
+          className="space-y-4"
+        >
           <div className="space-y-2">
             <Label htmlFor="email">Email</Label>
             <Input
@@ -160,6 +175,13 @@ export default function StudentLoginForm() {
           </div>
           <Button type="submit" className="w-full" disabled={isLoading}>
             {isLoading ? "Logging in..." : "Log in"}
+          </Button>
+          <Button
+            type="button"
+            className="w-full flex items-center justify-center space-x-2"
+            onClick={handleLogin}
+          >
+            <span>Log in with Google</span>
           </Button>
         </form>
       </CardContent>
