@@ -10,7 +10,6 @@ const CounselorScheduling = () => {
   const [selectedCounselor, setSelectedCounselor] = useState('');
   const [meetingType, setMeetingType] = useState('video');
 
-  // Sample counselor data
   const counselors = [
     {
       id: 1,
