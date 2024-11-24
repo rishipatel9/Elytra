@@ -10,6 +10,9 @@
     "start:prisma": "npx prisma migrate dev && npx prisma generate"
   },
   "dependencies": {
+    "@livekit/components-react": "^2.6.9",
+    "@livekit/components-styles": "^1.1.3",
+    "@livekit/krisp-noise-filter": "^0.2.12",
     "@prisma/client": "^5.22.0",
     "@radix-ui/react-checkbox": "^1.1.2",
     "@radix-ui/react-dialog": "^1.1.2",
@@ -23,7 +26,10 @@
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
     "formik": "^2.4.6",
+    "framer-motion": "^11.11.17",
     "jsonwebtoken": "^9.0.2",
+    "livekit-client": "^2.6.3",
+    "livekit-server-sdk": "^2.6.1",
     "lucide-react": "^0.460.0",
     "next": "15.0.3",
     "next-auth": "^4.24.10",
