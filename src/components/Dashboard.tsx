@@ -1,40 +1,40 @@
-"use client";
-import React, { useState, useEffect } from "react";
-import { signOut } from "next-auth/react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { LogOut, Send } from "lucide-react";
-import { getAllStudents } from "@/app/helper/student";
+'use client';
+import React, { useState, useEffect } from 'react';
+import { signOut } from 'next-auth/react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { LogOut, Send } from 'lucide-react';
+import { getAllStudents } from '@/app/helper/student';
 
 interface Message {
-  role: "user" | "assistant" | "system";
+  role: 'user' | 'assistant' | 'system';
   content: string;
 }
 
 const Dashboard = () => {
   const [messages, setMessages] = useState<Message[]>([]); // Initially empty, no system message displayed
-  const [input, setInput] = useState("");
+  const [input, setInput] = useState('');
   const [isStreaming, setIsStreaming] = useState(false);
   const [students, setStudents] = useState<any[]>([]);
-  
+
   const sendMessage = async () => {
     if (!input.trim()) return;
 
-    const userMessage: Message = { role: "user", content: input };
+    const userMessage: Message = { role: 'user', content: input };
     setMessages((prev) => [...prev, userMessage]);
 
-    const botMessage: Message = { role: "assistant", content: "" };
+    const botMessage: Message = { role: 'assistant', content: '' };
     setMessages((prev) => [...prev, botMessage]);
     setIsStreaming(true);
-    const response=await getAllStudents()
-    console.log(JSON.stringify(response))
-    const input_with_context = `U are a career guidance expert  this is the details of  the student ${JSON.stringify(response)} help them with any queries the query of the user is ${input}`
+    const response = await getAllStudents();
+    console.log(JSON.stringify(response));
+    const input_with_context = `U are a career guidance expert  this is the details of  the student ${JSON.stringify(response)} help them with any queries the query of the user is ${input}`;
     try {
-      const response = await fetch("/api/chat", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+      const response = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           message: input_with_context,
           students: students.map((student) => ({
@@ -47,7 +47,7 @@ const Dashboard = () => {
         }),
       });
 
-      if (!response.body) throw new Error("No response body");
+      if (!response.body) throw new Error('No response body');
 
       const reader = response.body.getReader();
       const decoder = new TextDecoder();
@@ -66,15 +66,15 @@ const Dashboard = () => {
         );
       }
     } catch (error) {
-      console.error("Error streaming response:", error);
+      console.error('Error streaming response:', error);
     }
 
-    setInput("");
+    setInput('');
     setIsStreaming(false);
   };
 
   return (
-    <div className="flex flex-col h-full w-full bg-background">
+    <div className="flex flex-col h-screen w-full bg-background">
       {/* Header */}
       <header className="flex items-center justify-between px-6 py-4 border-b">
         <div className="flex items-center gap-2">
@@ -99,30 +99,30 @@ const Dashboard = () => {
       </header>
 
       {/* Chat Area */}
-      <ScrollArea className="flex-1 p-4">
+      <ScrollArea className="flex-1 p-4 overflow-y-auto">
         <div className="space-y-4">
           {messages.map((message, index) => (
             <div
               key={index}
               className={`flex ${
-                message.role === "user" ? "justify-end" : "justify-start"
+                message.role === 'user' ? 'justify-end' : 'justify-start'
               }`}
             >
               <div
                 className={`flex gap-2 max-w-[80%] items-start ${
-                  message.role === "user" ? "flex-row-reverse" : "flex-row"
+                  message.role === 'user' ? 'flex-row-reverse' : 'flex-row'
                 }`}
               >
                 <Avatar className="w-8 h-8">
                   <AvatarFallback>
-                    {message.role === "user" ? "S" : "AI"}
+                    {message.role === 'user' ? 'S' : 'AI'}
                   </AvatarFallback>
                 </Avatar>
                 <div
                   className={`rounded-lg px-4 py-2 ${
-                    message.role === "user"
-                      ? "bg-primary text-primary-foreground"
-                      : "bg-muted"
+                    message.role === 'user'
+                      ? 'bg-primary text-primary-foreground'
+                      : 'bg-muted'
                   }`}
                 >
                   <p className="text-sm">{message.content}</p>
@@ -137,13 +137,13 @@ const Dashboard = () => {
       </ScrollArea>
 
       {/* Input Area */}
-      <div className="p-4 border-t">
+      <div className="p-4 border-t mb-10">
         <div className="flex gap-2">
           <Input
             placeholder="Type your question about studying abroad..."
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            onKeyDown={(e) => e.key === "Enter" && sendMessage()}
+            onKeyDown={(e) => e.key === 'Enter' && sendMessage()}
             className="flex-1"
             disabled={isStreaming}
           />

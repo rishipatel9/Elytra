@@ -1,4 +1,4 @@
-import { Calendar, Home, Inbox, Search, Settings } from "lucide-react"
+import { Calendar, Home, Inbox, Search, Settings, User } from 'lucide-react';
 
 import {
   Sidebar,
@@ -9,27 +9,32 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-} from "@/components/ui/sidebar"
+} from '@/components/ui/sidebar';
+import { title } from 'process';
 
 // Menu items.
 const items = [
   {
-    title: "Mentor",
-    url: "/dashboard/mentor",
+    title: 'Home',
+    url: '/',
     icon: Home,
   },
   {
-    title: "Programs",
-    url: "/dashboard/programs",
+    title: 'Virtual Mentor',
+    url: '/video-bot',
+    icon: User,
+  },
+  {
+    title: 'Program Finder',
+    url: '/dashboard/programs',
     icon: Inbox,
   },
   {
-    title: "Counselor",
-    url: "/dashboard/counselor",
+    title: 'Ask a Counselor',
+    url: '/dashboard/counselor',
     icon: Calendar,
   },
-
-]
+];
 
 export function AppSidebar() {
   return (
@@ -40,10 +45,13 @@ export function AppSidebar() {
           <SidebarGroupContent>
             <SidebarMenu>
               {items.map((item) => (
-                <SidebarMenuItem className="py-3 font-semibold text-white text-2xl " key={item.title}>
+                <SidebarMenuItem
+                  className="py-4 px-5 font-semibold text-white text-2xl"
+                  key={item.title}
+                >
                   <SidebarMenuButton asChild>
-                    <a href={item.url}>
-                      <item.icon />
+                    <a href={item.url} className="flex items-center">
+                      <item.icon className="mr-3" />
                       <span>{item.title}</span>
                     </a>
                   </SidebarMenuButton>
@@ -54,5 +62,5 @@ export function AppSidebar() {
         </SidebarGroup>
       </SidebarContent>
     </Sidebar>
-  )
+  );
 }
