@@ -2,10 +2,9 @@
 
 import { z } from "zod";
 import { revalidatePath } from "next/cache";
-import { PrismaClient } from "@prisma/client";
 import { unstable_noStore as noStore } from "next/cache";
+import prisma from "@/lib/prisma";
 
-const prisma = new PrismaClient();
 
 const programSchema = z.object({
   name: z.string().min(1, "Program name is required"),

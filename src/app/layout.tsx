@@ -26,8 +26,8 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className="bg-lkt-white animate-in flex flex-row">
-        <ConditionalSidebar />
+      <body>
+        {/* <ConditionalSidebar /> */}
         {children}
       </body>
     </html>
