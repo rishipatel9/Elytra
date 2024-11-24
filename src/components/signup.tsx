@@ -48,8 +48,8 @@ export default function SignupPage() {
 
           <div className="text-center text-sm">
             <span className="text-gray-400">Already a member? </span>
-            <a href="/login" className="text-[#4220A9] hover:text-[#321880]">
-              Log in now
+            <a href="/auth/signin" className="text-[#4220A9] hover:text-[#321880]">
+              Signin
             </a>
           </div>
 

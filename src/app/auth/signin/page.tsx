@@ -1,21 +1,12 @@
-'use client';
 
-import { signIn, useSession } from "next-auth/react";
-import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import SigninButton from "@/components/SigninButton";
+import { getUserDetails } from "@/utils";
+import { redirect } from "next/navigation";
 
-export default function SignIn() {
-    const { data: session, status } = useSession();
-    const router = useRouter();
-
-    useEffect(() => {
-        if (session) {
-            router.push("/dashboard");
-        }
-    }, [session, router]);
-
-    if (status === "loading") {
-        return <div>Loading...</div>;
+export default async function SignIn() {
+    const session = await getUserDetails();
+    if (session) {
+      redirect("/dashboard");
     }
 
     return (
@@ -30,13 +21,7 @@ export default function SignIn() {
             <h1 className="text-4xl font-bold text-white mb-2">Signin.</h1>
             <p className="text-gray-400">Signin to your Account</p>
           </div>
-  
-            <button 
-            type="button"
-            onClick={() => signIn('google', { callbackUrl: '/dashboard' })}
-            className="w-full py-3 px-4 bg-[#4220A9] text-white rounded-lg hover:bg-[#321880] transition-colors">
-              Sign up
-            </button>
+          <SigninButton/>
           </div>
         </div>
     );
