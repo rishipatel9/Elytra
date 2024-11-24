@@ -1,26 +1,17 @@
-import { NextResponse } from "next/server";
-import type { NextRequest } from "next/server";
-import jwt from "jsonwebtoken";
+// middleware.ts
+import { withAuth } from "next-auth/middleware";
 
-const JWT_SECRET = process.env.JWT_SECRET || "your-secure-secret";
-
-export function middleware(req: NextRequest) {
-    const adminToken = req.cookies.get("adminToken")?.value;
-    if (!adminToken) {
-        return NextResponse.redirect(new URL("/signup", req.url));
-    }
-    try {
-        const decoded = jwt.verify(adminToken, JWT_SECRET) as unknown as { role: string };
-        if (decoded.role !== "admin") {
-            return NextResponse.redirect(new URL("/signup", req.url));
-        }
-    } catch (error) {
-        console.error("Token verification failed:", error);
-        return NextResponse.redirect(new URL("/signup", req.url));
-    }
-    return NextResponse.next();
-}
+export default withAuth({
+    pages: {
+        signIn: "/auth/signin",
+    },
+     
+});
 
 export const config = {
-    matcher: ["/admin/:path*"],
+    matcher: [
+        "/", // Protects the root route
+        "/execute/:path*", // Protects all routes under /execute
+        "/profile/:path*", // Protects all routes under /profile
+    ],
 };

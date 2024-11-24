@@ -27,7 +27,7 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const parsedData = studentSchema.parse(body);
 
-    const student = await prisma.studentInformation.create({
+    const student = await prisma.user.create({
       data: parsedData,
     });
 
@@ -46,8 +46,8 @@ export async function GET(req: NextRequest) {
   const id = searchParams.get("id");
   if (id) {
     try {
-      const student = await prisma.studentInformation.findUnique({
-        where: { id: parseInt(id) },
+      const student = await prisma.user.findUnique({
+        where: { id: id },
       });
       if (!student) {
         return NextResponse.json(
@@ -65,7 +65,7 @@ export async function GET(req: NextRequest) {
   }
 
   try {
-    const students = await prisma.studentInformation.findMany();
+    const students = await prisma.user.findMany();
     return NextResponse.json({ students }, { status: 200 });
   } catch (error) {
     return NextResponse.json(
@@ -82,7 +82,7 @@ export async function PUT(req: NextRequest) {
 
     const parsedData = studentSchema.omit({ visaQuestions: true }).parse(body);
 
-    const student = await prisma.studentInformation.update({
+    const student = await prisma.user.update({
       where: { id },
       data: parsedData,
     });
@@ -108,8 +108,8 @@ export async function DELETE(req: NextRequest) {
   }
 
   try {
-    const student = await prisma.studentInformation.delete({
-      where: { id: parseInt(id) },
+    const student = await prisma.user.delete({
+      where: { id:id },
     });
 
     return NextResponse.json(
