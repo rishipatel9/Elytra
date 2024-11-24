@@ -4,7 +4,17 @@ import { z } from "zod";
 import { revalidatePath } from "next/cache";
 import { unstable_noStore as noStore } from "next/cache";
 import prisma from "@/lib/prisma";
+import { GoogleGenerativeAI } from "@google/generative-ai"; // Gemini API
+import { Pinecone } from '@pinecone-database/pinecone'
 
+const pinecone = new Pinecone({ apiKey:process.env.NEXT_PUBLIC_PINECONE_API_KEY || " "})
+
+const genAI = new GoogleGenerativeAI(process.env.NEXT_PUBLIC_GEMINI_API_KEY|| " ");
+const model = genAI.getGenerativeModel({ model: "text-embedding-004" });
+
+ 
+
+const index = pinecone.Index("program-recommendations"); // Replace with your Pinecone index name
 
 const programSchema = z.object({
   name: z.string().min(1, "Program name is required"),
@@ -21,68 +31,60 @@ type ProgramFormData = z.infer<typeof programSchema>;
 export async function createProgram(formData: ProgramFormData) {
   noStore();
   try {
+    // Validate form data
     const validatedData = programSchema.parse(formData);
 
+    // Create the program in your Prisma database
     const program = await prisma.program.create({
-      data:{
+      data: {
         name: validatedData.name,
         description: validatedData.description || "",
         mode: validatedData.mode || "",
         duration: validatedData.duration || "",
         category: validatedData.category || "",
         fees: validatedData.fees || "",
-        eligibility: validatedData.eligibility || ""
-      }
+        eligibility: validatedData.eligibility || "",
+      },
     });
 
-    revalidatePath('/programs');
+    // Generate embeddings using Gemini API
+    const textToEmbed = `${validatedData.name} ${validatedData.description || ""}`;
+    const embeddingResult = await model.embedContent(textToEmbed);
 
-    return { 
-      success: true, 
-      message: "Program created successfully",
-      program 
+    // Upsert embeddings into Pinecone
+    const embeddingVector = embeddingResult.embedding.values;
+    await index.upsert([
+  {
+    id: program.id.toString(),
+    values: embeddingVector,
+    metadata: {
+      name: validatedData.name,
+      description: validatedData.description || "",
+      mode: validatedData.mode || "",
+      duration: validatedData.duration || "",
+      category: validatedData.category || "",
+      fees: validatedData.fees || "",
+      eligibility: validatedData.eligibility || "",
+    },
+  },
+]);
+
+
+    // Revalidate the path
+    revalidatePath("/programs");
+
+    return {
+      success: true,
+      message: "Program created successfully and upserted into Pinecone",
+      program,
     };
   } catch (error) {
     if (error instanceof z.ZodError) {
-      const errorMessages = error.errors.map(err => err.message).join(", ");
+      const errorMessages = error.errors.map((err) => err.message).join(", ");
       return { success: false, message: `Validation error: ${errorMessages}` };
     }
 
     console.error("Error creating program:", error);
     return { success: false, message: "Failed to create program" };
-  }
-}
-
-export async function getPrograms() {
-  noStore();
-  try {
-    const programs = await prisma.program.findMany({
-      orderBy: {
-        createdAt: 'desc'
-      }
-    });
-    
-    return programs;
-  } catch (error) {
-    console.error("Error fetching programs:", error);
-    throw new Error("Failed to fetch programs");
-  }
-}
-
-export async function getProgram(id: string) {
-  noStore();
-  try {
-    const program = await prisma.program.findUnique({
-      where: { id: parseInt(id, 10) }
-    });
-    
-    if (!program) {
-      throw new Error("Program not found");
-    }
-    
-    return program;
-  } catch (error) {
-    console.error("Error fetching program:", error);
-    throw new Error("Failed to fetch program");
   }
 }

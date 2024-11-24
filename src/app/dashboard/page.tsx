@@ -11,11 +11,16 @@ const Page = async () => {
   }
 
   return (
-    <div className="min-h-screen w-full">
+     <div className="min-h-screen w-full">
       {" "}
       {/* Set min-height and full width */}
+ 
+    <div className="">
+      Dashboard Page
+ 
       <Dashboard />
-    </div>
+      </div>
+      </div>
   );
 };
 
