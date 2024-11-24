@@ -1,18 +1,19 @@
-// app/dashboard/page.tsx
-import Dashboard from '../../components/Dashboard';
-import { getUserDetails } from '../../utils';
-import { redirect } from 'next/navigation';
-import React from 'react';
+import Dashboard from "../../components/Dashboard";
+import { getUserDetails } from "../../utils";
+import { redirect } from "next/navigation";
+import React from "react";
 
 const Page = async () => {
   const session = await getUserDetails();
-  
+
   if (!session) {
-    redirect('/');
+    redirect("/");
   }
-  
+
   return (
-    <div className="max-w-7xl mx-auto">
+    <div className="min-h-screen w-full">
+      {" "}
+      {/* Set min-height and full width */}
       <Dashboard />
     </div>
   );

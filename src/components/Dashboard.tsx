@@ -1,63 +1,161 @@
-'use client';
-import React, { useState } from 'react';
+"use client";
+import React, { useState, useEffect } from "react";
+import { signOut } from "next-auth/react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { LogOut, Send } from "lucide-react";
+
+interface Message {
+  role: "user" | "assistant" | "system";
+  content: string;
+}
 
 const Dashboard = () => {
-  const [messages, setMessages] = useState<{ role: 'user' | 'bot'; text: string }[]>([]);
-  const [input, setInput] = useState('');
+  const [messages, setMessages] = useState<Message[]>([]); // Initially empty, no system message displayed
+  const [input, setInput] = useState("");
+  const [isStreaming, setIsStreaming] = useState(false);
+  const [students, setStudents] = useState<any[]>([]);
 
-  const handleSendMessage = () => {
+  const sendMessage = async () => {
     if (!input.trim()) return;
 
-    const userMessage = { role: 'user', text: input };
-    setMessages((prev:any) => [...prev, userMessage]);
+    const userMessage: Message = { role: "user", content: input };
+    setMessages((prev) => [...prev, userMessage]);
 
+    const botMessage: Message = { role: "assistant", content: "" };
+    setMessages((prev) => [...prev, botMessage]);
+    setIsStreaming(true);
 
-    setTimeout(() => {
-      const botResponse = { role: 'bot', text: `You said: "${input}"` };
-      setMessages((prev:any) => [...prev, botResponse]);
-    }, 1000);
+    try {
+      const response = await fetch("/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          message: input,
+          students: students.map((student) => ({
+            name: student.name,
+            nationality: student.nationality,
+            careerAspirations: student.careerAspirations,
+            preferredCountries: student.preferredCountries,
+            preferredPrograms: student.preferredPrograms,
+          })),
+        }),
+      });
 
-    setInput('');
+      if (!response.body) throw new Error("No response body");
+
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        const chunk = decoder.decode(value, { stream: true });
+        setMessages((prev) =>
+          prev.map((msg, idx) =>
+            idx === prev.length - 1
+              ? { ...msg, content: msg.content + chunk }
+              : msg
+          )
+        );
+      }
+    } catch (error) {
+      console.error("Error streaming response:", error);
+    }
+
+    setInput("");
+    setIsStreaming(false);
   };
 
   return (
-    <div className="flex flex-col bg-[#151723] w-full h-full p-4 text-white">
-      <div className="flex-grow overflow-y-auto p-5 space-y-4">
-        {messages.map((message, index) => (
-          <div
-            key={index}
-            className={`flex ${
-              message.role === 'user' ? 'justify-end' : 'justify-start'
-            }`}
-          >
+    <div className="flex flex-col h-full w-full bg-background">
+      {/* Header */}
+      <header className="flex items-center justify-between px-6 py-4 border-b">
+        <div className="flex items-center gap-2">
+          <Avatar>
+            <AvatarFallback>C</AvatarFallback>
+          </Avatar>
+          <div>
+            <h1 className="text-lg font-semibold">AI Counselor</h1>
+            <p className="text-sm text-muted-foreground">
+              Guiding you through your study abroad journey
+            </p>
+          </div>
+        </div>
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={() => signOut()}
+          aria-label="Logout"
+        >
+          <LogOut className="w-5 h-5" />
+        </Button>
+      </header>
+
+      {/* Chat Area */}
+      <ScrollArea className="flex-1 p-4">
+        <div className="space-y-4">
+          {messages.map((message, index) => (
             <div
-              className={`max-w-[75%] p-3 rounded-lg ${
-                message.role === 'user' ? 'bg-blue-600' : 'bg-gray-700'
+              key={index}
+              className={`flex ${
+                message.role === "user" ? "justify-end" : "justify-start"
               }`}
             >
-              {message.text}
+              <div
+                className={`flex gap-2 max-w-[80%] items-start ${
+                  message.role === "user" ? "flex-row-reverse" : "flex-row"
+                }`}
+              >
+                <Avatar className="w-8 h-8">
+                  <AvatarFallback>
+                    {message.role === "user" ? "S" : "AI"}
+                  </AvatarFallback>
+                </Avatar>
+                <div
+                  className={`rounded-lg px-4 py-2 ${
+                    message.role === "user"
+                      ? "bg-primary text-primary-foreground"
+                      : "bg-muted"
+                  }`}
+                >
+                  <p className="text-sm">{message.content}</p>
+                </div>
+              </div>
             </div>
-          </div>
-        ))}
-      </div>
+          ))}
+          {isStreaming && (
+            <div className="text-muted-foreground">Counselor is typing...</div>
+          )}
+        </div>
+      </ScrollArea>
 
       {/* Input Area */}
-      <div className="p-3 border-t border-gray-700 bg-[#1d1f2b]">
-        <div className="flex items-center gap-3">
-          <input
-            type="text"
+      <div className="p-4 border-t">
+        <div className="flex gap-2">
+          <Input
+            placeholder="Type your question about studying abroad..."
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
-            className="flex-grow p-3 rounded-lg bg-gray-800 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-            placeholder="Type your message..."
+            onKeyDown={(e) => e.key === "Enter" && sendMessage()}
+            className="flex-1"
+            disabled={isStreaming}
           />
-          <button
-            onClick={handleSendMessage}
-            className="px-4 py-2 bg-blue-500 rounded-lg hover:bg-blue-600 transition-colors"
+          <Button
+            onClick={sendMessage}
+            size="icon"
+            disabled={isStreaming}
+            aria-label="Send message"
           >
-            Send
-          </button>
+            {isStreaming ? (
+              <span className="text-sm">...</span>
+            ) : (
+              <Send className="w-4 h-4" />
+            )}
+          </Button>
         </div>
       </div>
     </div>
