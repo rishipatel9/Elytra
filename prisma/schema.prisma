@@ -1,5 +1,3 @@
-// This is your Prisma schema file
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -10,20 +8,42 @@ datasource db {
 }
 
 model StudentInformation {
-  id                      Int      @id @default(autoincrement())
-  name                    String
-  email                   String   @unique
-  phone                   String
-  age                     Int
-  nationality             String
-  previousDegree         String
-  grades                 String
-  currentEducationLevel  String
-  preferredCountries      String
-  preferredPrograms       String
-  careerAspirations      String
-  visaQuestions          String?
-  createdAt               DateTime @default(now())
-  updatedAt               DateTime @updatedAt
+  id                    Int      @id @default(autoincrement())
+  name                  String
+  email                 String   @unique
+  phone                 String
+  age                   Int
+  nationality           String
+  previousDegree        String
+  grades                String
+  currentEducationLevel String
+  preferredCountries    String
+  preferredPrograms     String
+  careerAspirations     String
+  visaQuestions         String?
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+  image                 String?
 }
 
+model Program {
+  id          Int      @id @default(autoincrement())
+  name        String
+  description String
+  mode        String
+  duration    String
+  category    String
+  fees        String
+  eligibility String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Admin {
+  id        Int      @id @default(autoincrement())
+  name      String
+  email     String   @unique
+  password  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}

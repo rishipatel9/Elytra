@@ -7,17 +7,15 @@ export default function LandingPage() {
     return (
         <div className="min-h-screen bg-[#151723] text-white overflow-hidden">
             <Navbar />
-   
-            <div className="relative flex items-center justify-center min-h-screen">
-                <div className="absolute top-0 right-0 transform translate-x-1/2 translate-y-1/2 
-                        w-[500px] h-[500px] sm:w-[600px] sm:h-[600px] lg:w-[800px] lg:h-[800px] 
-                        rounded-full bg-gradient-to-r from-[#3C20AE] via-[#4220A9]/80 to-[#445B85] 
-                        blur-[150px] sm:blur-[180px] lg:blur-[200px] opacity-85 z-0"></div>
+
+                    <div className="relative flex items-center justify-center min-h-screen">
+                    <Gradient/>
+
 
                 <div className="absolute inset-0 bg-[linear-gradient(to_right,_rgba(255,255,255,0.1)_1px,_transparent_1px)] bg-[size:100px_100%] opacity-30 z-0"></div>
 
                 <div className="relative z-10 text-center px-4 max-w-6xl mx-auto">
-                    <h1 className="text-3xl sm:text-4xl lg:text-6xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white to-[#9FA5C6]">
+                    <h1 className="text-3xl sm:text-4xl lg:text-5xl  tracking-tight bg-clip-text text-transparent bg-gradient-to-r text-white">
                         Unlock Your Full Potential with AI-Powered Student Counseling
                     </h1>
                     <p className="mt-4 text-lg sm:text-xl lg:text-xl text-[#9FA5C6] leading-relaxed sm:leading-snug lg:leading-normal max-w-4xl mx-auto">
@@ -81,7 +79,7 @@ export default function LandingPage() {
     );
 }
 
-function FeatureCard({ icon, title, description }: { icon: any, title: string, description: string }) {
+function FeatureCard({ icon, title, description }: { icon: React.ReactNode, title: string, description: string }) {
     return (
         <div className="bg-[#232534] p-6 rounded-lg text-center hover:bg-[#3A3D47] transition-colors duration-200">
             <div className="text-[#4220A9] mb-4 flex justify-center">{icon}</div>
@@ -89,4 +87,32 @@ function FeatureCard({ icon, title, description }: { icon: any, title: string, d
             <p className="text-[#9FA5C6]">{description}</p>
         </div>
     );
+}
+
+
+function Gradient(){
+    return (
+        <>
+        <div className="absolute top-0 right-0 w-[300px] h-[300px] sm:w-[400px] sm:h-[400px] lg:w-[600px] lg:h-[600px] 
+            rounded-full bg-gradient-to-tr from-[#3B1FAB] via-[#3B1FAB] to-[#3B1FAB] 
+            blur-[150px] sm:blur-[150px] lg:blur-[150px] opacity-40 z-0"></div>
+
+        <div className="absolute top-0 right-0 w-[300px] h-[300px] sm:w-[400px] sm:h-[400px] lg:w-[600px] lg:h-[600px] 
+            rounded-full bg-gradient-to-tr from-[#3B1FAB] via-[#3B1FAB] to-[#3B1FAB] 
+            blur-[150px] sm:blur-[150px] lg:blur-[150px] opacity-40 z-0"></div>
+
+        <div className="absolute top-0 right-0 w-[300px] h-[300px] sm:w-[400px] sm:h-[400px] lg:w-[600px] lg:h-[600px] 
+            rounded-full bg-gradient-to-tr from-[#3B1FAB] via-[#3B1FAB] to-[#3B1FAB] 
+            blur-[150px] sm:blur-[150px] lg:blur-[150px] opacity-40 z-0"></div>
+        <div className="absolute top-0 right-0 w-[300px] h-[300px] sm:w-[400px] sm:h-[400px] lg:w-[600px] lg:h-[600px] 
+            rounded-full bg-gradient-to-tr from-[#3B1FAB] via-[#3B1FAB] to-[#3B1FAB] 
+            blur-[150px] sm:blur-[150px] lg:blur-[150px] opacity-40 z-0"></div>
+        <div className="absolute top-0 right-0 w-[300px] h-[300px] sm:w-[400px] sm:h-[400px] lg:w-[600px] lg:h-[600px] 
+            rounded-full bg-gradient-to-tr from-[#3B1FAB] via-[#3B1FAB] to-[#3B1FAB] 
+            blur-[150px] sm:blur-[150px] lg:blur-[150px] opacity-40 z-0"></div>
+        <div className="absolute top-0 right-0 w-[300px] h-[300px] sm:w-[400px] sm:h-[400px] lg:w-[600px] lg:h-[600px] 
+            rounded-full bg-gradient-to-tr from-[#3B1FAB] via-[#3B1FAB] to-[#3B1FAB] 
+            blur-[150px] sm:blur-[150px] lg:blur-[150px] opacity-40 z-0"></div>
+    </>
+    )
 }

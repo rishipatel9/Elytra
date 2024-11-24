@@ -22,7 +22,20 @@ const NEXT_AUTH = {
       return "/dashboard";
     },
   },
+  // events:{
+  //   async signIn({user}:{user:User}){  
+      
+  //   },
+  // }
   
 };
 
 export { NEXT_AUTH };
+
+
+export type User ={
+  id: string;
+  name: string;
+  email: string;
+  image: string;
+}

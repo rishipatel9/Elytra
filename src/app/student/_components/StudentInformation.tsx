@@ -16,7 +16,6 @@ import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
@@ -139,9 +138,10 @@ export default function StudentInformationForm() {
           });
         }
       } catch (error) {
+        console.error(error);
         toast({
           title: "Error",
-          description: "Something went wrong with the submission!",
+          description:  "Something went wrong!",
           variant: "destructive",
         });
       } finally {

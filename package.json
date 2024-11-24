@@ -6,11 +6,13 @@
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "start:prisma": "npx prisma migrate dev && npx prisma generate"
   },
   "dependencies": {
     "@prisma/client": "^5.22.0",
     "@radix-ui/react-checkbox": "^1.1.2",
+    "@radix-ui/react-dialog": "^1.1.2",
     "@radix-ui/react-label": "^2.1.0",
     "@radix-ui/react-select": "^2.1.2",
     "@radix-ui/react-slot": "^1.1.0",
@@ -19,16 +21,19 @@
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
     "formik": "^2.4.6",
+    "jsonwebtoken": "^9.0.2",
     "lucide-react": "^0.460.0",
     "next": "15.0.3",
     "next-auth": "^4.24.10",
     "react": "18.2.0",
     "react-dom": "18.2.0",
+    "sonner": "^1.7.0",
     "tailwind-merge": "^2.5.4",
     "tailwindcss-animate": "^1.0.7",
     "zod": "^3.23.8"
   },
   "devDependencies": {
+    "@types/jsonwebtoken": "^9.0.7",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",

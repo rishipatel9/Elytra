@@ -1,22 +1,24 @@
 import React from 'react';
 import { Input } from './ui/input';
-import { GithubIcon, GoogleIcon } from '@/icons/icons';
+
 import SignupButtons from './SignUpButtons';
 
 export default function SignupPage() {
   return (
     <div className="relative flex flex-col items-center justify-center min-h-screen bg-[#151723] px-4">
+
       <div className="absolute top-1/4 right-1/4 w-[500px] h-[500px] rounded-full bg-gradient-to-r from-[#4220A9] via-[#4220A9]/80 to-[#321880] blur-3xl opacity-10 z-0"></div>
       <div className="absolute inset-0 bg-[linear-gradient(to_right,_rgba(255,255,255,0.1)_1px,_transparent_1px)] bg-[size:70px_70%] opacity-35 z-0"></div>
 
       <div className="relative z-10 w-full max-w-md space-y-8">
+
         <div className="text-center">
           <h1 className="text-4xl font-bold text-white mb-2">Signup.</h1>
           <p className="text-gray-400">Create an account with us.</p>
         </div>
 
         <div className="space-y-4">
-        <SignupButtons/>
+          <SignupButtons />
           <div className="relative">
             <div className="absolute inset-0 flex items-center">
               <div className="w-full border-t border-gray-800"></div>
@@ -25,6 +27,7 @@ export default function SignupPage() {
               <span className="px-4 text-gray-400">Or continue with</span>
             </div>
           </div>
+
 
           <Input
             type="email"
@@ -42,10 +45,22 @@ export default function SignupPage() {
             Sign up
           </button>
 
+
           <div className="text-center text-sm">
-            <span className="text-gray-400">Already member? </span>
-            <a href="#" className="text-[#4220A9] hover:text-[#321880]">
+            <span className="text-gray-400">Already a member? </span>
+            <a href="/login" className="text-[#4220A9] hover:text-[#321880]">
               Log in now
+            </a>
+          </div>
+
+
+          <div className="text-center text-sm mt-4">
+            <span className="text-gray-400">Are you an admin? </span>
+            <a
+              href="/admin/login"
+              className="text-[#4220A9] hover:text-[#321880] underline"
+            >
+              Log in as Admin
             </a>
           </div>
         </div>
@@ -53,4 +68,3 @@ export default function SignupPage() {
     </div>
   );
 }
-
