@@ -1,15 +1,17 @@
 'use client'
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Calendar, Clock, User, Video, MessageSquare } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { SidebarTrigger } from '@/components/ui/sidebar';
+import { getSession } from 'next-auth/react';
+import { toast } from 'sonner';
 
 const CounselorScheduling = () => {
   const [selectedDate, setSelectedDate] = useState('');
   const [selectedTime, setSelectedTime] = useState('');
   const [selectedCounselor, setSelectedCounselor] = useState('');
   const [meetingType, setMeetingType] = useState('video');
-
+  const [session, setSession] = useState<any>(null);
   const counselors = [
     {
       id: 1,
@@ -35,15 +37,48 @@ const CounselorScheduling = () => {
     '09:00 AM', '10:00 AM', '11:00 AM',
     '02:00 PM', '03:00 PM', '04:00 PM'
   ];
+  useEffect(() => {
+    const fetchSession = async () => {
+      const userSession = await getSession();
+      setSession(userSession);
+    };
+    fetchSession();
+  }, []);
 
-  const handleSchedule = () => {
-    console.log('Meeting scheduled:', {
+  const handleSchedule = async () => {
+    const selectedCounselorDetails = counselors.find(c => c.id === Number(selectedCounselor));
+
+    const meetingDetails = {
+      email: session?.user?.email || '',
+      counselorName: selectedCounselorDetails?.name,
       date: selectedDate,
       time: selectedTime,
-      counselor: selectedCounselor,
-      type: meetingType
-    });
+      meetingType,
+    };
+  
+    console.log('Meeting scheduled:', meetingDetails);
+  
+    try {
+      const response = await fetch('/api/email', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(meetingDetails),
+      });
+      console.log(response)
+  
+      if (response.ok) {
+        toast.success('Meeting scheduled successfully');
+      } else {
+        toast.error('An error occurred. Please try again.');
+      }
+    } catch (error) {
+      console.error('Error scheduling meeting:', error);
+      toast.error('An error occurred. Please try again.');
+    }
   };
+  
 
   return (
     <div className="min-h-screen bg-gray-900 p-6 text-gray-100">
