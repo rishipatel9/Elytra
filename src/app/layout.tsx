@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
-import { ConditionalSidebar, SideBar } from "./side-bar";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -27,7 +26,6 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        {/* <ConditionalSidebar /> */}
         {children}
       </body>
     </html>

@@ -1,18 +1,21 @@
-import Dashboard from '@/components/Dashboard';
-import { getUserDetails } from '@/utils';
+// app/dashboard/page.tsx
+import Dashboard from '../../components/Dashboard';
+import { getUserDetails } from '../../utils';
 import { redirect } from 'next/navigation';
-import React from 'react'
+import React from 'react';
 
-const page =async  () => {
-    const session = await getUserDetails();
+const Page = async () => {
+  const session = await getUserDetails();
+  
   if (!session) {
-    redirect(`/`);
-  } 
+    redirect('/');
+  }
+  
   return (
-    <div>
-        <Dashboard/>
+    <div className="max-w-7xl mx-auto">
+      <Dashboard />
     </div>
-  )
-}
+  );
+};
 
-export default page
+export default Page;
