@@ -14,6 +14,7 @@ import {
   VendorIcon,
   Warehouse,
 } from "@/components/icons/icons";
+import { usePathname } from "next/navigation";
 
 interface DropdownMenuItemProps {
   label: string;
@@ -70,6 +71,10 @@ const DropdownMenuItem = ({
     </div>
   );
 };
+export function ConditionalSidebar() {
+  const pathname = usePathname();
+  return pathname === "/dashboard" ? <SideBar /> : null;
+}
 
 export function SideBar() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -89,7 +94,7 @@ export function SideBar() {
     >
       {/* Main Menu Items */}
       <Link href="/" className="w-full">
-        <div className="flex items-center px-4 py-2 text-gray-800 hover:bg-gray-50 hover:text-black transition-colors duration-200">
+        <div className="flex items-center justify-between px-4 py-2 text-gray-800 hover:bg-gray-50 hover:text-black transition-colors duration-200">
           <HomeIcon />
           {isSidebarOpen && <span className="ml-3">Dashboard</span>}
         </div>
@@ -99,21 +104,21 @@ export function SideBar() {
 
       {/* Updated Links */}
       <Link href="/ai-call" className="w-full">
-        <div className="flex items-center px-4 py-2 text-gray-800 hover:bg-gray-50 hover:text-black transition-colors duration-200">
+        <div className="flex items-center justify-between px-4 py-2 text-gray-800 hover:bg-gray-50 hover:text-black transition-colors duration-200">
           <CustomerIcon />
           {isSidebarOpen && <span className="ml-3">Virtual Mentor</span>}
         </div>
       </Link>
 
       <Link href="/programs" className="w-full">
-        <div className="flex items-center px-4 py-2 text-gray-800 hover:bg-gray-50 hover:text-black transition-colors duration-200">
+        <div className="flex items-center justify-between px-4 py-2 text-gray-800 hover:bg-gray-50 hover:text-black transition-colors duration-200">
           <VendorIcon />
           {isSidebarOpen && <span className="ml-3">Study Programs Abroad</span>}
         </div>
       </Link>
 
       <Link href="/human-counselor" className="w-full">
-        <div className="flex items-center px-4 py-2 text-gray-800 hover:bg-gray-50 hover:text-black transition-colors duration-200">
+        <div className="flex items-center justify-between px-4 py-2 text-gray-800 hover:bg-gray-50 hover:text-black transition-colors duration-200">
           <MoneyIcon />
           {isSidebarOpen && <span className="ml-3">Ask as Counselor</span>}
         </div>

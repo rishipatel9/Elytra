@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
-import { SideBar } from "./side-bar";
+import { ConditionalSidebar, SideBar } from "./side-bar";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -27,7 +27,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="bg-lkt-white animate-in flex flex-row">
-        <SideBar />
+        <ConditionalSidebar />
         {children}
       </body>
     </html>
