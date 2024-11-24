@@ -15,7 +15,7 @@ import { MediaDeviceFailure } from "livekit-client";
 import { NoAgentNotification } from "@/components/video-bot/NoAgentNotification";
 import { CloseIcon } from "@/components/video-bot/CloseIcon";
 import { useKrispNoiseFilter } from "@livekit/components-react/krisp";
-import { ConnectionDetails } from "../app/api/connection-details/route";
+import { ConnectionDetails } from "../api/connection-details/route";
 import VideoConferenceRenderer from "@/components/video-bot/video-renderer";
 
 export default function Page() {
@@ -160,44 +160,33 @@ function SimpleVoiceAssistant(props: {
 }
 
 
+
 function ControlBar(props: { onConnectButtonClicked: () => void; agentState: AgentState }) {
   const krisp = useKrispNoiseFilter();
   useEffect(() => {
     krisp.setNoiseFilterEnabled(true);
   }, []);
 
+  // Simplified version without complex animations
   return (
     <div className="relative h-[100px]">
-      <AnimatePresence>
-        {props.agentState === "disconnected" && (
-          <motion.button
-            initial={{ opacity: 0, top: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0, top: "-10px" }}
-            transition={{ duration: 1, ease: [0.09, 1.04, 0.245, 1.055] }}
-            className="uppercase absolute left-1/2 -translate-x-1/2 px-4 py-2 bg-white text-black rounded-md"
-            onClick={() => props.onConnectButtonClicked()}
-          >
-            Start a conversation
-          </motion.button>
-        )}
-      </AnimatePresence>
-      <AnimatePresence>
-        {props.agentState !== "disconnected" && props.agentState !== "connecting" && (
-          <motion.div
-            initial={{ opacity: 0, top: "10px" }}
-            animate={{ opacity: 1, top: 0 }}
-            exit={{ opacity: 0, top: "-10px" }}
-            transition={{ duration: 0.4, ease: [0.09, 1.04, 0.245, 1.055] }}
-            className="flex h-8 absolute left-1/2 -translate-x-1/2  justify-center"
-          >
-            <VoiceAssistantControlBar controls={{ leave: false }} />
-            <DisconnectButton>
-              <CloseIcon />
-            </DisconnectButton>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {props.agentState === "disconnected" && (
+        <button
+          className="uppercase absolute left-1/2 transform -translate-x-1/2 px-4 py-2 bg-white text-black rounded-md"
+          onClick={props.onConnectButtonClicked}
+        >
+          Start a conversation
+        </button>
+      )}
+
+      {props.agentState !== "disconnected" && props.agentState !== "connecting" && (
+        <div className="flex h-8 absolute left-1/2 transform -translate-x-1/2 justify-center">
+          <VoiceAssistantControlBar controls={{ leave: false }} />
+          <DisconnectButton>
+            <CloseIcon />
+          </DisconnectButton>
+        </div>
+      )}
     </div>
   );
 }
