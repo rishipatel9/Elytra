@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import { signOut } from "next-auth/react";
+import { signOut, useSession } from "next-auth/react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -18,6 +18,10 @@ const Dashboard = () => {
   const [input, setInput] = useState("");
   const [isStreaming, setIsStreaming] = useState(false);
   const [students, setStudents] = useState<any[]>([]);
+  const { data: session } = useSession();
+  const userId = session?.user?.id ?? null;
+
+  console.log(`user id is data is ${userId}`)
   
   const sendMessage = async () => {
     if (!input.trim()) return;
