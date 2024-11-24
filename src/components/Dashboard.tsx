@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { LogOut, Send } from "lucide-react";
+import { getAllStudents } from "@/app/helper/student";
 
 interface Message {
   role: "user" | "assistant" | "system";
@@ -17,7 +18,7 @@ const Dashboard = () => {
   const [input, setInput] = useState("");
   const [isStreaming, setIsStreaming] = useState(false);
   const [students, setStudents] = useState<any[]>([]);
-
+  
   const sendMessage = async () => {
     if (!input.trim()) return;
 
@@ -27,13 +28,15 @@ const Dashboard = () => {
     const botMessage: Message = { role: "assistant", content: "" };
     setMessages((prev) => [...prev, botMessage]);
     setIsStreaming(true);
-
+    const response=await getAllStudents()
+    console.log(JSON.stringify(response))
+    const input_with_context = `U are a career guidance expert  this is the details of  the student ${JSON.stringify(response)} help them with any queries the query of the user is ${input}`
     try {
       const response = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          message: input,
+          message: input_with_context,
           students: students.map((student) => ({
             name: student.name,
             nationality: student.nationality,
