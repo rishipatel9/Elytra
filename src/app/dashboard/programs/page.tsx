@@ -7,6 +7,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { LogOut, Send } from 'lucide-react';
 import { getAllStudents } from '@/app/helper/student';
+import { SidebarTrigger } from '@/components/ui/sidebar';
 
 interface Message {
   role: 'user' | 'assistant' | 'system';
@@ -76,6 +77,7 @@ const page = () => {
   return (
     <div className="flex flex-col h-full w-full bg-background">
       {/* Header */}
+      <SidebarTrigger  />
       <header className="flex items-center justify-between px-6 py-4 border-b">
         <div className="flex items-center gap-2">
           <Avatar>

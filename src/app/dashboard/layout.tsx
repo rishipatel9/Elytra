@@ -11,9 +11,8 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         <main className="flex-1 overflow-hidden">
           <div className="h-full w-full flex flex-col"> {/* Ensure children take full width */}
             <header className="border-b border-gray-200">
-              <SidebarTrigger />
             </header>
-            <div className="flex-1 overflow-y-auto p-6">{children}</div>
+            <div>{children}</div>
           </div>
         </main>
       </div>
