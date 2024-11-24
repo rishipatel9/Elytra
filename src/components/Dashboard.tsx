@@ -1,24 +1,13 @@
-<<<<<<< HEAD
 'use client';
-import React, { useState, useEffect } from 'react';
-import { signOut } from 'next-auth/react';
+import React, { useState, } from 'react';
+import { signOut, useSession } from 'next-auth/react';
+import { Session } from 'next-auth';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { LogOut, Send } from 'lucide-react';
 import { getAllStudents } from '@/app/helper/student';
-=======
-"use client";
-import React, { useState, useEffect } from "react";
-import { signOut, useSession } from "next-auth/react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { LogOut, Send } from "lucide-react";
-import { getAllStudents } from "@/app/helper/student";
->>>>>>> fix-auth
 
 interface Message {
   role: 'user' | 'assistant' | 'system';
@@ -26,19 +15,16 @@ interface Message {
 }
 
 const Dashboard = () => {
-  const [messages, setMessages] = useState<Message[]>([]); // Initially empty, no system message displayed
+  const [messages, setMessages] = useState<Message[]>([]); 
   const [input, setInput] = useState('');
   const [isStreaming, setIsStreaming] = useState(false);
   const [students, setStudents] = useState<any[]>([]);
-<<<<<<< HEAD
 
-=======
-  const { data: session } = useSession();
+  const { data: session } = useSession() as unknown as { data: Session & { user: { id: string } } };
   const userId = session?.user?.id ?? null;
 
   console.log(`user id is data is ${userId}`)
   
->>>>>>> fix-auth
   const sendMessage = async () => {
     if (!input.trim()) return;
 
@@ -50,7 +36,7 @@ const Dashboard = () => {
     setIsStreaming(true);
     const response = await getAllStudents();
     console.log(JSON.stringify(response));
-    const input_with_context = `U are a career guidance expert  this is the details of  the student ${JSON.stringify(response)} help them with any queries the query of the user is ${input}`;
+    const input_with_context = ` U are a career guidance expert  this is the details of  the student ${JSON.stringify(response)} help them with any queries the query of the user is ${input};`
     try {
       const response = await fetch('/api/chat', {
         method: 'POST',
