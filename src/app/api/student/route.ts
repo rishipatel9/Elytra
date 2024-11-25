@@ -30,6 +30,7 @@ export async function POST(req: NextRequest) {
     const student = await prisma.user.create({
       data: parsedData,
     });
+    console.log('student:', student)
 
     return NextResponse.json({ student }, { status: 201 });
   } catch (error) {

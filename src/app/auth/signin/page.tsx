@@ -6,7 +6,7 @@ import { redirect } from "next/navigation";
 export default async function SignIn() {
     const session = await getUserDetails();
     if (session) {
-      redirect("/dashboard");
+      redirect("/student/student-info");
     }
 
     return (

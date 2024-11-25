@@ -1,3 +1,4 @@
+'use client'
 import { useState } from "react";
 import { useFormik } from "formik";
 import { useToast } from "@/hooks/use-toast";
@@ -22,6 +23,7 @@ import {
 import { validateEmail, validatePhone } from "@/utils/validation";
 
 import { createStudent } from "../../helper/student/index";
+import { useRouter } from "next/navigation";
 
 interface StudentData {
   name: string;
@@ -64,6 +66,7 @@ const educationLevels = [
 export default function StudentInformationForm() {
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
+  const router=useRouter();
 
   const formik = useFormik<FormValues>({
     initialValues: {
@@ -124,12 +127,13 @@ export default function StudentInformationForm() {
 
         // Call the createStudent function
         const response = await createStudent(studentData);
-
-        if (response.success) {
-          toast({
-            title: "Form Submitted Successfully",
-            description: "Thank you for your interest. We'll be in touch soon!",
-          });
+        console.log(response);
+        if (response) {
+          router.push("/dashboard");  
+          // toast({
+          //   title: "Form Submitted Successfully",
+          //   description: "Thank you for your interest. We'll be in touch soon!",
+          // });
         } else {
           toast({
             title: "Submission Failed",
