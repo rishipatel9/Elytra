@@ -55,12 +55,12 @@ const Page = () => {
 
       console.log(JSON.stringify(searchResults))
       const contexts = searchResults.matches.map(
-  (match: any) =>
-    `${match.metadata?.name || 'Unknown'}: ${match.metadata?.description || 'No description'}`
-);
+        (match: any) =>
+          `${match.metadata?.name || 'Unknown'}: ${match.metadata?.description || 'No description'}`
+      );
 
       setUsedContexts(contexts);
-     console.log(`contexts are ${contexts}`)
+      console.log(`contexts are ${contexts}`)
       const response = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -104,10 +104,10 @@ const Page = () => {
   };
 
   return (
-    <div className="flex flex-col h-full w-full bg-background">
+    <div className="flex flex-col h-screen"> {/* Changed to h-screen */}
       {/* Header */}
       <SidebarTrigger />
-      <header className="flex items-center justify-between px-6 py-4 border-b">
+      <header className="flex items-center justify-between px-6 py-4 border-b shrink-0">
         <div className="flex items-center gap-2">
           <Avatar>
             <AvatarFallback>C</AvatarFallback>
@@ -129,87 +129,87 @@ const Page = () => {
         </Button>
       </header>
 
-      {/* Context Box */}
-      {usedContexts.length > 0 && (
-        <div className="p-4 bg-muted text-muted-foreground">
-          <h2 className="text-sm font-semibold">Used Contexts:</h2>
-          <ul className="list-disc pl-4">
-            {usedContexts.map((context, idx) => (
-              <li key={idx} className="text-sm">
-                {context}
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
+      {/* Main scrollable container */}
+      <div className="flex-1 overflow-hidden flex flex-col">
+        {/* Context Box */}
+        {usedContexts.length > 0 && (
+          <div className="p-4 bg-muted text-muted-foreground shrink-0">
+            <h2 className="text-sm font-semibold">Used Contexts:</h2>
+            <ul className="list-disc pl-4">
+              {usedContexts.map((context, idx) => (
+                <li key={idx} className="text-sm">
+                  {context}
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
 
-      {/* Chat Area */}
-      <ScrollArea className="flex-1 p-4">
-        <div className="space-y-4">
-          {messages.map((message, index) => (
-            <div
-              key={index}
-              className={`flex ${
-                message.role === 'user' ? 'justify-end' : 'justify-start'
-              }`}
-            >
+        {/* Chat Area */}
+        <ScrollArea className="flex-1 p-4">
+          <div className="space-y-4 mb-4">
+            {messages.map((message, index) => (
               <div
-                className={`flex gap-2 max-w-[80%] items-start ${
-                  message.role === 'user' ? 'flex-row-reverse' : 'flex-row'
-                }`}
-              >
-                <Avatar className="w-8 h-8">
-                  <AvatarFallback>
-                    {message.role === 'user' ? 'S' : 'AI'}
-                  </AvatarFallback>
-                </Avatar>
-                <div
-                  className={`rounded-lg px-4 py-2 ${
-                    message.role === 'user'
-                      ? 'bg-primary text-primary-foreground'
-                      : 'bg-muted'
+                key={index}
+                className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'
                   }`}
+              >
+                <div
+                  className={`flex gap-2 max-w-[80%] items-start ${message.role === 'user' ? 'flex-row-reverse' : 'flex-row'
+                    }`}
                 >
-                  <p className="text-sm">{message.content}</p>
+                  <Avatar className="w-8 h-8">
+                    <AvatarFallback>
+                      {message.role === 'user' ? 'S' : 'AI'}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div
+                    className={`rounded-lg px-4 py-2 ${message.role === 'user'
+                        ? 'bg-primary text-primary-foreground'
+                        : 'bg-muted'
+                      }`}
+                  >
+                    <p className="text-sm">{message.content}</p>
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
-          {isStreaming && (
-            <div className="text-muted-foreground">
-              Program recommender is typing...
-            </div>
-          )}
-        </div>
-      </ScrollArea>
-
-      {/* Input Area */}
-      <div className="p-4 border-t">
-        <div className="flex gap-2">
-          <Input
-            placeholder="Type your question about program recommendations..."
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            onKeyDown={(e) => e.key === 'Enter' && sendMessage()}
-            className="flex-1"
-            disabled={isStreaming}
-          />
-          <Button
-            onClick={sendMessage}
-            size="icon"
-            disabled={isStreaming}
-            aria-label="Send message"
-          >
-            {isStreaming ? (
-              <span className="text-sm">...</span>
-            ) : (
-              <Send className="w-4 h-4" />
+            ))}
+            {isStreaming && (
+              <div className="text-muted-foreground">
+                Program recommender is typing...
+              </div>
             )}
-          </Button>
+          </div>
+        </ScrollArea>
+
+        {/* Input Area - Fixed at bottom */}
+        <div className="p-4 border-t mt-auto bg-background">
+          <div className="flex gap-2 max-w-[1200px] mx-auto">
+            <Input
+              placeholder="Type your question about program recommendations..."
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && sendMessage()}
+              className="flex-1"
+              disabled={isStreaming}
+            />
+            <Button
+              onClick={sendMessage}
+              size="icon"
+              disabled={isStreaming}
+              aria-label="Send message"
+            >
+              {isStreaming ? (
+                <span className="text-sm">...</span>
+              ) : (
+                <Send className="w-4 h-4" />
+              )}
+            </Button>
+          </div>
         </div>
       </div>
     </div>
   );
-};
+}
 
 export default Page;
