@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { LogOut, Send } from 'lucide-react';
-import { getAllStudents } from '@/app/helper/student';
+import { getAllStudents, getStudentById } from '@/app/helper/student';
 
 interface Message {
   role: 'user' | 'assistant' | 'system';
@@ -34,7 +34,7 @@ const Dashboard = () => {
     const botMessage: Message = { role: 'assistant', content: '' };
     setMessages((prev) => [...prev, botMessage]);
     setIsStreaming(true);
-    const response = await getAllStudents();
+    const response = await getStudentById(userId);
     console.log(JSON.stringify(response));
     const input_with_context = ` U are a career guidance expert  this is the details of  the student ${JSON.stringify(response)} help them with any queries the query of the user is ${input};`
     try {

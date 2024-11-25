@@ -8,17 +8,29 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { LogOut, Send } from 'lucide-react';
 import { getAllStudents } from '@/app/helper/student';
 import { SidebarTrigger } from '@/components/ui/sidebar';
+import { GoogleGenerativeAI } from '@google/generative-ai'; // Gemini API
+import { Pinecone } from '@pinecone-database/pinecone';
+
+const pinecone = new Pinecone({
+  apiKey: process.env.NEXT_PUBLIC_PINECONE_API_KEY || ' ',
+});
+
+const genAI = new GoogleGenerativeAI(process.env.NEXT_PUBLIC_GEMINI_API_KEY || ' ');
+const model = genAI.getGenerativeModel({ model: 'text-embedding-004' });
+
+const index = pinecone.Index('program-recommendations');
 
 interface Message {
   role: 'user' | 'assistant' | 'system';
   content: string;
 }
 
-const page = () => {
-  const [messages, setMessages] = useState<Message[]>([]); // Initially empty, no system message displayed
+const Page = () => {
+  const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isStreaming, setIsStreaming] = useState(false);
   const [students, setStudents] = useState<any[]>([]);
+  const [usedContexts, setUsedContexts] = useState<string[]>([]);
 
   const sendMessage = async () => {
     if (!input.trim()) return;
@@ -29,15 +41,32 @@ const page = () => {
     const botMessage: Message = { role: 'assistant', content: '' };
     setMessages((prev) => [...prev, botMessage]);
     setIsStreaming(true);
-    const response = await getAllStudents();
-    console.log(JSON.stringify(response));
-    const input_with_context = `You are an expert at recommending which programs/courses students should do. The user's query is: ${input}`;
+
     try {
+      const embeddingResult = await model.embedContent(input);
+      const embeddingVector = embeddingResult.embedding.values;
+
+      const searchResults = await index.query({
+        vector: embeddingVector,
+        topK: 3,
+        includeMetadata: true,
+      });
+
+
+      console.log(JSON.stringify(searchResults))
+      const contexts = searchResults.matches.map(
+  (match: any) =>
+    `${match.metadata?.name || 'Unknown'}: ${match.metadata?.description || 'No description'}`
+);
+
+      setUsedContexts(contexts);
+     console.log(`contexts are ${contexts}`)
       const response = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          message: input_with_context,
+          message: `You are an expert at recommending programs/courses. The user's query is: ${input}`,
+          contexts,
           students: students.map((student) => ({
             name: student.name,
             nationality: student.nationality,
@@ -77,7 +106,7 @@ const page = () => {
   return (
     <div className="flex flex-col h-full w-full bg-background">
       {/* Header */}
-      <SidebarTrigger  />
+      <SidebarTrigger />
       <header className="flex items-center justify-between px-6 py-4 border-b">
         <div className="flex items-center gap-2">
           <Avatar>
@@ -99,6 +128,20 @@ const page = () => {
           <LogOut className="w-5 h-5" />
         </Button>
       </header>
+
+      {/* Context Box */}
+      {usedContexts.length > 0 && (
+        <div className="p-4 bg-muted text-muted-foreground">
+          <h2 className="text-sm font-semibold">Used Contexts:</h2>
+          <ul className="list-disc pl-4">
+            {usedContexts.map((context, idx) => (
+              <li key={idx} className="text-sm">
+                {context}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
 
       {/* Chat Area */}
       <ScrollArea className="flex-1 p-4">
@@ -169,4 +212,4 @@ const page = () => {
   );
 };
 
-export default page;
+export default Page;

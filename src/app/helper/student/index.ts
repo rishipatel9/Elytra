@@ -12,7 +12,7 @@ export const getAllStudents = async () => {
   }
 };
 
-export const getStudentById = async (id: number) => {
+export const getStudentById = async (id: string) => {
   try {
     const response = await axios.get(`${apiUrl}?id=${id}`);
     return response.data;
