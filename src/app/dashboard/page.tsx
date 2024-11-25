@@ -16,7 +16,6 @@ const Page = async () => {
       {/* Set min-height and full width */}
  
     <div className="">
-      Dashboard Page
  
       <Dashboard />
       </div>

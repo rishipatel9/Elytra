@@ -1,5 +1,7 @@
 import { NEXT_AUTH } from "@/lib/auth";
-import { AuthOptions, getServerSession } from "next-auth";
+// @ts-ignore 
+import { AuthOptions ,getServerSession} from "next-auth";
+
 
 export const getUserDetails = async () => {
   const session = await getServerSession(NEXT_AUTH as AuthOptions);
@@ -13,6 +15,8 @@ export async function loginAdmin({ email, password }: { email: string; password:
     },
     body: JSON.stringify({ email, password }),
   });
+
+  console.log('response:', response)
 
   if (!response.ok) {
     const errorData = await response.json();
