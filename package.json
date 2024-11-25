@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
-     "build": "prisma generate && next build",
+     "build": "npx prisma generate && next build",
     "start": "next start",
     "start:prisma": "npx prisma migrate dev && npx prisma generate",
     "prepare": "husky install",
