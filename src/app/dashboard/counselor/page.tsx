@@ -16,19 +16,31 @@ const CounselorScheduling = () => {
     {
       id: 1,
       name: 'Dr. Sarah Johnson',
-      specialty: 'Cognitive Behavioral Therapy',
+      specialty: 'Career Development & Planning',
       image: '/api/placeholder/64/64'
     },
     {
       id: 2,
       name: 'Dr. Michael Chen',
-      specialty: 'Mental Health Counseling',
+      specialty: 'Professional Growth Strategy',
       image: '/api/placeholder/64/64'
     },
     {
       id: 3,
       name: 'Dr. Emily Williams',
-      specialty: 'Family Therapy',
+      specialty: 'Resume Building & Interview Prep',
+      image: '/api/placeholder/64/64'
+    },
+    {
+      id: 4,
+      name: 'Dr. James Wilson',
+      specialty: 'Industry Transition Guidance',
+      image: '/api/placeholder/64/64'
+    },
+    {
+      id: 5,
+      name: 'Dr. Lisa Rodriguez',
+      specialty: 'Leadership Development',
       image: '/api/placeholder/64/64'
     }
   ];
@@ -81,9 +93,9 @@ const CounselorScheduling = () => {
   
 
   return (
-    <div className="min-h-screen bg-gray-900 p-6 text-gray-100">
+    <div className="h-screen overflow-y-auto bg-gray-900 p-6 text-gray-100">
       
-      <div className="max-w-6xl mx-auto space-y-6">
+      <div className="max-w-6xl mx-auto space-y-6 pb-6">
       
         <h1 className="text-3xl gap-2 flex font-bold mb-8"><div>
         <SidebarTrigger  />
@@ -99,7 +111,7 @@ const CounselorScheduling = () => {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="space-y-4">
+              <div className="space-y-4 max-h-[60vh] overflow-y-auto">
                 {counselors.map((counselor) => (
                   <div
                     key={counselor.id}
