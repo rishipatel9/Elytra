@@ -1,5 +1,5 @@
 'use client'
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useFormik } from "formik";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
@@ -24,6 +24,8 @@ import { validateEmail, validatePhone } from "@/utils/validation";
 
 import { createStudent } from "../../helper/student/index";
 import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
+import axios from "axios";
 
 interface StudentData {
   name: string;
@@ -63,10 +65,26 @@ const educationLevels = [
   "Other",
 ];
 
-export default function StudentInformationForm() {
+export default function  StudentInformationForm() {
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
-  const router=useRouter();
+  const { data: session } = useSession();
+  const router = useRouter();
+
+  useEffect(() => {
+    const chechUserForm= async () => {
+      try{
+        const res=await axios.get("/api/student")
+        if(res.data){
+          router.push("/dashboard")
+        }
+
+      }catch(error){
+        console.log(error)
+      }
+    }
+    chechUserForm()
+  }, [session, router]);
 
   const formik = useFormik<FormValues>({
     initialValues: {

@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { z } from "zod";
+import { getServerSession } from "next-auth/next";
+
 
 const studentSchema = z.object({
   name: z.string().min(1, "Name is required"),
@@ -41,41 +43,65 @@ export async function POST(req: NextRequest) {
   }
 }
 
-export async function GET(req: NextRequest) {
-  const { searchParams } = new URL(req.url);
+// export async function GET(req: NextRequest) {
+//   const { searchParams } = new URL(req.url);
 
-  const id = searchParams.get("id");
-  if (id) {
-    try {
-      const student = await prisma.user.findUnique({
-        where: { id: id },
-      });
-      if (!student) {
-        return NextResponse.json(
-          { message: "Student not found" },
-          { status: 404 }
-        );
-      }
-      return NextResponse.json({ student }, { status: 200 });
-    } catch (error) {
-      return NextResponse.json(
-        { message: "Error fetching student", error: error },
-        { status: 500 }
-      );
+//   const id = searchParams.get("id");
+//   if (id) {
+//     try {
+//       const student = await prisma.user.findUnique({
+//         where: { id: id },
+//       });
+//       if (!student) {
+//         return NextResponse.json(
+//           { message: "Student not found" },
+//           { status: 404 }
+//         );
+//       }
+//       return NextResponse.json({ student }, { status: 200 });
+//     } catch (error) {
+//       return NextResponse.json(
+//         { message: "Error fetching student", error: error },
+//         { status: 500 }
+//       );
+//     }
+//   }
+
+//   try {
+//     const students = await prisma.user.findMany();
+//     return NextResponse.json({ students }, { status: 200 });
+//   } catch (error) {
+//     return NextResponse.json(
+//       { message: "Error fetching students", error: error },
+//       { status: 500 }
+//     );
+//   }
+// }
+
+export async function GET(req:NextRequest){
+  try{
+    const session = await getServerSession();
+
+    if(!session){
+      return NextResponse.json({message:"Unauthorized"}, {status:401});
     }
-  }
 
-  try {
     const students = await prisma.user.findMany();
-    return NextResponse.json({ students }, { status: 200 });
-  } catch (error) {
-    return NextResponse.json(
-      { message: "Error fetching students", error: error },
-      { status: 500 }
-    );
+
+    if (!session.user) {
+      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+    }
+
+    const student = students.filter((student: any) => student.email === session.user.email);
+    if(student.length === 0){
+      return NextResponse.json({message:"Student not found"}, {status:404});
+    }
+
+    return NextResponse.json({student}, {status:200});
+  }catch(e){
+    return NextResponse.json({message:"Error fetching student", error:e}, {status:500});
   }
 }
-
 export async function PUT(req: NextRequest) {
   try {
     const body = await req.json();
