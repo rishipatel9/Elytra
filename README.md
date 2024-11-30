@@ -1,3 +1,4 @@
+
 # Elytra: AI-Powered Video Chatbot for Student Counseling  
 
 Elytra is an AI-powered video chatbot designed to guide and counsel students who are aspiring to study abroad. By integrating cutting-edge AI technologies and real-time video chat capabilities, Elytra offers personalized, real-time counseling, making the journey to studying abroad much smoother.
@@ -105,6 +106,80 @@ Make sure the following software is installed:
 
 ---
 
+## Docker Setup  
+
+To run Elytra using Docker, follow these steps to ensure that your environment is properly configured.
+
+### Prerequisites
+
+Before running Elytra in Docker, make sure you have the following installed:
+
+- **Docker**: [Install Docker](https://www.docker.com/get-started)
+- **Docker Compose** (optional but recommended for multi-container setups)
+
+### Running Elytra with Docker
+
+1. Clone the repository and navigate to the project directory:
+
+   ```bash
+   git clone https://github.com/your-repo/elytra.git
+   cd elytra
+   ```
+
+2. Build the Docker image:
+
+   ```bash
+   docker build -t elytra .
+   ```
+
+3. Create a `.env` file in the root of the project (if not already done). This should contain your environment variables for the services you are using (e.g., OpenAI API key, Google OAuth credentials, etc.).
+
+   Example `.env` file:
+
+   ```env
+   GOOGLE_CLIENT_ID=  
+   GOOGLE_CLIENT_SECRET=  
+   GITHUB_CLIENT_ID=  
+   GITHUB_CLIENT_SECRET=  
+   NEXT_SECRET=  
+   DATABASE_URL=  
+   NEXT_PUBLIC_ADMIN_EMAIL=  
+   NEXT_PUBLIC_ADMIN_PASSWORD=  
+   NEXT_PUBLIC_JWT_SECRET=  
+   LIVEKIT_API_KEY=  
+   LIVEKIT_API_SECRET=  
+   LIVEKIT_URL=  
+   NEXT_PUBLIC_PINECONE_API_KEY=  
+   NEXT_PUBLIC_GEMINI_API_KEY=  
+   OPENAI_API_KEY=  
+   NEXT_PUBLIC_NODEMAILER_PASS=  
+   NEXT_PUBLIC_MAIL_ADD=  
+   ```
+
+4. Run the Docker container:
+
+   ```bash
+   docker run --env-file .env -p 3000:3000 elytra
+   ```
+
+   This command will start the app, and you can access it in your browser at [http://localhost:3000](http://localhost:3000).
+
+### Accessing the Application
+
+Once the Docker container is running, the application will be accessible on your local machine at `http://localhost:3000`. You can use your browser to interact with the app.
+
+### Stopping the Docker Container
+
+To stop the running container, press `Ctrl+C` in your terminal or use the following command to stop it:
+
+```bash
+docker stop <container_id>
+```
+
+You can get the `container_id` by running `docker ps` to list all running containers.
+
+---
+
 ## Scripts  
 
 The following commands are available:
@@ -201,3 +276,4 @@ We welcome contributions to this project! Here's how you can get involved:
 ## License  
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
