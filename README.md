@@ -42,7 +42,7 @@ Make sure the following software is installed:
 1. Clone the repository:  
 
    ```bash  
-   git clone https://github.com/your-repo/elytra.git  
+   git clone https://github.com/rishipatel9/elytra.git  
    cd elytra  
    ```
 
