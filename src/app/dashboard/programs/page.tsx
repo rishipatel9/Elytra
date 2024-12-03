@@ -65,7 +65,7 @@ const Page = () => {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          message: `You are an expert at recommending programs/courses. The user's query is: ${input}`,
+          message: `You are an expert at recommending programs/courses. The user's query is: ${input} these are some of the programs Elytra (we) have to offer,${contexts} try to incorporate them in your response as well like we elyta offer these too if u would like to know more about them if the context is not proveded to u  just give them ur genreral response`,
           contexts,
           students: students.map((student) => ({
             name: student.name,
