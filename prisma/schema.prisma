@@ -27,6 +27,7 @@ model User {
   preferredPrograms     String?
   careerAspirations     String?
   visaQuestions         String?
+  filledApplication     Boolean?  @default(false)
   accounts              Account[]
   sessions              Session[]
 }
@@ -50,11 +51,11 @@ model Account {
 }
 
 model Session {
-  id           String  @id @default(cuid())
-  sessionToken String  @unique
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
   expires      DateTime
   userId       String
-  user         User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model VerificationToken {

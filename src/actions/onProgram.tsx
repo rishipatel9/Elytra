@@ -14,8 +14,7 @@ const model = genAI.getGenerativeModel({ model: "text-embedding-004" });
 
  
 
-const index = pinecone.Index("program-recommendations"); // Replace with your Pinecone index name
-
+const index = pinecone.Index("program-recommendations");
 const programSchema = z.object({
   name: z.string().min(1, "Program name is required"),
   description: z.string().optional(),

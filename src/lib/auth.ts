@@ -2,61 +2,73 @@ import GoogleProvider from "next-auth/providers/google";
 import GithubProvider from "next-auth/providers/github";
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import prisma from "./prisma";
+import CredentialsProvider from "next-auth/providers/credentials";
 
-// const NEXT_AUTH = {
-//   providers: [
-//     GoogleProvider({
-//       clientId: process.env.GOOGLE_CLIENT_ID || "",
-//       clientSecret: process.env.GOOGLE_CLIENT_SECRET || "",
-//     }),
-//     GithubProvider({
-//       clientId: process.env.GITHUB_CLIENT_ID || "",
-//       clientSecret: process.env.GITHUB_CLIENT_SECRET || "",
-//     }),
-//   ],
-//   secret: process.env.NEXT_SECRET,
-//   pages: {
-//     signIn: "/signup",
-//     error: "/auth/error",
-//   },
-//   callbacks: {
-//     async redirect() {
-//       return "/dashboard";
-//     },
-//   },
-//   // events:{
-//   //   async signIn({user}:{user:User}){  
-      
-//   //   },
-//   // }
-  
-// };
 const NEXT_AUTH = {
   adapter: PrismaAdapter(prisma),
-      secret: process.env.NEXTAUTH_SECRET,
-
   providers: [
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID ?? "",
       clientSecret: process.env.GOOGLE_CLIENT_SECRET ?? "",
     }),
-  ],
-  callbacks: {
-    async session({ session, token }: { session: any; token: any }) {
-      if (session.user) {
-        session.user.id = token.id as string;
+    GithubProvider({
+      clientId: process.env.GITHUB_CLIENT_ID || "",
+      clientSecret: process.env.GITHUB_CLIENT_SECRET || "",
+    }),
+    CredentialsProvider({
+      name: "Credentials",
+      credentials: {
+        email: { label: "Email", type: "email" },
+        password: { label: "Password", type: "password" },
+        name: { label: "Name", type: "text", optional: true }
+      },
+      async authorize(credentials) {
+        const existingUser = await prisma.user.findUnique({
+          where: { email: credentials?.email },
+        });
+    
+        if (existingUser) {
+          throw new Error("User already exists, please sign in.");
+        }
+    
+        const newUser = await prisma.user.create({
+          data: {
+            email: credentials?.email ?? "",
+            password: credentials?.password, 
+            name: credentials?.name,
+          }
+        });
+    
+        return { id: String(newUser.id), name: newUser.name, email: newUser.email };
       }
-      return session;
-    },
-    async jwt({ token, user }: { token: any; user?: any }) {
+    })
+       
+  ],
+  secret: process.env.NEXTAUTH_SECRET,
+  callbacks: {
+    async jwt({ token, user }: { token: any; user: any }) {
       if (user) {
         token.id = user.id;
+        token.email = user.email;
+        token.name = user.name;
       }
       return token;
     },
+    async session({ session, token }: { session: any; token: any }) {
+      // console.log('session:', session);
+      // console.log('token:', token);
+      if (token) {
+        session.user = {
+          id: token.id,
+          email: token.email,
+          name: token.name,
+        };
+      }
+      return session;
+    },
   },
   events: {
-    async signIn({ user }:{user:any}) {
+    async signIn({ user }: { user: any }) {
       try {
         const existingStudent = await prisma.user.findUnique({
           where: { email: user.email! },
@@ -68,17 +80,7 @@ const NEXT_AUTH = {
               email: user.email!,
               name: user.name,
               username: user.email!.split("@")[0],
-              image: user.image,
-              phone: null,
-              age: null,
-              nationality: null,
-              previousDegree: null,
-              grades: null,
-              currentEducationLevel: null,
-              preferredCountries: null,
-              preferredPrograms: null,
-              careerAspirations: null,
-              visaQuestions: null,
+              image: user.image, 
             },
           });
         }
@@ -97,11 +99,9 @@ const NEXT_AUTH = {
   debug: process.env.NODE_ENV === "development",
 };
 
-
 export { NEXT_AUTH };
 
-
-export type User ={
+export type User = {
   id: string;
   name: string;
   email: string;

@@ -100,6 +100,7 @@ const Dashboard = () => {
           onClick={() => signOut()}
           aria-label="Logout"
         >
+          Logout
           <LogOut className="w-5 h-5" />
         </Button>
       </header>

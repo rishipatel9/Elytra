@@ -1,66 +1,61 @@
 import React from 'react';
 import { Input } from './ui/input';
-
 import SignupButtons from './SignUpButtons';
+import EmailSignUp from '@/app/signup/_components/EmailSignUp';
 
-export default function SignupPage() {
+export default function SignUp() {
   return (
-    <div className="relative flex flex-col items-center justify-center min-h-screen bg-[#151723] px-4">
+    <div className="relative flex flex-col items-center font-sans justify-center min-h-screen bg-gradient-to-br from-[#1e1e2f] to-[#151723] px-4 overflow-hidden">
+      {/* Background Blur Effects */}
+      <div className="absolute top-1/3 left-1/4 w-[400px] h-[500px] rounded-full bg-gradient-to-r from-[#4220A9] to-[#391a94] blur-3xl opacity-20 animate-pulse"></div>
+      <div className="absolute bottom-0 right-0 w-[500px] h-[500px] rounded-full bg-gradient-to-tl from-[#4220A9]/60 to-[#321880]/60 blur-2xl opacity-20"></div>
 
-      <div className="absolute top-1/4 right-1/4 w-[500px] h-[500px] rounded-full bg-gradient-to-r from-[#4220A9] via-[#4220A9]/80 to-[#321880] blur-3xl opacity-10 z-0"></div>
-      <div className="absolute inset-0 bg-[linear-gradient(to_right,_rgba(255,255,255,0.1)_1px,_transparent_1px)] bg-[size:70px_70%] opacity-35 z-0"></div>
+      {/* Grid Pattern Overlay */}
+      <div className="absolute inset-0 bg-[linear-gradient(to_right,_rgba(255,255,255,0.05)_1px,_transparent_1px)] bg-[size:80px_80px] opacity-10 pointer-events-none"></div>
 
-      <div className="relative z-10 w-full max-w-md space-y-8">
-
+      {/* Content */}
+      <div className="relative z-10 w-full max-w-md p-6 bg-[#1a1b25] rounded-lg shadow-lg space-y-8 border border-gray-800">
+        {/* Header */}
         <div className="text-center">
-          <h1 className="text-4xl font-bold text-white mb-2">Signup.</h1>
-          <p className="text-gray-400">Create an account with us.</p>
+          <h1 className="text-4xl font-extrabold text-white tracking-wide">Sign up</h1>
+          <p className="text-gray-400 mt-2">Join us and explore endless possibilities.</p>
         </div>
 
+        {/* Social Signup Buttons */}
         <div className="space-y-4">
           <SignupButtons />
-          <div className="relative">
+          <div className="relative my-6">
             <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-gray-800"></div>
+              <div className="w-full border-t border-gray-700"></div>
             </div>
             <div className="relative flex justify-center text-sm">
-              <span className="px-4 text-gray-400">Or continue with</span>
+              <span className="px-3 bg-[#1a1b25] text-gray-500">Or sign up with</span>
             </div>
           </div>
 
+          {/* Signup Form */}
+          <EmailSignUp/>
 
-          <Input
-            type="email"
-            placeholder="email@example.com"
-            className="w-full px-4 py-3 bg-[#111827] border border-gray-800 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#4220A9] focus:border-transparent"
-          />
+        
 
-          <Input
-            type="password"
-            placeholder="Your password"
-            className="w-full px-4 py-3 bg-[#111827] border border-gray-800 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#4220A9] focus:border-transparent"
-          />
-
-          <button className="w-full py-3 px-4 bg-[#4220A9] text-white rounded-lg hover:bg-[#321880] transition-colors">
-            Sign up
-          </button>
-
-
+          {/* Additional Links */}
           <div className="text-center text-sm">
-            <span className="text-gray-400">Already a member? </span>
-            <a href="/auth/signin" className="text-[#4220A9] hover:text-[#321880]">
-              Signin
+            <span className="text-gray-400">Already have an account? </span>
+            <a
+              href="/auth/signin"
+              className="text-[#4220A9] font-medium hover:text-[#321880] transition-colors"
+            >
+              Sign In
             </a>
           </div>
 
-
           <div className="text-center text-sm mt-4">
-            <span className="text-gray-400">Are you an admin? </span>
+            <span className="text-gray-400">Admin? </span>
             <a
               href="/admin/login"
-              className="text-[#4220A9] hover:text-[#321880] underline"
+              className="text-[#4220A9] font-medium hover:text-[#321880] underline transition-colors"
             >
-              Log in as Admin
+              Login as Admin
             </a>
           </div>
         </div>
