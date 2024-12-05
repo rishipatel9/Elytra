@@ -1,8 +1,8 @@
 import type { Metadata } from 'next';
  import './globals.css';
 import { Manrope } from 'next/font/google';
-import { Providers } from './providers/providers';
 import { Toaster } from '@/components/ui/toaster';
+import { Providers } from '@/providers/providers';
 
 const manrope = Manrope({ subsets: ['latin'] });
 

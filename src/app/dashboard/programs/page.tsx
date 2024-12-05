@@ -6,7 +6,6 @@ import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { LogOut, Send } from 'lucide-react';
-import { getAllStudents } from '@/app/helper/student';
 import { SidebarTrigger } from '@/components/ui/sidebar';
 import { GoogleGenerativeAI } from '@google/generative-ai'; // Gemini API
 import { Pinecone } from '@pinecone-database/pinecone';

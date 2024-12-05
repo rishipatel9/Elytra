@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { LogOut, Send } from 'lucide-react';
-import { getAllStudents, getStudentById } from '@/app/helper/student';
+import { getAllStudents, getStudentById } from '@/helper/student';
 
 interface Message {
   role: 'user' | 'assistant' | 'system';
