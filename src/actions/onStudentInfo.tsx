@@ -1,6 +1,7 @@
-
+"use server";
 import prisma from "@/lib/prisma";
-import { getSession } from "next-auth/react";
+// @ts-ignore 
+import { getServerSession } from "next-auth";
 import { z } from "zod";
 
 const studentDataSchema = z.object({
@@ -23,43 +24,43 @@ const studentDataSchema = z.object({
 type StudentDataFormType = z.infer<typeof studentDataSchema>;
 
 export async function uploadStudentInfo(formData: StudentDataFormType) {
-    try {
-    //   const validatedData = studentDataSchema.parse(formData);
-    const validatedData = formData;
-  
-      const session = await getSession();
-  
-      if (!session) {
-        throw new Error("You must be logged in to create a student");
-      }
-  
-      const userEmail = session.user?.email;
-  
-      if (!userEmail) {
-        throw new Error("User ID not found in session");
-      }
-
-      const updatedUser = await prisma.user.update({
-        where: { email:userEmail },
-        data: {
-          name: validatedData.name,
-          phone: validatedData.phone,
-          age: validatedData.age,
-          nationality: validatedData.nationality,
-          previousDegree: validatedData.previousDegree,
-          grades: validatedData.grades,
-          currentEducationLevel: validatedData.currentEducationLevel,
-          preferredCountries: validatedData.preferredCountries.join(", "),
-          preferredPrograms: validatedData.preferredPrograms,
-          careerAspirations: validatedData.careerAspirations,
-          visaQuestions: validatedData.visaQuestions ?? "",
-          filledApplication: true, 
-        },
-      });
-  
-      return updatedUser; 
-    } catch (error) {
-      console.error("Error updating student:", error);
-      throw new Error("Error updating student");
+  try {
+    const validatedData = studentDataSchema.parse(formData);
+    console.log(validatedData)
+    const session = await getServerSession();
+    console.log(session)
+    if (!session) {
+      throw new Error("You must be logged in to submit student information.");
     }
+
+    const userEmail = session.user?.email;
+
+    if (!userEmail) {
+      throw new Error("User email not found in session.");
+    }
+
+    // Update user with validated data
+    const updatedUser = await prisma.user.update({
+      where: { email: userEmail },
+      data: {
+        name: validatedData.name,
+        phone: validatedData.phone,
+        age: validatedData.age,
+        nationality: validatedData.nationality,
+        previousDegree: validatedData.previousDegree,
+        grades: validatedData.grades,
+        currentEducationLevel: validatedData.currentEducationLevel,
+        preferredCountries: validatedData.preferredCountries.join(", "),  
+        preferredPrograms: validatedData.preferredPrograms,
+        careerAspirations: validatedData.careerAspirations,
+        visaQuestions: validatedData.visaQuestions ?? "",
+        filledApplication: true, 
+      },
+    });
+
+    return updatedUser;
+  } catch (error) {
+    console.error("Error updating student information:", error);
+    throw new Error("There was an error updating the student information.");
   }
+}

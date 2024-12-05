@@ -117,6 +117,7 @@ export const TextArea = ({
     <div className="space-y-1">
       <label htmlFor={id} className="text-white">{label}</label>
       <Textarea
+        required
         id={id}
         name={name}
         onChange={onChange}
@@ -141,6 +142,7 @@ import {
   CommandList,
 } from "@/components/ui/command";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { TagInput } from 'emblor';
 
 const countries = [
   {
@@ -239,10 +241,11 @@ export function NationalitySelect({
           className="w-full min-w-[var(--radix-popper-anchor-width)] bg-[#0A0A0A] text-gray-300 border border-[#2D2D2D] rounded-md p-0 shadow-lg"
           align="start"
         >
-          <Command className='bg-[#0A0A0A] border border-[#2D2D2D]'>
+          <Command className='bg-[#0A0A0A] border border-[#2D2D2D]' >
             <CommandInput
               placeholder="Search country..."
               className="bg-[#0A0A0A] text-gray-300 placeholder-gray-500 px-3 py-2"
+              required
             />
             <CommandList>
               <CommandEmpty className="text-gray-500 bg-[#0A0A0A] p-2">
@@ -283,22 +286,12 @@ export function NationalitySelect({
 }
 
 
-import {  TagInput } from "emblor";
-
 const tags = [
-  {
-    id: "1",
-    text: "India",
-  },
-  {
-    id: "2",
-    text: "Usa",
-  },
-  {
-    id: "3",
-    text: "Uk",
-  },
+  { id: "1", text: "India" },
+  { id: "2", text: "Usa" },
+  { id: "3", text: "Uk" },
 ];
+
 interface Tag {
   id: string;
   text: string;
@@ -307,20 +300,16 @@ interface Tag {
 interface InputTagsProps {
   id: string;
   name: string;
-  value: string[]; // Parent passes string[]
+  value: string[]; 
   label: string;
-  onChange: (tags: Tag[]) => void; // Emits Tag[]
+  onChange: (tags: Tag[]) => void;
 }
 
 export const InputTags = ({ id, name, value, label, onChange }: InputTagsProps) => {
   const [exampleTags, setExampleTags] = useState<Tag[]>(
-    value.map((text, index) => ({ id: String(index), text })) // Convert string[] to Tag[]
+    value.map((text, index) => ({ id: String(index), text }))
   );
 
-  const handleTagChange = (newTags: Tag[]) => {
-    setExampleTags(newTags);
-    onChange(newTags); // Notify parent with updated Tag[]
-  };
 
   return (
     <div className="space-y-2">
@@ -328,34 +317,33 @@ export const InputTags = ({ id, name, value, label, onChange }: InputTagsProps) 
         {label}
       </Label>
       <TagInput
-  id={id}
-  name={name}
-  tags={exampleTags}
-  setTags={(newState) => {
-    const updatedTags =
-      typeof newState === "function" ? newState(exampleTags) : newState;
-    setExampleTags(updatedTags); // Update internal state
-    onChange(updatedTags); // Notify parent
-  }}
-  placeholder="Add a tag"
-  styleClasses={{
-    tagList: {
-      container: "gap-1",
-    },
-    input:
-      "bg-[#0A0A0A] border border-[#2D2D2D] font-sans font-normal text-white hover:transition-all placeholder:text-[#6B6B6B]",
-    tag: {
-      body: "relative h-7 bg-background border border-input hover:bg-background rounded-md font-medium text-xs ps-2 pe-7",
-      closeButton:
-        "absolute -inset-y-px -end-px p-0 rounded-s-none rounded-e-lg flex size-7 transition-colors outline-0 focus-visible:outline focus-visible:outline-2 focus-visible:outline-ring/70 text-muted-foreground/80 hover:text-foreground",
-    },
-  }}
-  inlineTags={false}
-  inputFieldPosition="top"
-  activeTagIndex={-1}
-  setActiveTagIndex={() => {}}
-/>
-
+        id={id}
+        name={name}
+        tags={exampleTags}
+        setTags={(newState) => {
+          const updatedTags =
+            typeof newState === "function" ? newState(exampleTags) : newState;
+          setExampleTags(updatedTags); // Update internal state
+          onChange(updatedTags); // Notify parent
+        }}
+        placeholder="Add a tag"
+        styleClasses={{
+          tagList: {
+            container: "gap-1",
+          },
+          input:
+            "bg-[#0A0A0A] border border-[#2D2D2D] font-sans font-normal text-white hover:transition-all placeholder:text-[#6B6B6B]",
+          tag: {
+            body: "relative h-7 bg-background border border-input hover:bg-background rounded-md font-medium text-xs ps-2 pe-7",
+            closeButton:
+              "absolute -inset-y-px -end-px p-0 rounded-s-none rounded-e-lg flex size-7 transition-colors outline-0 focus-visible:outline focus-visible:outline-2 focus-visible:outline-ring/70 text-muted-foreground/80 hover:text-foreground",
+          },
+        }}
+        inlineTags={false}
+        inputFieldPosition="top"
+        activeTagIndex={-1}
+        setActiveTagIndex={() => {}}
+      />
     </div>
   );
 };

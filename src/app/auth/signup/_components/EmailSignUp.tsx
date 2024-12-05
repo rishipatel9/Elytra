@@ -1,6 +1,7 @@
 'use client';
 import { Input } from '@/components/ui/input';
 import { signIn } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
 import React, { useState } from 'react';
 import { toast, Toaster } from 'sonner';
 
@@ -10,6 +11,7 @@ const EmailSignUp = () => {
     const [name, setName] = useState('');
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
+    const router=useRouter()
 
     const handleSubmit = async (e: any) => {
         e.preventDefault();
@@ -34,6 +36,8 @@ const EmailSignUp = () => {
                 toast.success('Successfully signed up!', {
                     position: 'bottom-right',
                 });
+                router.push('/dashboard');
+
             }
         } catch (err) {
             setLoading(false);

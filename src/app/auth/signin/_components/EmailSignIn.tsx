@@ -1,12 +1,14 @@
 "use client";
 import { Input } from "@/components/ui/input";
 import { signIn } from "next-auth/react";
+import { useRouter } from 'next/navigation';
 import React, { useState } from "react";
 import { toast, Toaster } from "sonner";
 
 const EmailSignIn = () => {
   const [formData, setFormData] = useState({ email: "", password: "" });
   const [loading, setLoading] = useState(false);
+  const router=useRouter()
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -27,8 +29,9 @@ const EmailSignIn = () => {
 
       if (result?.error) {
         toast.error(result.error, { position: "bottom-right" });
-      } else {
+    } else {
         toast.success("Successfully signed in!", { position: "bottom-right" });
+        router.push("/dashboard");
       }
     } catch (err) {
       console.error("Sign-in error:", err);

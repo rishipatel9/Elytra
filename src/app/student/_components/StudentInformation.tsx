@@ -3,10 +3,9 @@
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Label } from '@radix-ui/react-label';
-import  { InputDemo, InputTags, NationalitySelect, SelectDemo, TextArea } from '@/components/ui/origin';
-import { Tag } from 'emblor';
-import { uploadStudentInfo } from '@/actions/onStudentInfo';
+import { InputDemo, InputTags, NationalitySelect, SelectDemo, TextArea } from '@/components/ui/origin';
 import { toast, Toaster } from 'sonner';
+import { uploadStudentInfo } from '@/actions/onStudentInfo';
 
 interface StudentData {
   name: string;
@@ -27,11 +26,11 @@ const StudentDataForm: React.FC = () => {
     name: '',
     phone: '',
     age: 0,
-    nationality: '',
+    nationality: '', // Can be empty or null
     previousDegree: '',
     grades: '',
     currentEducationLevel: '',
-    preferredCountries: [],
+    preferredCountries: ["India", "Usa"], // Ensure this is an array
     preferredPrograms: '',
     careerAspirations: '',
     visaQuestions: ''
@@ -52,44 +51,41 @@ const StudentDataForm: React.FC = () => {
     }));
   };
 
-  const handleTagsChange = (tags: Tag[]) => {
-    const tagTexts = tags.map((tag) => tag.text);
-    setFormData((prev) => ({
-      ...prev,
-      preferredCountries: tagTexts, 
+  const handleTagsChange = (tags: { id: string; text: string }[]) => {
+    const updatedCountries = tags.map(tag => tag.text);
+
+    console.log('Updated Preferred Countries:', updatedCountries); // Debugging log
+    
+    setFormData(prevState => ({
+      ...prevState,
+      preferredCountries: updatedCountries,
     }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    console.log('Submitted Form Data:', formData);
-  };
-
-  async function handleFormAction(formdata:FormData) {
+  async function handleFormAction(formdata: FormData) {
     const data = {
       name: formdata.get('name') as string,
       phone: formdata.get('phone') as string,
       age: Number(formdata.get('age')),
-      nationality: formdata.get('nationality') as string,
+      nationality: formData.nationality as string,
       previousDegree: formdata.get('previousDegree') as string,
       grades: formdata.get('grades') as string,
       currentEducationLevel: formdata.get('currentEducationLevel') as string,
-      preferredCountries: formdata.getAll('preferredCountries') as string[],
+      preferredCountries: formData.preferredCountries as string[], 
       preferredPrograms: formdata.get('preferredPrograms') as string,
       careerAspirations: formdata.get('careerAspirations') as string,
       visaQuestions: formdata.get('visaQuestions') as string
     };
 
+    console.log('Form Data:', data);
+
     const response = await uploadStudentInfo(data);
-    console.log('Response:', response)
-    if(response){
+    console.log('Response:', response);
+    if (response) {
       toast.success('Student Information Uploaded Successfully');
-    }
-    else{
+    } else {
       toast.error('Error uploading student information');
     }
-
-    console.log('Form Data:', data);
   }
 
   return (
@@ -178,7 +174,7 @@ const StudentDataForm: React.FC = () => {
                   Career Aspirations
                 </Label>
                 <TextArea
-                label='Career Aspirations'
+                  label='Career Aspirations'
                   id="careerAspirations"
                   name="careerAspirations"
                   value={formData.careerAspirations}
@@ -204,7 +200,7 @@ const StudentDataForm: React.FC = () => {
 
           <div className="space-y-4 mt-6">
             <TextArea
-            label='Visa Questions'
+              label='Visa Questions'
               id="visaQuestions"
               name="visaQuestions"
               value={formData.visaQuestions || ""}
@@ -218,7 +214,7 @@ const StudentDataForm: React.FC = () => {
               Submit
             </Button>
           </div>
-          <Toaster/>
+          <Toaster />
         </form>
       </div>
     </div>
