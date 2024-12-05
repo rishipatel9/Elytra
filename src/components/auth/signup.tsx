@@ -1,7 +1,9 @@
 import React from 'react';
-import { Input } from './ui/input';
-import SignupButtons from './SignUpButtons';
-import EmailSignUp from '@/app/signup/_components/EmailSignUp';
+import { Input } from '../ui/input';
+import SignupButtons from '../SignUpButtons';
+import EmailSignUp from '@/app/auth/signup/_components/EmailSignUp';
+import Link from 'next/link';
+
 
 export default function SignUp() {
   return (
@@ -33,7 +35,6 @@ export default function SignUp() {
             </div>
           </div>
 
-          {/* Signup Form */}
           <EmailSignUp/>
 
         
@@ -41,12 +42,12 @@ export default function SignUp() {
           {/* Additional Links */}
           <div className="text-center text-sm">
             <span className="text-gray-400">Already have an account? </span>
-            <a
+            <Link
               href="/auth/signin"
               className="text-[#4220A9] font-medium hover:text-[#321880] transition-colors"
             >
               Sign In
-            </a>
+            </Link>
           </div>
 
           <div className="text-center text-sm mt-4">

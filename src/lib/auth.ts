@@ -3,6 +3,7 @@ import GithubProvider from "next-auth/providers/github";
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import prisma from "./prisma";
 import CredentialsProvider from "next-auth/providers/credentials";
+import bcrypt from "bcrypt";
 
 const NEXT_AUTH = {
   adapter: PrismaAdapter(prisma),
@@ -20,29 +21,71 @@ const NEXT_AUTH = {
       credentials: {
         email: { label: "Email", type: "email" },
         password: { label: "Password", type: "password" },
-        name: { label: "Name", type: "text", optional: true }
+        name: { label: "Name", type: "text", optional: true },
+        isSignUp: { label: "Is SignUp", type: "boolean", optional: true }, 
       },
       async authorize(credentials) {
-        const existingUser = await prisma.user.findUnique({
-          where: { email: credentials?.email },
-        });
-    
-        if (existingUser) {
-          throw new Error("User already exists, please sign in.");
+        const { email, password, name, isSignUp } = credentials as {
+          email: string;
+          password: string;
+          name?: string;
+          isSignUp?: string;
+        };
+      
+        if (!email || !password) {
+          throw new Error("Email and password are required");
         }
-    
-        const newUser = await prisma.user.create({
-          data: {
-            email: credentials?.email ?? "",
-            password: credentials?.password, 
-            name: credentials?.name,
-          }
+      
+        // Convert isSignUp to boolean for consistency
+        const isSignUpMode = isSignUp === "true";
+      
+        // Check for existing user
+        const existingUser = await prisma.user.findUnique({
+          where: { email },
         });
-    
-        return { id: String(newUser.id), name: newUser.name, email: newUser.email };
-      }
-    })
-       
+      
+        if (isSignUpMode) {
+          if (existingUser) {
+            throw new Error("Email is already registered, please sign in");
+          }
+      
+          if (!name) {
+            throw new Error("Name is required for sign-up");
+          }
+      
+          const hashedPassword = await bcrypt.hash(password, 10);
+          
+          console.log("user created")
+          const newUser = await prisma.user.create({
+            data: {
+              email,
+              password: hashedPassword,
+              name,
+            },
+          });
+      
+          return { id: newUser.id, email: newUser.email, name: newUser.name };
+        } else {
+          console.log("Existing User:", existingUser);
+          if (!existingUser) {
+            throw new Error("Invalid email or password");
+          }
+      
+          if (!existingUser.password) {
+            throw new Error("Invalid email or password");
+          }
+      
+          const isPasswordValid = await bcrypt.compare(password, existingUser.password);
+          
+          console.log("isPasswordValid:", password, existingUser.password, isPasswordValid);
+          if (!isPasswordValid) {
+            throw new Error("Invalid email or password");
+          }
+      
+          return { id: existingUser.id, email: existingUser.email, name: existingUser.name };
+        }
+      },      
+    }),    
   ],
   secret: process.env.NEXTAUTH_SECRET,
   callbacks: {
@@ -68,20 +111,27 @@ const NEXT_AUTH = {
     },
   },
   events: {
-    async signIn({ user }: { user: any }) {
+    async signUp ({ user }: { user: any }) {
       try {
-        const existingStudent = await prisma.user.findUnique({
-          where: { email: user.email! },
+        console.log("SignUp event:", user);
+        await prisma.user.create({
+          data: {
+            email: user.email,
+            name: user.name,
+            username: user.email.split("@")[0],
+            image: user.image,
+          },
         });
-
-        if (!existingStudent) {
-          await prisma.user.create({
-            data: {
-              email: user.email!,
-              name: user.name,
-              username: user.email!.split("@")[0],
-              image: user.image, 
-            },
+      } catch (error) {
+        console.error("Error in SignUp event:", error);
+      }
+    },
+    async signIn({ user,account }: { user: any,account:any }) {
+      try {
+        console.log("signIn event:", user, account);
+        if (account.provider !== 'credentials') {
+          const existingUser = await prisma.user.findUnique({
+            where: { email: user.email! },
           });
         }
       } catch (error) {
@@ -92,9 +142,14 @@ const NEXT_AUTH = {
   pages: {
     signIn: "/auth/signin",
     error: "/auth/error",
+
   },
   session: {
     strategy: "jwt",
+  },
+  redirect:{
+    callbackUrl: '/dashboard',
+    home: '/dashboard',
   },
   debug: process.env.NODE_ENV === "development",
 };

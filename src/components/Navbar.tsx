@@ -38,8 +38,8 @@ const Navbar = () => {
           <Link href="#" className="hover:text-[#4220A9] transition-colors duration-200 text-white">
             About
           </Link>
-          <Link href="/signup" className="hover:text-[#4220A9] transition-colors duration-200 text-white">
-            SignUp
+          <Link href="/auth/signin" className="hover:text-[#4220A9] transition-colors duration-200 text-white">
+            Signin
           </Link>
         </div>
       </div>

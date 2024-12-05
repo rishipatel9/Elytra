@@ -1,4 +1,4 @@
-import Dashboard from "../../components/Dashboard";
+import Dashboard from "../../components/dashboard/Dashboard";
 import { getUserDetails } from "../../utils";
 import { redirect } from "next/navigation";
 import React from "react";

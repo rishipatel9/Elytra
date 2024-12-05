@@ -16,24 +16,24 @@ const EmailSignUp = () => {
         setError('');
         setLoading(true);
         try {
-            const result = await signIn('credentials', {
+            const result = await signIn("credentials",{
                 redirect: false,
                 email,
                 password,
                 name,
+                isSignUp: true,
             });
     
             setLoading(false);
     
             if (result?.error) {
-                setError(result.error); // This is where we handle error from NextAuth
+                setError(result.error); 
                 console.log('Error during sign in:', result.error);
-                toast.error(result.error); // Toast error message
+                toast.error(result.error);
             } else {
                 toast.success('Successfully signed up!', {
                     position: 'bottom-right',
                 });
-                // Optional: redirect or perform other actions after success
             }
         } catch (err) {
             setLoading(false);
@@ -101,4 +101,3 @@ const EmailSignUp = () => {
 };
 
 export default EmailSignUp;
-

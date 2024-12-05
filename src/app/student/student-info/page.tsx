@@ -11,7 +11,6 @@ const StudentInfo = async () => {
       return <div>Unauthorized</div>;
     }
     const user=session.user;
-    // console.log(user)
     const response = await axios.post(`http://localhost:3000/api/student/filled`,{
       id:user.id,
       email:user.email,
