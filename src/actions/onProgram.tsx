@@ -10,14 +10,16 @@ import * as XLSX from "xlsx";
 
 import path from 'path';
 import * as fs from 'fs';
+import { Itim } from "next/font/google";
 
-import { myName } from "../../water";
 
 
 
 
 // Updated program schema
 const programSchema = z.object({
+  university: z.string().min(1, "University is required"),
+
   name: z.string().min(1, "Program name is required"),
   description: z.string().optional(),
   mode: z.string().optional(),
@@ -27,13 +29,12 @@ const programSchema = z.object({
   eligibility: z.object({
     ugBackground: z.string().optional(),
     minimumGpa: z.string().optional(),
-    backlogs: z.string().optional(),
+    backlogs: z.number().optional(),
     workExperience: z.string().optional(),
     allow3YearDegree: z.string().optional(),
     decisionFactor: z.string().optional(),
   }),
   ranking: z.string().optional(),
-  university: z.string().min(1, "University is required"),
   college: z.string().optional(),
   location: z.string().optional(),
   publicPrivate: z.string().optional(),
@@ -41,23 +42,25 @@ const programSchema = z.object({
   specialUniversityFeatures: z.string().optional(),
   specialization: z.string().optional(),
   usp: z.string().optional(),
+  iitIim: z.string().optional(), 
   curriculum: z.string().optional(),
   coOpInternship: z.string().optional(),
-  gloveraPricing: z.string().optional(),
-  originalPricing: z.string().optional(),
-  savings: z.string().optional(),
-  savingsPercentage: z.string().optional(),
-  totalCredits: z.string().optional(),
-  iitIim: z.string().optional(),
-  creditsInIITIIM: z.string().optional(),
-  creditsInUS: z.string().optional(),
+  gloveraPricing:  z.union([z.string(), z.number()]).optional(),
+  originalPricing:  z.union([z.string(), z.number()]).optional(),
+  savings:  z.union([z.string(), z.number()]).optional(),
+  savingsPercentage:  z.union([z.string(), z.number()]).optional(),
+  totalCredits:  z.union([z.string(), z.number()]).optional(),
+  creditsInIITIIM:  z.union([z.string(), z.number()]).optional(),
+  creditsInUS:  z.union([z.string(), z.number()]).optional(),
+  applicationFee:  z.union([z.string(), z.number()]).optional(),
+  deposit:  z.union([z.string(), z.number()]).optional(),
   canFinishIn: z.string().optional(),
+  
   transcriptEvaluation: z.string().optional(), // Added new field
   lor: z.string().optional(), // Added new field
   sop: z.string().optional(), // Added new field
   interviews: z.string().optional(), // Added new field
-  applicationFee: z.string().optional(), // Added new field
-  deposit: z.string().optional(), // Added new field
+ 
   depositRefundableVisa: z.string().optional(), // Added new field
   keyCompaniesHiring: z.string().optional(), // Added new field
   keyJobRoles: z.string().optional(), // Added new field
@@ -71,7 +74,7 @@ const eligibilitySchema = z.object({
   program: z.string().min(1, "Program name is required"),
   typeOfProgram: z.string().optional(),
   percentage: z.string().optional(),
-  backlogs: z.string().optional(),
+  backlogs: z.union([z.string(), z.number()]).transform(val => val === '' ? null : Number(val)).optional(),
   workExperience: z.string().optional(),
   allow3YearDegree: z.string().optional(),
   minimumGpaOrPercentage: z.string().optional(), 
@@ -82,10 +85,9 @@ const genAI = new GoogleGenerativeAI(process.env.NEXT_PUBLIC_GEMINI_API_KEY || "
 const model = genAI.getGenerativeModel({ model: "text-embedding-004" });
 const pinecone = new Pinecone({ apiKey: process.env.NEXT_PUBLIC_PINECONE_API_KEY || " " });
 const programIndex = pinecone.Index("program-recommendations");
-const eligibilityIndex = pinecone.Index("eligibility");
 
 // Function to map Excel row to program object
-function mapExcelRowToProgram(row: any): z.infer<typeof programSchema> {
+function mapExcelRowToProgram(row: any) {
   return {
     name:row['Program Name'] || '',
    
@@ -102,27 +104,29 @@ function mapExcelRowToProgram(row: any): z.infer<typeof programSchema> {
     college: row['College'] || '',
     location: row['Location'] || '',
     publicPrivate: row['Public/Private'] || '',
+    
     specialLocationFeatures: row['Whats Special About this location'] || '',
     specialUniversityFeatures: row['Whats Special about this Univ/ College'] || '',
     specialization: row['Specialization/ Concentrations Possible'] || '',
     usp: row['Top USP of this Program'] || '',
     curriculum: row['Curriculum'] || '',
+    iitIim: row['IIT/IIM?'] || '', // Handling IIT/IIM distinction
     coOpInternship: row['Co-op/ Internship'] || '',
     gloveraPricing: row['Glovera Pricing'] || '', // Handling new field
     originalPricing: row['Original Pricing'] || '', // Handling new field
     savings: row['Savings'] || '', // Handling new field
     savingsPercentage: row['Savings %'] || '', // Handling new field
     totalCredits: row['Total Credits'] || '', // Handling new field
-    iitIim: row['IIT/IIM?'] || '', // Handling IIT/IIM distinction
     creditsInIITIIM: row['Credits in IIT/IIM'] || '', // Handling new field
     creditsInUS: row['Credits in US'] || '', // Handling new field
+    applicationFee: row['Application Fee'] || '',
+    deposit: row['Deposit'] || '',
     canFinishIn: row['Can finish in'] || '', // Handling new field
     transcriptEvaluation: row['Transcript Evaluation (NR - Not Required)'] || '',
     lor: row['LOR'] || '',
     sop: row['SOP'] || '',
     interviews: row['Interviews'] || '',
-    applicationFee: row['Application Fee'] || '',
-    deposit: row['Deposit'] || '',
+   
     depositRefundableVisa: row['Deposit (Refundable in case of visa rejection)'] || '',
     keyCompaniesHiring: row['Key Companies Hiring'] || '',
     keyJobRoles: row['Key Job Roles'] || '',
@@ -171,6 +175,102 @@ function diagnoseFileAccess(filePath: string) {
 }
 
 // Bulk import function for programs
+
+// Bulk import function for eligibility
+export async function bulkImportEligibility(filePath: string) {
+  noStore();
+  
+  try {
+    // Read the Excel file
+    const fileBuffer = fs.readFileSync(filePath);
+    
+    // Read workbook from buffer
+    const workbook = XLSX.read(fileBuffer, { type: 'buffer' });
+    
+    const worksheet = workbook.Sheets[workbook.SheetNames[0]];
+    
+    // Convert worksheet to JSON
+    const data = XLSX.utils.sheet_to_json(worksheet);
+    console.log(`Loaded ${data.length} eligibility entries from ${filePath}`);
+    
+    // Track successful and failed imports
+    const importResults = {
+      total: data.length,
+      successful: 0,
+      failed: 0,
+      errors: [] as string[]
+    };
+
+    // Process each row
+    for (const row of data) {
+      try {
+        // Convert row to eligibility object
+        const eligibilityData = mapExcelRowToEligibility(row);
+        
+        // Validate the data
+        const validEligibilityData = eligibilitySchema.parse(eligibilityData);
+        const eligibility = await prisma.eligibility.create({
+          data: {
+            university: validEligibilityData.university,
+            program: validEligibilityData.program,
+            typeOfProgram: validEligibilityData.typeOfProgram || "",
+            percentage: validEligibilityData.percentage || "",
+            backlogs: validEligibilityData.backlogs ? String(validEligibilityData.backlogs) : null, 
+            workExperience: validEligibilityData.workExperience || "",
+            allow3YearDegree: validEligibilityData.allow3YearDegree || "",
+            minimumGpaOrPercentage: validEligibilityData.minimumGpaOrPercentage || "",
+            decisionFactor: validEligibilityData.decisionFactor || "",
+          },
+        });
+
+        // Generate embedding for eligibility data
+        const textToEmbed = `${validEligibilityData.university} - ${validEligibilityData.program} - Eligibility details: Work Experience ${validEligibilityData.workExperience}, Backlogs ${validEligibilityData.backlogs}, 3-Year Degree ${validEligibilityData.allow3YearDegree}`;
+        const embeddingResult = await model.embedContent(textToEmbed);
+        const embeddingVector = embeddingResult.embedding.values;
+
+        // Upsert eligibility details to the existing program index
+        await programIndex.upsert([
+          {
+            id: `eligibility-${validEligibilityData.university}-${validEligibilityData.program}`,
+            values: embeddingVector,
+            metadata: {
+              EligibilityUniversity: validEligibilityData.university,
+              EligibilityProgram: validEligibilityData.program,
+              EligibilityTypeOfProgram: validEligibilityData.typeOfProgram || "",
+              EligibilityPercentage: validEligibilityData.percentage || "N/A",
+              EligibilityBacklogs: validEligibilityData.backlogs || "N/A",
+              EligibilityWorkExperience: validEligibilityData.workExperience || "N/A",
+              EligibilityAllow3YearDegree: validEligibilityData.allow3YearDegree?.toString() || "false",
+            },
+          },
+        ]);
+
+        importResults.successful++;
+      } catch (error) {
+        importResults.failed++;
+        if (error instanceof z.ZodError) {
+          const errorMessages = error.errors.map((err) => err.message).join(", ");
+          importResults.errors.push(`Validation error for row: ${errorMessages}`);
+        } else {
+          importResults.errors.push(`Error importing row: ${error}`);
+        }
+      }
+    }
+
+    return {
+      success: true,
+      message: "Bulk import of eligibility data completed",
+      results: importResults
+    };
+  } catch (error) {
+    console.error("Error in bulk import of eligibility data:", error);
+    return {
+      success: false, 
+      message: "Failed to perform bulk import of eligibility data",
+      error: error instanceof Error ? error.message : String(error)
+    };
+  }
+}
 export async function bulkImportPrograms(filePath: string) {
   noStore();
   
@@ -233,8 +333,8 @@ export async function bulkImportPrograms(filePath: string) {
             lor: validatedData.lor || "", // Added new field
             sop: validatedData.sop || "", // Added new field
             interviews: validatedData.interviews || "", // Added new field
-            applicationFee: validatedData.applicationFee || "", // Added new field
-            deposit: validatedData.deposit || "", // Added new field
+            applicationFee: validatedData.applicationFee ? String(validatedData.applicationFee) : null, 
+            deposit: validatedData.deposit ? String(validatedData.deposit) : null,
             depositRefundableVisa: validatedData.depositRefundableVisa || "", // Added new field
             keyCompaniesHiring: validatedData.keyCompaniesHiring || "", // Added new field
             keyJobRoles: validatedData.keyJobRoles || "", // Added new field
@@ -279,6 +379,11 @@ export async function bulkImportPrograms(filePath: string) {
               KeyCompaniesHiring: validatedData.keyCompaniesHiring || "",
               KeyJobRoles: validatedData.keyJobRoles || "",
               QuantQualitative: validatedData.quantQualitative || "",
+              EligibilityUGBackground: validatedData.eligibility.ugBackground || "",
+              EligibilityMinimumGPA: validatedData.eligibility.minimumGpa || "",
+              EligibilityBacklogs: validatedData.eligibility.backlogs || "",
+              EligibilityWorkExperience: validatedData.eligibility.workExperience || "",
+              EligibilityAllow3YearDegree: validatedData.eligibility.allow3YearDegree || "",
             },
           },
         ]);
@@ -314,104 +419,6 @@ export async function bulkImportPrograms(filePath: string) {
   }
 }
 
-// Bulk import function for eligibility
-export async function bulkImportEligibility(filePath: string) {
-  noStore();
-  
-  try {
-    // Read the Excel file
-    const fileBuffer = fs.readFileSync(filePath);
-    
-    // Read workbook from buffer
-    const workbook = XLSX.read(fileBuffer, { type: 'buffer' });
-    
-    const worksheet = workbook.Sheets[workbook.SheetNames[0]];
-    
-    // Convert worksheet to JSON
-    const data = XLSX.utils.sheet_to_json(worksheet);
-    console.log(`Loaded ${data.length} programs from ${filePath}`);
-    console.log(data);
-    
-    // Track successful and failed imports
-    const importResults = {
-      total: data.length,
-      successful: 0,
-      failed: 0,
-      errors: [] as string[]
-    };
-
-    // Process each row
-    for (const row of data) {
-      try {
-        // Convert row to eligibility object
-        const eligibilityData = mapExcelRowToEligibility(row);
-        
-        // Validate the data
-        const validEligibilityData = eligibilitySchema.parse(eligibilityData);
-
-        //prisma create eligibility
-        const eligibility = await prisma.eligibility.create({
-          data: {
-            university: validEligibilityData.university,
-            program: validEligibilityData.program,
-            typeOfProgram: validEligibilityData.typeOfProgram || "",
-            percentage: validEligibilityData.percentage || "",
-            backlogs: validEligibilityData.backlogs || "",
-            workExperience: validEligibilityData.workExperience || "",
-            allow3YearDegree: validEligibilityData.allow3YearDegree || "",
-            minimumGpaOrPercentage: validEligibilityData.minimumGpaOrPercentage || "",
-            decisionFactor: validEligibilityData.decisionFactor || "",
-          },
-        });
-
-        // Generate embedding
-        const textToEmbed = `${validEligibilityData.university} - ${validEligibilityData.program} - ${validEligibilityData.typeOfProgram || ""}`;
-        const embeddingResult = await model.embedContent(textToEmbed);
-        const embeddingVector = embeddingResult.embedding.values;
-
-        // Upsert eligibility details to Pinecone
-        await eligibilityIndex.upsert([
-          {
-            id: `eligibility-${validEligibilityData.university}-${validEligibilityData.program}`,
-            values: embeddingVector,
-            metadata: {
-              University: validEligibilityData.university,
-              Program: validEligibilityData.program,
-              TypeOfProgram: validEligibilityData.typeOfProgram || "",
-              Percentage: validEligibilityData.percentage || "N/A",
-              Backlogs: validEligibilityData.backlogs || "N/A",
-              WorkExperience: validEligibilityData.workExperience || "N/A",
-              Allow3YearDegree: validEligibilityData.allow3YearDegree?.toString() || "false",
-            },
-          },
-        ]);
-
-        importResults.successful++;
-      } catch (error) {
-        importResults.failed++;
-        if (error instanceof z.ZodError) {
-          const errorMessages = error.errors.map((err) => err.message).join(", ");
-          importResults.errors.push(`Validation error for row: ${errorMessages}`);
-        } else {
-          importResults.errors.push(`Error importing row: ${error}`);
-        }
-      }
-    }
-
-    return {
-      success: true,
-      message: "Bulk import of eligibility data completed",
-      results: importResults
-    };
-  } catch (error) {
-    console.error("Error in bulk import of eligibility data:", error);
-    return {
-      success: false, 
-      message: "Failed to perform bulk import of eligibility data",
-      error: error instanceof Error ? error.message : String(error)
-    };
-  }
-}
 
 // Usage example
 // export async function importDataFromExcel() {
