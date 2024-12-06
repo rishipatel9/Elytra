@@ -5,6 +5,8 @@ import { NextResponse } from "next/server";
 export async function GET() {
   try {
     const result = await importDataFromExcel();
+    console.log(`Log result ${result}`);
+    
     return NextResponse.json({ success: true, result });
   } catch (error) {
     return NextResponse.json(

@@ -6,8 +6,11 @@ import { unstable_noStore as noStore } from "next/cache";
 import prisma from "@/lib/prisma";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { Pinecone } from '@pinecone-database/pinecone'
-import xlsx from "xlsx";
-import fs from "fs";
+import * as xlsx from "xlsx";
+import path from 'path';
+import { myName } from "../../water";
+
+
 
 // Existing program schema
 const programSchema = z.object({
@@ -288,8 +291,12 @@ export async function bulkImportEligibility(filePath: string) {
 
 // Usage example
 export async function importDataFromExcel() {
-  const courseFilePath = '../../../Courses.xlsx';
-const eligibilityFilePath = '../../../Eligibility.xlsx';
+  const courseFilePath = path.join(process.cwd(), 'src', 'Courses.xlsx');
+  const eligibilityFilePath = path.join(process.cwd(), 'src', 'Eligibility.xlsx');
+  
+  console.log('Attempting to read from:');
+  console.log('Courses:', courseFilePath);
+  console.log('Eligibility:', eligibilityFilePath);
 
   await bulkImportPrograms(courseFilePath);
   await bulkImportEligibility(eligibilityFilePath);
