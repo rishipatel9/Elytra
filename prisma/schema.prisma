@@ -65,7 +65,6 @@ model VerificationToken {
 
   @@unique([identifier, token])
 }
-
 model Program {
   id        Int    @id @default(autoincrement())
   name      String
