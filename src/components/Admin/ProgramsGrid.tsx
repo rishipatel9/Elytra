@@ -1,17 +1,19 @@
-'use client'
+'use client';
 import axios from 'axios';
 import { useEffect, useState } from 'react';
 import ProgramCard from './ProgramCard';
 
-
 export type Program = {
     name: string;
-    description: string;
-    mode: string;
-    duration: string;
-    category: string;
-    fees: string;
-    eligibility: string;
+    university: string;
+    specialization: string[]; // Must be an array
+    usp: string[];
+    ranking: string;
+    location: string;
+    deposit?: string; // Optional
+    eligibility: {
+        ugBackground: string[];
+    };
 };
 
 const ProgramsGrid = () => {
@@ -22,10 +24,19 @@ const ProgramsGrid = () => {
         const fetchPrograms = async () => {
             try {
                 const response = await axios.get('/api/programs');
-                setPrograms(response.data.programs); // Assuming the response has a 'programs' key
+                const formattedPrograms = response.data.programs.map((program: any) => ({
+                    ...program,
+                    specialization: Array.isArray(program.specialization)
+                        ? program.specialization
+                        : [program.specialization || "N/A"], // Ensure array
+                    usp: Array.isArray(program.usp) ? program.usp : [program.usp || "N/A"], // Ensure array
+                    eligibility: program.eligibility || { ugBackground: [] },
+                    deposit: program.deposit || "Not Specified",
+                }));
+                setPrograms(formattedPrograms);
                 setIsLoading(false);
             } catch (error) {
-                console.log(error);
+                console.error(error);
                 setIsLoading(false);
             }
         };
@@ -35,15 +46,13 @@ const ProgramsGrid = () => {
 
     return (
         <>
-            <div className="w-full h-10 text-white py-4">
-                Programs
-            </div>
+            <div className="w-full h-10 text-white py-4 text-xl font-bold">Programs</div>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 py-2">
                 {isLoading ? (
-                    <div className="text-white">Loading Programs...</div>
+                    <div className="text-white text-lg">Loading Programs...</div>
                 ) : (
-                    programs.map((program) => (
-                        <ProgramCard key={program.name} program={program} />
+                    programs.map((program, idx) => (
+                        <ProgramCard key={idx} program={program} />
                     ))
                 )}
             </div>

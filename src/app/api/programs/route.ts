@@ -4,7 +4,7 @@ import { NextResponse } from "next/server";
 
 export async function GET() {
   try {
-    const cookieStore = await cookies(); // Added `await` here
+    const cookieStore = await cookies();
     const adminToken = cookieStore.get("adminToken")?.value;
 
     if (!adminToken) {
@@ -12,7 +12,20 @@ export async function GET() {
       return NextResponse.redirect(new URL("/admin/login", baseUrl));
     }
 
-    const programs = await prisma.program.findMany();
+    // Select meaningful fields for the frontend
+    const programs = await prisma.program.findMany({
+      select: {
+        name: true,
+        university: true,
+        specialization: true,
+        usp: true,
+        ranking: true,
+        location: true,
+        eligibility: true,
+        deposit: true, // Retaining this field in case it gets populated later
+      },
+    });
+
     return NextResponse.json({ programs }, { status: 200 });
   } catch (error) {
     console.error("Error fetching programs:", error);

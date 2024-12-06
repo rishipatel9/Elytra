@@ -12,8 +12,21 @@ import { Input } from '../ui/input';
 import { PlusIcon } from '@/icons/icons';
 
 import { useFormStatus } from 'react-dom';
-import { createProgram } from '@/actions/onProgram';
+import prisma from '@/lib/prisma';
+// import { createProgram } from '@/actions/onProgram';
 
+async function createProgram(program: {
+    name: string;
+    description: string;
+    mode: string;
+    duration: string;
+    category: string;
+    fees: string;
+    eligibility: string;
+}) {
+   return program;
+    
+}
 function SubmitButton() {
     const { pending } = useFormStatus();
     
@@ -50,16 +63,16 @@ const AddProgram = () => {
             eligibility: formData.get('eligibility') as string,
         });
 
-        if (response.success) {
-            toast.success(response.message);
-            setIsDialogOpen(false);
-            router.refresh(); // Refresh the page to show new data
-            // Reset form
-            const form = document.querySelector('form') as HTMLFormElement;
-            form?.reset();
-        } else {
-            toast.error(response.message);
-        }
+        // if (response.success) {
+        //     toast.success(response.message);
+        //     setIsDialogOpen(false);
+        //     router.refresh(); // Refresh the page to show new data
+        //     // Reset form
+        //     const form = document.querySelector('form') as HTMLFormElement;
+        //     form?.reset();
+        // } else {
+        //     toast.error(response.message);
+        // }
     }
 
     return (
