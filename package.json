@@ -71,6 +71,7 @@
     "openai": "^4.73.0",
     "react": "18.2.0",
     "react-dom": "18.2.0",
+    "react-phone-number-input": "^3.4.10",
     "simli-client": "^1.2.1",
     "sonner": "^1.7.0",
     "tailwind-merge": "^2.5.4",

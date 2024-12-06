@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Label } from '@radix-ui/react-label';
-import { InputDemo, InputTags, NationalitySelect, SelectDemo, TextArea } from '@/components/ui/origin';
+import { InputDemo, InputTags, NationalitySelect, PhoneInput, PhoneInputComponent, SelectDemo, TextArea } from '@/components/ui/origin';
 import { toast, Toaster } from 'sonner';
 import { uploadStudentInfo } from '@/actions/onStudentInfo';
 
@@ -89,9 +89,9 @@ const StudentDataForm: React.FC = () => {
   }
 
   return (
-    <div className="h-full w-full mx-auto p-6 flex justify-center items-center bg-[#0A0A0B] shadow-lg">
-      <div className="container max-w-4xl space-y-6 text-left border p-4 border-[#2D2D2D] rounded-lg">
-        <h1 className="text-2xl font-bold mb-6 text-center text-white">
+    <div className="w-full h-full  mx-auto p-6 flex items-start md:items-center justify-center bg-[#181818] shadow-lg">
+    <div className="container max-w-4xl space-y-6 text-left rounded-lg">
+      <h1 className="text-2xl font-bold mb-6 text-left md:text-3xl  text-white">
           Student Information Form
         </h1>
         <form action={handleFormAction} className="space-y-6">
@@ -165,14 +165,12 @@ const StudentDataForm: React.FC = () => {
               />
             </div>
           </div>
+          {/* <PhoneInput/> */}
 
           <div className="space-y-4 mt-6">
             <h2 className="text-xl font-semibold text-white">Study Preferences</h2>
             <div className="grid md:grid-cols-2 gap-6">
               <div>
-                <Label htmlFor="careerAspirations" className="dark:text-gray-300">
-                  Career Aspirations
-                </Label>
                 <TextArea
                   label='Career Aspirations'
                   id="careerAspirations"
@@ -183,9 +181,6 @@ const StudentDataForm: React.FC = () => {
                 />
               </div>
               <div>
-                <Label htmlFor="preferredPrograms" className="dark:text-gray-300">
-                  Preferred Programs
-                </Label>
                 <TextArea
                   label='Preferred Programs'
                   id="preferredPrograms"
@@ -210,7 +205,7 @@ const StudentDataForm: React.FC = () => {
           </div>
 
           <div className="text-center mt-8">
-            <Button type="submit" className="px-6 py-3 bg-white text-black mx-auto w-full">
+            <Button type="submit" className="px-6 py-3 bg-white text-black mx-auto w-full font-semibold hover:bg-[#cac6c6]">
               Submit
             </Button>
           </div>
