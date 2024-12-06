@@ -10,11 +10,6 @@ import * as XLSX from "xlsx";
 
 import path from 'path';
 import * as fs from 'fs';
-import { Itim } from "next/font/google";
-
-
-
-
 
 // Updated program schema
 const programSchema = z.object({
@@ -67,8 +62,7 @@ const programSchema = z.object({
   quantQualitative: z.string().optional(), // Added new field
 });
 
-
-
+// Eligibility schema
 const eligibilitySchema = z.object({
   university: z.string().min(1, "University is required"),
   program: z.string().min(1, "Program name is required"),
@@ -80,60 +74,71 @@ const eligibilitySchema = z.object({
   minimumGpaOrPercentage: z.string().optional(), 
   decisionFactor: z.string().optional(), 
 });
+
 // Initialize Gemini and Pinecone
 const genAI = new GoogleGenerativeAI(process.env.NEXT_PUBLIC_GEMINI_API_KEY || " ");
 const model = genAI.getGenerativeModel({ model: "text-embedding-004" });
 const pinecone = new Pinecone({ apiKey: process.env.NEXT_PUBLIC_PINECONE_API_KEY || " " });
 const programIndex = pinecone.Index("program-recommendations");
 
+// Helper function to safely convert values to numbers
+function safeNumberConversion(value: any): number | null {
+  if (value === undefined || value === null || value === '' || value === 'NA' || value === 'N/A') {
+    return null;
+  }
+  // Handle string numbers with commas
+  if (typeof value === 'string') {
+    // Remove commas and $ signs
+    value = value.replace(/[$,]/g, '');
+  }
+  const num = Number(value);
+  return isNaN(num) ? null : num;
+}
+
 // Function to map Excel row to program object
 function mapExcelRowToProgram(row: any) {
   return {
-    name:row['Program Name'] || '',
-   
+    name: row['Program Name'] || '',
+    university: row['University'] || '',
     eligibility: {
       ugBackground: row['UG Background'] || '',
       minimumGpa: row['Minimum GPA or %'] || '',
-      backlogs: row['Backlogs'] || '',
+      backlogs: safeNumberConversion(row['Backlogs']) ?? 0,
       workExperience: row['Work Experience'] || '',
       allow3YearDegree: row['Will allow 3 years undergrad candidates?'] || '',
       decisionFactor: row['Decision Factor'] || '',
     },
     ranking: row['Ranking'] || '',
-    university: row['University'] || '',
     college: row['College'] || '',
     location: row['Location'] || '',
     publicPrivate: row['Public/Private'] || '',
-    
     specialLocationFeatures: row['Whats Special About this location'] || '',
     specialUniversityFeatures: row['Whats Special about this Univ/ College'] || '',
     specialization: row['Specialization/ Concentrations Possible'] || '',
     usp: row['Top USP of this Program'] || '',
     curriculum: row['Curriculum'] || '',
-    iitIim: row['IIT/IIM?'] || '', // Handling IIT/IIM distinction
-    coOpInternship: row['Co-op/ Internship'] || '',
-    gloveraPricing: row['Glovera Pricing'] || '', // Handling new field
-    originalPricing: row['Original Pricing'] || '', // Handling new field
-    savings: row['Savings'] || '', // Handling new field
-    savingsPercentage: row['Savings %'] || '', // Handling new field
-    totalCredits: row['Total Credits'] || '', // Handling new field
-    creditsInIITIIM: row['Credits in IIT/IIM'] || '', // Handling new field
-    creditsInUS: row['Credits in US'] || '', // Handling new field
+    iitIim: row['IIT/IIM?'] || '',
+    coOpInternship: row['Co-op'] || '',
+    gloveraPricing: safeNumberConversion(row['Glovera Pricing']),
+    originalPricing: safeNumberConversion(row['Original Pricing']),
+    savings: safeNumberConversion(row['Savings']),
+    savingsPercentage: safeNumberConversion(row['Savings %']),
+    totalCredits: safeNumberConversion(row['Total Credits']),
+    creditsInIITIIM: safeNumberConversion(row['Credits in IIT/IIM']),
+    creditsInUS: safeNumberConversion(row['Credits in US']),
     applicationFee: row['Application Fee'] || '',
-    deposit: row['Deposit'] || '',
-    canFinishIn: row['Can finish in'] || '', // Handling new field
-    transcriptEvaluation: row['Transcript Evaluation (NR - Not Required)'] || '',
+    deposit: safeNumberConversion(row['Deposit']),
+    canFinishIn: row['Can finish in'] || '',
+    transcriptEvaluation: row['Transcript Evaluation'] || '',
     lor: row['LOR'] || '',
     sop: row['SOP'] || '',
     interviews: row['Interviews'] || '',
-   
     depositRefundableVisa: row['Deposit (Refundable in case of visa rejection)'] || '',
     keyCompaniesHiring: row['Key Companies Hiring'] || '',
     keyJobRoles: row['Key Job Roles'] || '',
     quantQualitative: row['Quant/ Qualitative'] || '',
   };
 }
-
 
 // Function to map Excel row to eligibility object
 function mapExcelRowToEligibility(row: any): z.infer<typeof eligibilitySchema> {
@@ -147,6 +152,7 @@ function mapExcelRowToEligibility(row: any): z.infer<typeof eligibilitySchema> {
     allow3YearDegree: row['Allow 3-Year Degree'] || '',
   };
 }
+
 function diagnoseFileAccess(filePath: string) {
   try {
     // Check file existence
@@ -271,6 +277,7 @@ export async function bulkImportEligibility(filePath: string) {
     };
   }
 }
+
 export async function bulkImportPrograms(filePath: string) {
   noStore();
   
@@ -285,9 +292,6 @@ export async function bulkImportPrograms(filePath: string) {
     // Convert worksheet to JSON
     const data = XLSX.utils.sheet_to_json(worksheet);
     console.log(`Loaded ${data.length} programs from ${filePath}`);
-    console.log(data);
-    
-    
     
     // Track successful and failed imports
     const importResults = {
@@ -298,105 +302,127 @@ export async function bulkImportPrograms(filePath: string) {
     };
 
     // Process each row
-    for (const row of data) {
+    for (const [index, row] of data.entries()) {
+      // Add debug logging for specific rows
+      if (index + 1 >= 23 && index + 1 <= 28) {
+        console.log(`\n=== Debug Row ${index + 1} ===`);
+        // @ts-ignore
+        console.log('Raw deposit value:', row['Deposit']);
+        console.log('Raw row data:', JSON.stringify(row, null, 2));
+      }
+
       try {
         // Convert row to program object
         const programData = mapExcelRowToProgram(row);
         
+        // Add more debug logging for problematic rows
+        if (index + 1 >= 23 && index + 1 <= 28) {
+          console.log(`Mapped deposit value for Row ${index + 1}:`, programData.deposit);
+          console.log('Full mapped data:', JSON.stringify(programData, null, 2));
+        }
+        
         // Validate the data
-        const validatedData = programSchema.parse(programData);
-
-        // Create the program in Prisma
-        const program = await prisma.program.create({
-          data: {
-            name: validatedData.name,
-            description: validatedData.description || "",
-            mode: validatedData.mode || "",
-            duration: validatedData.duration || "",
-            category: validatedData.category || "",
-            fees: validatedData.fees || "",
-            eligibility: JSON.stringify(validatedData.eligibility),
-            ranking: validatedData.ranking || "",
-            university: validatedData.university,
-            college: validatedData.college || "",
-            location: validatedData.location || "",
-            publicPrivate: validatedData.publicPrivate || "",
-            specialLocationFeatures: validatedData.specialLocationFeatures || "",
-            specialUniversityFeatures: validatedData.specialUniversityFeatures || "",
-            specialization: validatedData.specialization || "",
-            usp: validatedData.usp || "",
-            curriculum: validatedData.curriculum || "",
-            coOpInternship: validatedData.coOpInternship || "",
-            
-            // New fields
-            transcriptEvaluation: validatedData.transcriptEvaluation || "", // Added new field
-            lor: validatedData.lor || "", // Added new field
-            sop: validatedData.sop || "", // Added new field
-            interviews: validatedData.interviews || "", // Added new field
-            applicationFee: validatedData.applicationFee ? String(validatedData.applicationFee) : null, 
-            deposit: validatedData.deposit ? String(validatedData.deposit) : null,
-            depositRefundableVisa: validatedData.depositRefundableVisa || "", // Added new field
-            keyCompaniesHiring: validatedData.keyCompaniesHiring || "", // Added new field
-            keyJobRoles: validatedData.keyJobRoles || "", // Added new field
-            quantQualitative: validatedData.quantQualitative || "", // Added new field
-          },
-        });
-        
-        
-
-        // Generate embedding
-        const textToEmbed = `${validatedData.name} at ${validatedData.university} - ${validatedData.description || ""}`;
-        const embeddingResult = await model.embedContent(textToEmbed);
-        const embeddingVector = embeddingResult.embedding.values;
-
-        // Upsert program details to Pinecone
-        await programIndex.upsert([
-          {
-            id: `uni-programs-${program.id}`,
-            values: embeddingVector,
-            metadata: {
-              Program: validatedData.name,
-              Ranking: validatedData.ranking || "",
-              University: validatedData.university,
-              College: validatedData.college || "",
-              Location: validatedData.location || "",
-              PublicPrivate: validatedData.publicPrivate || "",
-              SpecialLocationFeatures: validatedData.specialLocationFeatures || "",
-              SpecialUniversityFeatures: validatedData.specialUniversityFeatures || "",
-              Specialization: validatedData.specialization || "",
-              USP: validatedData.usp || "",
-              Curriculum: validatedData.curriculum || "",
-              CoOpInternship: validatedData.coOpInternship || "",
-              
-              // Added new fields to metadata
-              TranscriptEvaluation: validatedData.transcriptEvaluation || "",
-              LOR: validatedData.lor || "",
-              SOP: validatedData.sop || "",
-              Interviews: validatedData.interviews || "",
-              ApplicationFee: validatedData.applicationFee || "",
-              Deposit: validatedData.deposit || "",
-              DepositRefundableVisa: validatedData.depositRefundableVisa || "",
-              KeyCompaniesHiring: validatedData.keyCompaniesHiring || "",
-              KeyJobRoles: validatedData.keyJobRoles || "",
-              QuantQualitative: validatedData.quantQualitative || "",
-              EligibilityUGBackground: validatedData.eligibility.ugBackground || "",
-              EligibilityMinimumGPA: validatedData.eligibility.minimumGpa || "",
-              EligibilityBacklogs: validatedData.eligibility.backlogs || "",
-              EligibilityWorkExperience: validatedData.eligibility.workExperience || "",
-              EligibilityAllow3YearDegree: validatedData.eligibility.allow3YearDegree || "",
+        try {
+          const validatedData = programSchema.parse(programData);
+          
+          // Create the program in Prisma
+          const program = await prisma.program.create({
+            data: {
+              name: validatedData.name,
+              description: validatedData.description || "",
+              mode: validatedData.mode || "",
+              duration: validatedData.duration || "",
+              category: validatedData.category || "",
+              fees: validatedData.fees || "",
+              eligibility: JSON.stringify(validatedData.eligibility),
+              ranking: validatedData.ranking || "",
+              university: validatedData.university,
+              college: validatedData.college || "",
+              location: validatedData.location || "",
+              publicPrivate: validatedData.publicPrivate || "",
+              specialLocationFeatures: validatedData.specialLocationFeatures || "",
+              specialUniversityFeatures: validatedData.specialUniversityFeatures || "",
+              specialization: validatedData.specialization || "",
+              usp: validatedData.usp || "",
+              curriculum: validatedData.curriculum || "",
+              coOpInternship: validatedData.coOpInternship || "",
+              transcriptEvaluation: validatedData.transcriptEvaluation || "",
+              lor: validatedData.lor || "",
+              sop: validatedData.sop || "",
+              interviews: validatedData.interviews || "",
+              applicationFee: validatedData.applicationFee ? String(validatedData.applicationFee) : null,
+              deposit: validatedData.deposit ? String(validatedData.deposit) : null,
+              depositRefundableVisa: validatedData.depositRefundableVisa || "",
+              keyCompaniesHiring: validatedData.keyCompaniesHiring || "",
+              keyJobRoles: validatedData.keyJobRoles || "",
+              quantQualitative: validatedData.quantQualitative || "",
             },
-          },
-        ]);
-        
+          });
 
-        importResults.successful++;
+          // Generate embedding
+          const textToEmbed = `${validatedData.name} at ${validatedData.university} - ${validatedData.description || ""}`;
+          const embeddingResult = await model.embedContent(textToEmbed);
+          const embeddingVector = embeddingResult.embedding.values;
+
+          // Upsert program details to Pinecone
+          await programIndex.upsert([
+            {
+              id: `uni-programs-${program.id}`,
+              values: embeddingVector,
+              metadata: {
+                Program: validatedData.name,
+                Ranking: validatedData.ranking || "",
+                University: validatedData.university,
+                College: validatedData.college || "",
+                Location: validatedData.location || "",
+                PublicPrivate: validatedData.publicPrivate || "",
+                SpecialLocationFeatures: validatedData.specialLocationFeatures || "",
+                SpecialUniversityFeatures: validatedData.specialUniversityFeatures || "",
+                Specialization: validatedData.specialization || "",
+                USP: validatedData.usp || "",
+                Curriculum: validatedData.curriculum || "",
+                CoOpInternship: validatedData.coOpInternship || "",
+                TranscriptEvaluation: validatedData.transcriptEvaluation || "",
+                LOR: validatedData.lor || "",
+                SOP: validatedData.sop || "",
+                Interviews: validatedData.interviews || "",
+                ApplicationFee: validatedData.applicationFee || "",
+                Deposit: validatedData.deposit || "",
+                DepositRefundableVisa: validatedData.depositRefundableVisa || "",
+                KeyCompaniesHiring: validatedData.keyCompaniesHiring || "",
+                KeyJobRoles: validatedData.keyJobRoles || "",
+                QuantQualitative: validatedData.quantQualitative || "",
+                EligibilityUGBackground: validatedData.eligibility.ugBackground || "",
+                EligibilityMinimumGPA: validatedData.eligibility.minimumGpa || "",
+                EligibilityBacklogs: validatedData.eligibility.backlogs || "",
+                EligibilityWorkExperience: validatedData.eligibility.workExperience || "",
+                EligibilityAllow3YearDegree: validatedData.eligibility.allow3YearDegree || "",
+              },
+            },
+          ]);
+
+          importResults.successful++;
+        } catch (validationError) {
+          if (validationError instanceof z.ZodError) {
+            const errorDetails = validationError.errors.map(err => {
+              const path = err.path.join('.');
+              return `Field '${path}': ${err.message}`;
+            }).join(', ');
+            console.error(`Row ${index + 1} validation error:`, errorDetails);
+            importResults.errors.push(`Row ${index + 1}: ${errorDetails}`);
+          }
+          throw validationError;
+        }
       } catch (error) {
         importResults.failed++;
         if (error instanceof z.ZodError) {
-          const errorMessages = error.errors.map((err) => err.message).join(", ");
-          importResults.errors.push(`Validation error for row: ${errorMessages}`);
+          const errorDetails = error.errors.map(err => {
+            const path = err.path.join('.');
+            return `Field '${path}': ${err.message}`;
+          }).join(', ');
+          importResults.errors.push(`Row ${index + 1}: ${errorDetails}`);
         } else {
-          importResults.errors.push(`Error importing row: ${error}`);
+          importResults.errors.push(`Row ${index + 1} error: ${error}`);
         }
       }
     }
@@ -412,13 +438,12 @@ export async function bulkImportPrograms(filePath: string) {
   } catch (error) {
     console.error("Error in bulk import of programs:", error);
     return {
-      success: false, 
+      success: false,
       message: "Failed to perform bulk import of programs",
       error: error instanceof Error ? error.message : String(error)
     };
   }
 }
-
 
 // Usage example
 // export async function importDataFromExcel() {
