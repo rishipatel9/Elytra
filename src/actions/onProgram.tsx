@@ -34,17 +34,27 @@ export async function createProgram(formData: ProgramFormData) {
     const validatedData = programSchema.parse(formData);
 
     // Create the program in your Prisma database
-    const program = await prisma.program.create({
-      data: {
-        name: validatedData.name,
-        description: validatedData.description || "",
-        mode: validatedData.mode || "",
-        duration: validatedData.duration || "",
-        category: validatedData.category || "",
-        fees: validatedData.fees || "",
-        eligibility: validatedData.eligibility || "",
-      },
-    });
+    // const program = await prisma.program.create({
+    //   data: {
+    //     name: validatedData.name,
+    //     description: validatedData.description || "",
+    //     mode: validatedData.mode || "",
+    //     duration: validatedData.duration || "",
+    //     category: validatedData.category || "",
+    //     fees: validatedData.fees || "",
+    //     eligibility: validatedData.eligibility || "",
+    //   },
+    // });
+    const program ={
+      id: 1,
+      name: validatedData.name,
+      description: validatedData.description || "",
+      mode: validatedData.mode || "",
+      duration: validatedData.duration || "",
+      category: validatedData.category || "",
+      fees: validatedData.fees || "",
+      eligibility: validatedData.eligibility || "",
+    }
 
     // Generate embeddings using Gemini API
     const textToEmbed = `${validatedData.name} ${validatedData.description || ""}`;
