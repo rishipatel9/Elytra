@@ -3,11 +3,13 @@ import React, { useState, } from 'react';
 import { signOut, useSession } from 'next-auth/react';
 import { Session } from 'next-auth';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { Input } from '@/components/ui/input';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { LogOut, Send } from 'lucide-react';
 import { getStudentById } from '@/helper';
+import {  Toaster } from 'sonner';
+
 
 interface Message {
   role: 'user' | 'assistant' | 'system';
@@ -23,7 +25,6 @@ const Dashboard = () => {
   const { data: session } = useSession() as unknown as { data: Session & { user: { id: string } } };
   const userId = session?.user?.id ?? null;
 
-  // console.log(`user id is data is ${userId}`)
   
   const sendMessage = async () => {
     if (!input.trim()) return;
@@ -85,7 +86,7 @@ const Dashboard = () => {
       <header className="flex items-center justify-between px-6 py-4 border-b">
         <div className="flex items-center gap-2">
           <Avatar>
-            <AvatarFallback>C</AvatarFallback>
+            <AvatarFallback>A</AvatarFallback>
           </Avatar>
           <div>
             <h1 className="text-lg font-semibold">AI Counselor</h1>
@@ -144,7 +145,7 @@ const Dashboard = () => {
       </ScrollArea>
 
       {/* Input Area */}
-      <div className="p-4 border-t mb-10">
+      <div className="p-4 border-t ">
         <div className="flex gap-2">
           <Input
             placeholder="Type your question about studying abroad..."
@@ -166,6 +167,7 @@ const Dashboard = () => {
               <Send className="w-4 h-4" />
             )}
           </Button>
+          <Toaster position="top-center"/>
         </div>
       </div>
     </div>

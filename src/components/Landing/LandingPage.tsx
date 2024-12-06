@@ -12,7 +12,7 @@ export default function LandingPage() {
                     <Gradient/>
 
 
-                <div className="absolute inset-0 bg-[linear-gradient(to_right,_rgba(255,255,255,0.1)_1px,_transparent_1px)] bg-[size:100px_100%] opacity-30 z-0"></div>
+                <div className="absolute inset-0 bg-[linear-gradient(to_right,_rgba(255,255,255,0.1)_1px,_transparent_1px)] bg-[size:200px_200%] opacity-60 z-0"></div>
 
                 <div className="relative z-10 text-center px-4 max-w-6xl mx-auto">
                     <h1 className="text-3xl sm:text-4xl lg:text-5xl  tracking-tight bg-clip-text text-transparent bg-gradient-to-r text-white">

@@ -39,19 +39,23 @@ const items = [
 export function AppSidebar() {
   return (
     <Sidebar>
-      <SidebarContent className="bg-[#151723]">
+      <SidebarContent className="bg-[#F5F5F4] tex-black text-white shadow-lg">
+        {/* Sidebar Group */}
         <SidebarGroup>
-          <SidebarGroupLabel>Elytra</SidebarGroupLabel>
+          {/* <SidebarGroupLabel className="text-xl font-bold tracking-wide text-gray-300">
+            Elytra
+          </SidebarGroupLabel> */}
+
           <SidebarGroupContent>
             <SidebarMenu>
               {items.map((item) => (
                 <SidebarMenuItem
-                  className="py-4 px-5 font-semibold text-white text-2xl"
+                  className="py-3 px-5 font-semibold text-2xl text-black hover:bg-gray-700/50 rounded-md transition duration-150"
                   key={item.title}
                 >
                   <SidebarMenuButton asChild>
                     <a href={item.url} className="flex items-center">
-                      <item.icon className="mr-3" />
+                      <item.icon className="mr-3 text-black transition" />
                       <span>{item.title}</span>
                     </a>
                   </SidebarMenuButton>
