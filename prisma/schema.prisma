@@ -65,16 +65,25 @@ model VerificationToken {
 
   @@unique([identifier, token])
 }
-
 model Program {
-  id          Int      @id @default(autoincrement())
-  name        String
-  description String
-  mode        String
-  duration    String
-  category    String
-  fees        String
-  eligibility String
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id        Int    @id @default(autoincrement())
+  name      String
+  description String?
+  mode      String?
+  duration  String?
+  category  String?
+  fees      String?
+  eligibility Json
+  ranking   String?  
+  university String
+  college   String?
+  location  String?
+  publicPrivate String?
+  specialLocationFeatures String?
+  specialUniversityFeatures String?
+  specialization String?
+  usp       String?
+  curriculum String?
+  coOpInternship String?
 }
+
