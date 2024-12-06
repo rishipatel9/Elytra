@@ -15,7 +15,7 @@ import { myName } from "../../water";
 
 
 
-// Existing program schema
+
 // Updated program schema
 const programSchema = z.object({
   name: z.string().min(1, "Program name is required"),
@@ -30,6 +30,7 @@ const programSchema = z.object({
     backlogs: z.string().optional(),
     workExperience: z.string().optional(),
     allow3YearDegree: z.string().optional(),
+    decisionFactor: z.string().optional(),
   }),
   ranking: z.string().optional(),
   university: z.string().min(1, "University is required"),
@@ -42,19 +43,29 @@ const programSchema = z.object({
   usp: z.string().optional(),
   curriculum: z.string().optional(),
   coOpInternship: z.string().optional(),
-  gloveraPricing: z.string().optional(), // Added new field for financial aspect
-  originalPricing: z.string().optional(), // Added new field
-  savings: z.string().optional(), // Added new field
-  savingsPercentage: z.string().optional(), // Added new field
-  totalCredits: z.string().optional(), // Added new field
+  gloveraPricing: z.string().optional(),
+  originalPricing: z.string().optional(),
+  savings: z.string().optional(),
+  savingsPercentage: z.string().optional(),
+  totalCredits: z.string().optional(),
   iitIim: z.string().optional(),
-  creditsInIITIIM: z.string().optional(), // Added new field for specific credit details
-  creditsInUS: z.string().optional(), // Added new field for international credits
-  canFinishIn: z.string().optional(), // Added new field for time to completion
+  creditsInIITIIM: z.string().optional(),
+  creditsInUS: z.string().optional(),
+  canFinishIn: z.string().optional(),
+  transcriptEvaluation: z.string().optional(), // Added new field
+  lor: z.string().optional(), // Added new field
+  sop: z.string().optional(), // Added new field
+  interviews: z.string().optional(), // Added new field
+  applicationFee: z.string().optional(), // Added new field
+  deposit: z.string().optional(), // Added new field
+  depositRefundableVisa: z.string().optional(), // Added new field
+  keyCompaniesHiring: z.string().optional(), // Added new field
+  keyJobRoles: z.string().optional(), // Added new field
+  quantQualitative: z.string().optional(), // Added new field
 });
 
 
-// Existing eligibility schema
+
 const eligibilitySchema = z.object({
   university: z.string().min(1, "University is required"),
   program: z.string().min(1, "Program name is required"),
@@ -76,30 +87,27 @@ const eligibilityIndex = pinecone.Index("eligibility");
 // Function to map Excel row to program object
 function mapExcelRowToProgram(row: any): z.infer<typeof programSchema> {
   return {
-    name: row['Program Name'] || '',
-    description: row['Description'] || '',
-    mode: row['Mode'] || '',
-    duration: row['Duration'] || '',
-    category: row['Category'] || '',
-    fees: row['Fees'] || '',
+    name:row['Program Name'] || '',
+   
     eligibility: {
       ugBackground: row['UG Background'] || '',
-      minimumGpa: row['Minimum GPA'] || '',
+      minimumGpa: row['Minimum GPA or %'] || '',
       backlogs: row['Backlogs'] || '',
       workExperience: row['Work Experience'] || '',
-      allow3YearDegree: row['Allow 3-Year Degree'] || '',
+      allow3YearDegree: row['Will allow 3 years undergrad candidates?'] || '',
+      decisionFactor: row['Decision Factor'] || '',
     },
     ranking: row['Ranking'] || '',
     university: row['University'] || '',
     college: row['College'] || '',
     location: row['Location'] || '',
     publicPrivate: row['Public/Private'] || '',
-    specialLocationFeatures: row['Special Location Features'] || '',
-    specialUniversityFeatures: row['Special University Features'] || '',
-    specialization: row['Specialization'] || '',
-    usp: row['USP'] || '',
+    specialLocationFeatures: row['Whats Special About this location'] || '',
+    specialUniversityFeatures: row['Whats Special about this Univ/ College'] || '',
+    specialization: row['Specialization/ Concentrations Possible'] || '',
+    usp: row['Top USP of this Program'] || '',
     curriculum: row['Curriculum'] || '',
-    coOpInternship: row['Co-Op/Internship'] || '',
+    coOpInternship: row['Co-op/ Internship'] || '',
     gloveraPricing: row['Glovera Pricing'] || '', // Handling new field
     originalPricing: row['Original Pricing'] || '', // Handling new field
     savings: row['Savings'] || '', // Handling new field
@@ -109,6 +117,16 @@ function mapExcelRowToProgram(row: any): z.infer<typeof programSchema> {
     creditsInIITIIM: row['Credits in IIT/IIM'] || '', // Handling new field
     creditsInUS: row['Credits in US'] || '', // Handling new field
     canFinishIn: row['Can finish in'] || '', // Handling new field
+    transcriptEvaluation: row['Transcript Evaluation (NR - Not Required)'] || '',
+    lor: row['LOR'] || '',
+    sop: row['SOP'] || '',
+    interviews: row['Interviews'] || '',
+    applicationFee: row['Application Fee'] || '',
+    deposit: row['Deposit'] || '',
+    depositRefundableVisa: row['Deposit (Refundable in case of visa rejection)'] || '',
+    keyCompaniesHiring: row['Key Companies Hiring'] || '',
+    keyJobRoles: row['Key Job Roles'] || '',
+    quantQualitative: row['Quant/ Qualitative'] || '',
   };
 }
 
@@ -117,14 +135,12 @@ function mapExcelRowToProgram(row: any): z.infer<typeof programSchema> {
 function mapExcelRowToEligibility(row: any): z.infer<typeof eligibilitySchema> {
   return {
     university: row['University'] || '',
-    program: row['Program Name'] || '',
-    typeOfProgram: row['TypeOfProgram'] || '',
+    program: row['Program'] || '',
+    typeOfProgram: row['Type Of Program'] || '',
     percentage: row['Percentage'] || '',
     backlogs: row['Backlogs'] || '',
-    workExperience: row['Work Experience'] || '',
+    workExperience: row['Work Experience (yrs)'] || '',
     allow3YearDegree: row['Allow 3-Year Degree'] || '',
-    minimumGpaOrPercentage: row['Minimum GPA or %'] || '', // Handling new field
-    decisionFactor: row['Decision Factor'] || '', // Handling new field
   };
 }
 function diagnoseFileAccess(filePath: string) {
@@ -212,18 +228,20 @@ export async function bulkImportPrograms(filePath: string) {
             curriculum: validatedData.curriculum || "",
             coOpInternship: validatedData.coOpInternship || "",
             
-            // New fields added to match the updated Prisma schema
-            gloveraPricing: validatedData.gloveraPricing || "",
-            originalPricing: validatedData.originalPricing || "",
-            savings: validatedData.savings || "",
-            savingsPercentage: validatedData.savingsPercentage || "",
-            totalCredits: validatedData.totalCredits || "",
-            iitIim: validatedData.iitIim || "",
-            creditsInIITIIM: validatedData.creditsInIITIIM || "",
-            creditsInUS: validatedData.creditsInUS || "",
-            canFinishIn: validatedData.canFinishIn || "",
+            // New fields
+            transcriptEvaluation: validatedData.transcriptEvaluation || "", // Added new field
+            lor: validatedData.lor || "", // Added new field
+            sop: validatedData.sop || "", // Added new field
+            interviews: validatedData.interviews || "", // Added new field
+            applicationFee: validatedData.applicationFee || "", // Added new field
+            deposit: validatedData.deposit || "", // Added new field
+            depositRefundableVisa: validatedData.depositRefundableVisa || "", // Added new field
+            keyCompaniesHiring: validatedData.keyCompaniesHiring || "", // Added new field
+            keyJobRoles: validatedData.keyJobRoles || "", // Added new field
+            quantQualitative: validatedData.quantQualitative || "", // Added new field
           },
         });
+        
         
 
         // Generate embedding
@@ -238,7 +256,7 @@ export async function bulkImportPrograms(filePath: string) {
             values: embeddingVector,
             metadata: {
               Program: validatedData.name,
-              Ranking: validatedData.ranking || "", 
+              Ranking: validatedData.ranking || "",
               University: validatedData.university,
               College: validatedData.college || "",
               Location: validatedData.location || "",
@@ -249,9 +267,22 @@ export async function bulkImportPrograms(filePath: string) {
               USP: validatedData.usp || "",
               Curriculum: validatedData.curriculum || "",
               CoOpInternship: validatedData.coOpInternship || "",
+              
+              // Added new fields to metadata
+              TranscriptEvaluation: validatedData.transcriptEvaluation || "",
+              LOR: validatedData.lor || "",
+              SOP: validatedData.sop || "",
+              Interviews: validatedData.interviews || "",
+              ApplicationFee: validatedData.applicationFee || "",
+              Deposit: validatedData.deposit || "",
+              DepositRefundableVisa: validatedData.depositRefundableVisa || "",
+              KeyCompaniesHiring: validatedData.keyCompaniesHiring || "",
+              KeyJobRoles: validatedData.keyJobRoles || "",
+              QuantQualitative: validatedData.quantQualitative || "",
             },
           },
         ]);
+        
 
         importResults.successful++;
       } catch (error) {
@@ -316,26 +347,41 @@ export async function bulkImportEligibility(filePath: string) {
         const eligibilityData = mapExcelRowToEligibility(row);
         
         // Validate the data
-        const validatedData = eligibilitySchema.parse(eligibilityData);
+        const validEligibilityData = eligibilitySchema.parse(eligibilityData);
+
+        //prisma create eligibility
+        const eligibility = await prisma.eligibility.create({
+          data: {
+            university: validEligibilityData.university,
+            program: validEligibilityData.program,
+            typeOfProgram: validEligibilityData.typeOfProgram || "",
+            percentage: validEligibilityData.percentage || "",
+            backlogs: validEligibilityData.backlogs || "",
+            workExperience: validEligibilityData.workExperience || "",
+            allow3YearDegree: validEligibilityData.allow3YearDegree || "",
+            minimumGpaOrPercentage: validEligibilityData.minimumGpaOrPercentage || "",
+            decisionFactor: validEligibilityData.decisionFactor || "",
+          },
+        });
 
         // Generate embedding
-        const textToEmbed = `${validatedData.university} - ${validatedData.program} - ${validatedData.typeOfProgram || ""}`;
+        const textToEmbed = `${validEligibilityData.university} - ${validEligibilityData.program} - ${validEligibilityData.typeOfProgram || ""}`;
         const embeddingResult = await model.embedContent(textToEmbed);
         const embeddingVector = embeddingResult.embedding.values;
 
         // Upsert eligibility details to Pinecone
         await eligibilityIndex.upsert([
           {
-            id: `eligibility-${validatedData.university}-${validatedData.program}`,
+            id: `eligibility-${validEligibilityData.university}-${validEligibilityData.program}`,
             values: embeddingVector,
             metadata: {
-              University: validatedData.university,
-              Program: validatedData.program,
-              TypeOfProgram: validatedData.typeOfProgram || "",
-              Percentage: validatedData.percentage || "N/A",
-              Backlogs: validatedData.backlogs || "N/A",
-              WorkExperience: validatedData.workExperience || "N/A",
-              Allow3YearDegree: validatedData.allow3YearDegree?.toString() || "false",
+              University: validEligibilityData.university,
+              Program: validEligibilityData.program,
+              TypeOfProgram: validEligibilityData.typeOfProgram || "",
+              Percentage: validEligibilityData.percentage || "N/A",
+              Backlogs: validEligibilityData.backlogs || "N/A",
+              WorkExperience: validEligibilityData.workExperience || "N/A",
+              Allow3YearDegree: validEligibilityData.allow3YearDegree?.toString() || "false",
             },
           },
         ]);

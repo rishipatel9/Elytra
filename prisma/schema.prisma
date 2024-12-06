@@ -85,13 +85,40 @@ model Program {
   usp                       String?
   curriculum                String?
   coOpInternship            String?
-  gloveraPricing            String?   
-  originalPricing           String?   
-  savings                   String?   
-  savingsPercentage         String?   
-  totalCredits              String?   
-  iitIim                    String?   
-  creditsInIITIIM           String?    
-  creditsInUS               String?    
-  canFinishIn               String?    
+  gloveraPricing            String?
+  originalPricing           String?
+  savings                   String?
+  savingsPercentage         String?
+  totalCredits              String?
+  iitIim                    String?
+  creditsInIITIIM           String?
+  creditsInUS               String?
+  canFinishIn               String?
+
+  // New fields
+  transcriptEvaluation      String?  // Added new field
+  lor                       String?  // Added new field
+  sop                       String?  // Added new field
+  interviews               String?  // Added new field
+  applicationFee            String?  // Added new field
+  deposit                   String?  // Added new field
+  depositRefundableVisa     String?  // Added new field
+  keyCompaniesHiring        String?  // Added new field
+  keyJobRoles               String?  // Added new field
+  quantQualitative          String?  // Added new field
+}
+
+model Eligibility {
+  id                     Int      @id @default(autoincrement())
+  university             String
+  program               String
+  typeOfProgram         String?
+  percentage            String?
+  backlogs              String?
+  workExperience        String?
+  allow3YearDegree      String?
+  minimumGpaOrPercentage String?
+  decisionFactor        String?
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
 }
