@@ -1,0 +1,30 @@
+University,Program,Type of Program,Percentage,Backlogs,Work Experience (yrs),3 year degree Eligibility
+Case Western Reserve University,Master of Business Analytics and Intelligence,Business Analytics & Information Systems,>=75% ,0,>=2,Not Allowed
+Rutgers University,Master of Information Technology and Analytics,Business Analytics & Information Systems,>=62%,2,>=2,Allowed
+Fairfield University,MS in Business Analytics,Business Analytics & Information Systems,>=70%,0,>=1,Allowed
+Fairfield University,MS in Marketing Analytics & Strategy,Business Analytics & Information Systems,>=70%,0,>=1,Allowed
+DePaul University,MS in Business Analytics,Business Analytics & Information Systems,>=60%,4,0,Allowed
+Fordham University,Information Technology (M.S.),CS & Engineering,>=65%,2,0,Allowed
+Rider University,MS in Information Systems,Business Analytics & Information Systems,>=60%,4,>=1,Allowed
+The University of Akron,MSM in Business Analytics,Business Analytics & Information Systems,>=60%,6,0,Allowed
+The University of Akron,MS in Computer Science,CS & Engineering,>=60%,6,0,Not Allowed
+West Texas A&M University,MS in Computer Information Systems & Business Analytics,Business Analytics & Information Systems,>=60%,4,0,Not allowed
+PACE University,"MS in Marketing, Social Media & Mobile Marketing",MBA & Marketing,>=65%,4,>=2,Not Allowed
+PACE University,MS in Marketing Analytics,MBA & Marketing,>=65%,4,>=2,Not Allowed
+Clark University,MBA,MBA & Marketing,>=65%,4,>=2,Not Allowed
+Clark University,MS in Marketing,MBA & Marketing,>=65%,4,>=2,Not Allowed
+Clark University,MS in Business Analytics,Business Analytics & Information Systems,>=65%,4,>=2,Not Allowed
+Clark University,MS in Marketing Analytics,Business Analytics & Information Systems,>=65%,4,>=2,Not Allowed
+Clark University,Master’s in Computer Science,CS & Engineering,>=65%,4,>=2,Allowed
+Clark University,MS in Information Technology,CS & Engineering,>=65%,4,>=2,Allowed
+Millsaps College,MBA,MBA & Marketing,>=60%,6,>=2,Not Allowed
+Seattle University,MS in Data Science,CS & Engineering,>=65%,2,>=2,Not Allowed
+Seattle University,MS in Structural Engineering,CS & Engineering,>=65%,2,>=2,Not Allowed
+Seattle University,MS in Mechanical Engineering,CS & Engineering,>=65%,2,>=2,Not Allowed
+Rochester Institute of Technology,MS in Environmental Health and Safety Management,CS & Engineering,>=65%,2,>=2,"Allowed, if workex is >=3 years"
+Rochester Institute of Technology,MS in Business Analytics,Business Analytics & Information Systems,>=65%,2,>=2,"Allowed, if workex is >=3 years"
+Rochester Institute of Technology,STEM MBA,MBA & Marketing,>=65%,2,>=2,"Allowed, if workex is >=3 years"
+Rochester Institute of Technology,MS Manufacturing and Mechanical Systems Integration,CS & Engineering,>=65%,2,>=2,"Allowed, if workex is >=3 years"
+Tulane University,MS in Computer Science,CS & Engineering,>=75% ,2,>=2,Not Allowed
+Drexel University,MBA,MBA & Marketing,>=68%,2,>=1,Not Allowed
+Drexel University,MS in Artificial Intielligence and Machine Learning,CS & Engineering,>=70%,2,>=1,Not Allowed

@@ -66,24 +66,32 @@ model VerificationToken {
   @@unique([identifier, token])
 }
 model Program {
-  id        Int    @id @default(autoincrement())
-  name      String
-  description String?
-  mode      String?
-  duration  String?
-  category  String?
-  fees      String?
-  eligibility Json
-  ranking   String?  
-  university String
-  college   String?
-  location  String?
-  publicPrivate String?
-  specialLocationFeatures String?
+  id                        Int      @id @default(autoincrement())
+  name                      String
+  description               String?
+  mode                      String?
+  duration                  String?
+  category                  String?
+  fees                      String?
+  eligibility               Json
+  ranking                   String?
+  university                String
+  college                   String?
+  location                  String?
+  publicPrivate             String?
+  specialLocationFeatures   String?
   specialUniversityFeatures String?
-  specialization String?
-  usp       String?
-  curriculum String?
-  coOpInternship String?
+  specialization            String?
+  usp                       String?
+  curriculum                String?
+  coOpInternship            String?
+  gloveraPricing            String?   
+  originalPricing           String?   
+  savings                   String?   
+  savingsPercentage         String?   
+  totalCredits              String?   
+  iitIim                    String?   
+  creditsInIITIIM           String?    
+  creditsInUS               String?    
+  canFinishIn               String?    
 }
-

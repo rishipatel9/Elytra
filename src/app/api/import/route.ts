@@ -4,13 +4,24 @@ import { NextResponse } from "next/server";
 // http://localhost:3000/api/import
 export async function GET() {
   try {
-    const result = await importDataFromExcel();
-    console.log(`Log result ${result}`);
+    console.log('Starting import process...');
     
-    return NextResponse.json({ success: true, result });
+    const result = await importDataFromExcel();
+    console.log('Import completed:', result);
+    
+    return NextResponse.json({ 
+      success: true, 
+      programsImported: result.programs?.results?.successful || 0,
+      eligibilityImported: result.eligibility?.results?.successful || 0
+    });
   } catch (error) {
+    console.error('API Import Error:', error);
     return NextResponse.json(
-      { success: false, error: error instanceof Error ? error.message : "Unknown error" },
+      { 
+        success: false, 
+        error: error instanceof Error ? error.message : "Unknown error",
+        fullError: error
+      },
       { status: 500 }
     );
   }
