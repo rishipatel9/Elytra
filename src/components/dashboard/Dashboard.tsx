@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { LogOut, Send } from 'lucide-react';
-import { getAllStudents, getStudentById } from '@/app/helper/student';
+import { getStudentById } from '@/helper';
 
 interface Message {
   role: 'user' | 'assistant' | 'system';
@@ -23,7 +23,7 @@ const Dashboard = () => {
   const { data: session } = useSession() as unknown as { data: Session & { user: { id: string } } };
   const userId = session?.user?.id ?? null;
 
-  console.log(`user id is data is ${userId}`)
+  // console.log(`user id is data is ${userId}`)
   
   const sendMessage = async () => {
     if (!input.trim()) return;
@@ -100,6 +100,7 @@ const Dashboard = () => {
           onClick={() => signOut()}
           aria-label="Logout"
         >
+          Logout
           <LogOut className="w-5 h-5" />
         </Button>
       </header>

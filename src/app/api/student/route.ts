@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
-import { z } from "zod";
-import { getServerSession } from "next-auth/next";
+import { z } from "zod";import { redirect } from "next/navigation";
+;
+
 
 
 const studentSchema = z.object({
@@ -43,6 +44,7 @@ export async function POST(req: NextRequest) {
   }
 }
 
+
 // export async function GET(req: NextRequest) {
 //   const { searchParams } = new URL(req.url);
 
@@ -78,30 +80,6 @@ export async function POST(req: NextRequest) {
 //   }
 // }
 
-export async function GET() {
-  try {
-    const session = await getServerSession();
-
-    if (!session || !session.user) {
-      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
-    }
-
-    const students = await prisma.user.findMany();
-
-    const student = students.filter((student: any) => student.email === session?.user?.email);
-
-    if (student.length === 0) {
-      return NextResponse.json({ message: "Student not found" }, { status: 404 });
-    }
-
-    return NextResponse.json({ student }, { status: 200 });
-  } catch (e) {
-    return NextResponse.json(
-      { message: "Error fetching student", error: e },
-      { status: 500 }
-    );
-  }
-}
 export async function PUT(req: NextRequest) {
   try {
     const body = await req.json();

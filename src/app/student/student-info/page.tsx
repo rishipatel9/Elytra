@@ -1,14 +1,19 @@
-"use client";
-
-import React from "react";
+import { redirect } from 'next/navigation';
 import StudentInformationForm from "../_components/StudentInformation";
+import { getUserDetails } from '@/utils';
+import { checkStudentApplicationFilled } from '@/actions/onFilled';
 
-const StudentInfo = () => {
-  return (
-    <div>
-      <StudentInformationForm />
-    </div>
-  );
-};
+export default async function StudentInfoPage() {
+  const session = await getUserDetails();
 
-export default StudentInfo;
+  if (!session) {
+    redirect('/auth/signin');
+  }
+  const filled = await checkStudentApplicationFilled(session.user.id);
+
+  if (filled) {
+    redirect('/dashboard');
+  }
+
+  return <StudentInformationForm  />;
+}

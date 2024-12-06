@@ -22,8 +22,9 @@ import { useEffect, useRef, useState } from "react";
 import { useMemoizedFn, usePrevious } from "ahooks";
 
 import InteractiveAvatarTextInput from "./InteractiveAvatarTextInput";
+import { AVATARS, STT_LANGUAGE_LIST } from "@/constants";
 
-import {AVATARS, STT_LANGUAGE_LIST} from "./constant";
+
 
 export default function InteractiveAvatar() {
   const [isLoadingSession, setIsLoadingSession] = useState(false);

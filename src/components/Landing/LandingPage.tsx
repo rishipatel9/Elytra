@@ -22,7 +22,7 @@ export default function LandingPage() {
                         Experience the future of education, where personalized AI interactions guide you to success in your international academic journey.
                     </p>
                     <div className="mt-8 space-x-4 flex justify-center">
-                        <Link href="/auth/signin" className="px-6 py-2 sm:px-8 sm:py-4 bg-[#4220A9] text-white rounded-lg hover:bg-[#321880] transition-colors duration-200 flex items-center">
+                        <Link href="/auth/signup" className="px-6 py-2 sm:px-8 sm:py-4 bg-[#4220A9] text-white rounded-lg hover:bg-[#321880] transition-colors duration-200 flex items-center">
                             Get Started <ArrowRight className="ml-2" size={20} />
                         </Link>
                         <button className="px-6 py-2 sm:px-8 sm:py-4 bg-gray-800 text-white rounded-lg hover:bg-gray-700 transition-colors duration-200 ml-4">
