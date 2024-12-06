@@ -1,3 +1,4 @@
+"use client"
 import { Input, Spinner, Tooltip } from "@nextui-org/react";
 import { Airplane, ArrowRight, PaperPlaneRight } from "@phosphor-icons/react";
 import clsx from "clsx";
