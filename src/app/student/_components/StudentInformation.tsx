@@ -210,8 +210,8 @@ const StudentDataForm: React.FC = () => {
           </div>
 
           <div className="text-center mt-8">
-            <Button type="submit" className="px-6 py-3 bg-white text-black mx-auto w-full">
-              Submit
+            <Button variant={'outline'} type="submit" className="px-6 py-3 bg-white text-black mx-auto w-full onHover:bg-white ">
+              Submit 
             </Button>
           </div>
           <Toaster />
