@@ -1,3 +1,4 @@
+'use client'
 import type { StartAvatarResponse } from "@heygen/streaming-avatar";
 
 import StreamingAvatar, {
@@ -22,57 +23,119 @@ import { useEffect, useRef, useState } from "react";
 import { useMemoizedFn, usePrevious } from "ahooks";
 
 import InteractiveAvatarTextInput from "./InteractiveAvatarTextInput";
+<<<<<<< HEAD
 import { AVATARS, STT_LANGUAGE_LIST } from "@/constants";
 
 
+=======
+ 
+import {AVATARS, STT_LANGUAGE_LIST} from "../../lib/constant";
+import { OpenAIAssistant } from "@/lib/openai-assistant";
+import { useSession } from "next-auth/react";
+import { getStudentById } from "@/app/helper/student";
+import { Session } from "next-auth";
+>>>>>>> heygen-avatar
 
 export default function InteractiveAvatar() {
   const [isLoadingSession, setIsLoadingSession] = useState(false);
   const [isLoadingRepeat, setIsLoadingRepeat] = useState(false);
   const [stream, setStream] = useState<MediaStream>();
   const [debug, setDebug] = useState<string>();
-  const [knowledgeId, setKnowledgeId] = useState<string>("");
-  const [avatarId, setAvatarId] = useState<string>("");
   const [language, setLanguage] = useState<string>('en');
 
   const [data, setData] = useState<StartAvatarResponse>();
   const [text, setText] = useState<string>("");
   const mediaStream = useRef<HTMLVideoElement>(null);
   const avatar = useRef<StreamingAvatar | null>(null);
+  const openaiAssistant = useRef<OpenAIAssistant | null>(null);
   const [chatMode, setChatMode] = useState("text_mode");
   const [isUserTalking, setIsUserTalking] = useState(false);
-
+  
+  //const { data: session } = useSession() as unknown as { data: Session & { user: { id: string } } };
+  //const userId = session?.user?.id ?? null;
+  const userId="cm49rlgcw0000fx36ge376cid"
+  console.log(`student id ${userId}`)
+   
+   
   async function fetchAccessToken() {
     try {
       const response = await fetch("/api/get-access-token", {
         method: "POST",
       });
       const token = await response.text();
-
-      console.log("Access Token:", token); // Log the token to verify
-
+      console.log("Access Token:", token);
       return token;
     } catch (error) {
       console.error("Error fetching access token:", error);
+      return "";
     }
-
-    return "";
   }
-
+ 
+  
   async function startSession() {
-    setIsLoadingSession(true);
+     setIsLoadingSession(true);
     const newToken = await fetchAccessToken();
 
-    avatar.current = new StreamingAvatar({
-      token: newToken,
-    });
-    avatar.current.on(StreamingEvents.AVATAR_START_TALKING, (e) => {
+    try {
+      // Initialize HeyGen Avatar
+      avatar.current = new StreamingAvatar({
+        token: newToken,
+      });
+
+      // Initialize OpenAI Assistant
+      const openaiApiKey = process.env.NEXT_PUBLIC_OPENAI_API_KEY;
+      openaiAssistant.current = new OpenAIAssistant();
+      await openaiAssistant.current.initialize();
+
+      // Set up HeyGen Avatar event listeners
+      setupAvatarEventListeners();
+ 
+
+
+try {
+  const res = await avatar.current.createStartAvatar({
+    quality: AvatarQuality.Medium,
+    avatarName: "Wayne_20240711",
+    language: language,
+    disableIdleTimeout: true,
+    voice: {
+      rate: 2.0,
+      emotion: VoiceEmotion.EXCITED,
+    },
+   });
+  console.log('Avatar Start Response:', JSON.stringify(res, null, 2));
+        setData(res);
+
+} catch (error) {
+  console.error('Failed to start avatar:', error);
+  // Log more detailed error information
+  if (error instanceof Error) {
+    console.error('Error Name:', error.name);
+    console.error('Error Message:', error.message);
+    console.error('Error Stack:', error.stack);
+  }
+}
+      
+      // Default to voice mode
+      await avatar.current?.startVoiceChat({
+        useSilencePrompt: false
+      });
+      setChatMode("voice_mode");
+    } catch (error) {
+      console.error("Error starting avatar session:", error);
+    } finally {
+      setIsLoadingSession(false);
+    }
+  }
+
+  function setupAvatarEventListeners() {
+    avatar.current?.on(StreamingEvents.AVATAR_START_TALKING, (e) => {
       console.log("Avatar started talking", e);
     });
-    avatar.current.on(StreamingEvents.AVATAR_STOP_TALKING, (e) => {
+    avatar.current?.on(StreamingEvents.AVATAR_STOP_TALKING, (e) => {
       console.log("Avatar stopped talking", e);
     });
-    avatar.current.on(StreamingEvents.STREAM_DISCONNECTED, () => {
+    avatar.current?.on(StreamingEvents.STREAM_DISCONNECTED, () => {
       console.log("Stream disconnected");
       endSession();
     });
@@ -88,44 +151,50 @@ export default function InteractiveAvatar() {
       console.log(">>>>> User stopped talking:", event);
       setIsUserTalking(false);
     });
-    try {
-      const res = await avatar.current.createStartAvatar({
-        quality: AvatarQuality.Low,
-        avatarName: avatarId,
-        knowledgeId: knowledgeId, // Or use a custom `knowledgeBase`.
-        voice: {
-          rate: 1.5, // 0.5 ~ 1.5
-          emotion: VoiceEmotion.EXCITED,
-        },
-        language: language,
-        disableIdleTimeout: true,
-      });
-
-      setData(res);
-      // default to voice mode
-      await avatar.current?.startVoiceChat({
-        useSilencePrompt: false
-      });
-      setChatMode("voice_mode");
-    } catch (error) {
-      console.error("Error starting avatar session:", error);
-    } finally {
-      setIsLoadingSession(false);
-    }
   }
+
   async function handleSpeak() {
     setIsLoadingRepeat(true);
-    if (!avatar.current) {
-      setDebug("Avatar API not initialized");
-
+    if (!avatar.current || !openaiAssistant.current) {
+      setDebug("Avatar or OpenAI Assistant not initialized");
       return;
     }
-    // speak({ text: text, task_type: TaskType.REPEAT })
-    await avatar.current.speak({ text: text, taskType: TaskType.REPEAT, taskMode: TaskMode.SYNC }).catch((e) => {
+    console.log(`in handle speak`)
+    try {
+      // Get response from OpenAI Assistanst
+      console.log(`text is ${text}`)
+      //const studentDetails = await getStudentById(userId);
+  //     const studentDetails = {
+  // name: "John Doe",
+  // course: "Computer Science",
+  // preferredCountry: "Canada",
+  // preferredGrade: "A",
+  // educationLevel: "Undergraduate",
+  // nationality: "American",
+  //       age: 21,
+  // aspiration:"became an entrepreneur later in career "
+//};
+      //console.log(`student details are :${JSON.stringify(studentDetails)}`)
+     // setText(`user query is :${text}   for some context this is some info about student${studentDetails} if it helps  `)
+      console.log(`new text is ${text}`)
+      const newText = `user query is :${text} `;
+      console.log(`new text`)
+      const response = await openaiAssistant.current.getResponse(newText);
+
+      // Speak the response
+      console.log(`RESP IS :${JSON.stringify(response)}`)
+      await avatar.current.speak({ 
+        text: response, 
+        taskType: TaskType.REPEAT, 
+        taskMode: TaskMode.SYNC 
+      });
+    } catch (e:any) {
       setDebug(e.message);
-    });
-    setIsLoadingRepeat(false);
+    } finally {
+      setIsLoadingRepeat(false);
+    }
   }
+
   async function handleInterrupt() {
     if (!avatar.current) {
       setDebug("Avatar API not initialized");
@@ -220,53 +289,9 @@ export default function InteractiveAvatar() {
           ) : !isLoadingSession ? (
             <div className="h-full justify-center items-center flex flex-col gap-8 w-[500px] self-center">
               <div className="flex flex-col gap-2 w-full">
-                <p className="text-sm font-medium leading-none">
-                  Custom Knowledge ID (optional)
-                </p>
-                <Input
-                  placeholder="Enter a custom knowledge ID"
-                  value={knowledgeId}
-                  onChange={(e) => setKnowledgeId(e.target.value)}
-                />
-                <p className="text-sm font-medium leading-none">
-                  Custom Avatar ID (optional)
-                </p>
-                <Input
-                  placeholder="Enter a custom avatar ID"
-                  value={avatarId}
-                  onChange={(e) => setAvatarId(e.target.value)}
-                />
-                <Select
-                  placeholder="Or select one from these example avatars"
-                  size="md"
-                  onChange={(e) => {
-                    setAvatarId(e.target.value);
-                  }}
-                >
-                  {AVATARS.map((avatar) => (
-                    <SelectItem
-                      key={avatar.avatar_id}
-                      textValue={avatar.avatar_id}
-                    >
-                      {avatar.name}
-                    </SelectItem>
-                  ))}
-                </Select>
-                <Select
-                  label="Select language"
-                  placeholder="Select language"
-                  className="max-w-xs"
-                  selectedKeys={[language]}
-                  onChange={(e) => {
-                    setLanguage(e.target.value);
-                  }}
-                >
-                  {STT_LANGUAGE_LIST.map((lang) => (
-                    <SelectItem key={lang.key}>
-                      {lang.label}
-                    </SelectItem>
-                  ))}
-                </Select>
+                
+                
+                 
               </div>
               <Button
                 className="bg-gradient-to-tr from-indigo-500 to-indigo-300 w-full text-white"

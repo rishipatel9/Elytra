@@ -1,4 +1,4 @@
-import { Input, Spinner, Tooltip } from "@nextui-org/react";
+ import { Input, Spinner, Tooltip } from "@nextui-org/react";
 import { Airplane, ArrowRight, PaperPlaneRight } from "@phosphor-icons/react";
 import clsx from "clsx";
 
@@ -63,7 +63,7 @@ export default function InteractiveAvatarTextInput({
       }
       label={label}
       placeholder={placeholder}
-      size="sm"
+      size="sm" 
       value={input}
       onKeyDown={(e) => {
         if (e.key === "Enter") {
