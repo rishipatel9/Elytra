@@ -23,19 +23,15 @@ import { useEffect, useRef, useState } from "react";
 import { useMemoizedFn, usePrevious } from "ahooks";
 
 import InteractiveAvatarTextInput from "./InteractiveAvatarTextInput";
-<<<<<<< HEAD
-import { AVATARS, STT_LANGUAGE_LIST } from "@/constants";
-
-
-=======
  
+
+  
 import {AVATARS, STT_LANGUAGE_LIST} from "../../lib/constant";
 import { OpenAIAssistant } from "@/lib/openai-assistant";
 import { useSession } from "next-auth/react";
 import { getStudentById } from "@/app/helper/student";
 import { Session } from "next-auth";
->>>>>>> heygen-avatar
-
+ 
 export default function InteractiveAvatar() {
   const [isLoadingSession, setIsLoadingSession] = useState(false);
   const [isLoadingRepeat, setIsLoadingRepeat] = useState(false);
