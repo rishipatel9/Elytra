@@ -29,16 +29,16 @@ const Navbar = () => {
         </div>
 
         <div className="hidden lg:flex space-x-4">
-          <Link href="#" className="hover:text-[#4220A9] transition-colors duration-200 text-white">
+          <Link href="#" className="text-white hover:text-[#fafafa] hover:underline transition-colors duration-200">
             Home
           </Link>
-          <Link href="#" className="hover:text-[#4220A9] transition-colors duration-200 text-white">
+          <Link href="#" className="text-white hover:text-[#fafafa] hover:underline transition-colors duration-200">
             Features
           </Link>
-          <Link href="#" className="hover:text-[#4220A9] transition-colors duration-200 text-white">
+          <Link href="#" className="text-white hover:text-[#fafafa] hover:underline transition-colors duration-200">
             About
           </Link>
-          <Link href="/auth/signin" className="hover:text-[#4220A9] transition-colors duration-200 text-white">
+          <Link href="/auth/signin" className="text-white hover:text-[#fafafa] hover:underline transition-colors duration-200">
             Signin
           </Link>
         </div>
@@ -46,16 +46,16 @@ const Navbar = () => {
 
       {isMenuOpen && (
         <div className="lg:hidden absolute top-16 left-0 right-0 bg-violet-900 opacity-15 backdrop-blur-3xl border-b p-4 border-t border-[#ffffff33] text-center">
-          <Link href="#" className="block py-2 px-4 text-white hover:text-[#4220A9]">
+          <Link href="#" className="block py-2 px-4 text-white hover:text-[#fafafa] hover:underline">
             Home
           </Link>
-          <Link href="#" className="block py-2 px-4 text-white hover:text-[#4220A9]">
+          <Link href="#" className="block py-2 px-4 text-white hover:text-[#fafafa] hover:underline">
             Features
           </Link>
-          <Link href="#" className="block py-2 px-4 text-white hover:text-[#4220A9]">
+          <Link href="#" className="block py-2 px-4 text-white hover:text-[#fafafa] hover:underline">
             About
           </Link>
-          <Link href="#" className="block py-2 px-4 text-white hover:text-[#4220A9]">
+          <Link href="#" className="block py-2 px-4 text-white hover:text-[#fafafa] hover:underline">
             Contact
           </Link>
           <Link href="/signup" className="block py-2 px-4 mt-4 text-white bg-[#4220A9] hover:bg-[#5f2cc7] rounded-md">

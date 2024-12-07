@@ -1,7 +1,6 @@
 "use server";
 import prisma from "@/lib/prisma";
-// @ts-ignore 
-import { getServerSession } from "next-auth";
+import { getServerSession } from "next-auth/next";
 import { z } from "zod";
 
 const studentDataSchema = z.object({
@@ -26,9 +25,9 @@ type StudentDataFormType = z.infer<typeof studentDataSchema>;
 export async function uploadStudentInfo(formData: StudentDataFormType) {
   try {
     const validatedData = studentDataSchema.parse(formData);
-    console.log(validatedData)
+    console.log(`Validated Data: ${validatedData}`)
     const session = await getServerSession();
-    console.log(session)
+    console.log(`Session: ${session}`)
     if (!session) {
       throw new Error("You must be logged in to submit student information.");
     }

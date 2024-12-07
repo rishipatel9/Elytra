@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import jwt from "jsonwebtoken";
 
 const JWT_SECRET = process.env.NEXT_PUBLIC_JWT_SECRET ;
+console.log(`JWT_SECRET: ${JWT_SECRET}`);
+
 
 export async function POST(req: NextRequest) {
     try {
@@ -17,7 +19,7 @@ export async function POST(req: NextRequest) {
         }
         const token = jwt.sign(
             { role: "admin", email: requestBody.email },
-            JWT_SECRET || "",
+            JWT_SECRET as string,
             { expiresIn: "1d" } 
         );
 

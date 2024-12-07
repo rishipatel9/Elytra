@@ -1,5 +1,5 @@
 'use client';
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { signOut } from 'next-auth/react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -7,17 +7,18 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { LogOut, Send } from 'lucide-react';
 import { SidebarTrigger } from '@/components/ui/sidebar';
-import { GoogleGenerativeAI } from '@google/generative-ai'; // Gemini API
+import { GoogleGenerativeAI } from '@google/generative-ai';
 import { Pinecone } from '@pinecone-database/pinecone';
+import { toast } from 'sonner';
 
-const pinecone = new Pinecone({
-  apiKey: process.env.NEXT_PUBLIC_PINECONE_API_KEY || ' ',
+const pc = new Pinecone({
+  apiKey: process.env.NEXT_PUBLIC_PINECONE_API_KEY!,
 });
 
-const genAI = new GoogleGenerativeAI(process.env.NEXT_PUBLIC_GEMINI_API_KEY || ' ');
-const model = genAI.getGenerativeModel({ model: 'text-embedding-004' });
+const index = pc.index('program-recommendations');
 
-const index = pinecone.Index('program-recommendations');
+const genAI = new GoogleGenerativeAI(process.env.NEXT_PUBLIC_GEMINI_API_KEY || '');
+const model = genAI.getGenerativeModel({ model: 'text-embedding-004' });
 
 interface Message {
   role: 'user' | 'assistant' | 'system';
@@ -28,74 +29,143 @@ const Page = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isStreaming, setIsStreaming] = useState(false);
-  const [students, setStudents] = useState<any[]>([]);
   const [usedContexts, setUsedContexts] = useState<string[]>([]);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  // Auto scroll to bottom when new messages arrive
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
 
   const sendMessage = async () => {
     if (!input.trim()) return;
 
-    const userMessage: Message = { role: 'user', content: input };
-    setMessages((prev) => [...prev, userMessage]);
-
-    const botMessage: Message = { role: 'assistant', content: '' };
-    setMessages((prev) => [...prev, botMessage]);
-    setIsStreaming(true);
-
     try {
+      console.log('Getting embeddings for query:', input);
       const embeddingResult = await model.embedContent(input);
       const embeddingVector = embeddingResult.embedding.values;
+      console.log('Got embeddings, vector length:', embeddingVector.length);
 
-      const searchResults = await index.query({
-        vector: embeddingVector,
-        topK: 3,
-        includeMetadata: true,
-      });
+      console.log('Checking Pinecone connection...');
+      if (!process.env.NEXT_PUBLIC_PINECONE_API_KEY) {
+        throw new Error('Pinecone API key is not configured');
+      }
 
+      console.log('Searching Pinecone...');
+      try {
+        const searchResults = await index.query({
+          vector: embeddingVector,
+          topK: 5,
+          includeMetadata: true,
+        });
+        console.log('Pinecone search results:', searchResults);
 
-      console.log(JSON.stringify(searchResults))
-      const contexts = searchResults.matches.map(
-        (match: any) =>
-          `${match.metadata?.name || 'Unknown'}: ${match.metadata?.description || 'No description'}`
-      );
+        if (!searchResults.matches || searchResults.matches.length === 0) {
+          console.log('No matches found in Pinecone');
+          toast.error('No relevant programs found. Try a different query.');
+          return;
+        }
 
-      setUsedContexts(contexts);
-      console.log(`contexts are ${contexts}`)
-      const response = await fetch('/api/chat', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          message: `You are an expert at recommending programs/courses. The user's query is: ${input} these are some of the programs Elytra (we) have to offer,${contexts} try to incorporate them in your response as well like we elyta offer these too if u would like to know more about them if the context is not proveded to u  just give them ur genreral response`,
-          contexts,
-          students: students.map((student) => ({
-            name: student.name,
-            nationality: student.nationality,
-            careerAspirations: student.careerAspirations,
-            preferredCountries: student.preferredCountries,
-            preferredPrograms: student.preferredPrograms,
-          })),
-        }),
-      });
+        const contexts = searchResults.matches.map((match: any) => {
+          console.log('Processing match:', match);
+          const metadata = match.metadata;
+          return `
+Program Details:
+- Name: ${metadata.Program || 'Unknown'}
+- University: ${metadata.University || 'Unknown'}
+- Location: ${metadata.Location || 'Not specified'}
+- Specialization: ${metadata.Specialization || 'Not specified'}
+- Curriculum: ${metadata.Curriculum || 'Not specified'}
+- Special Features: ${metadata.SpecialLocationFeatures || 'Not specified'}
+- Co-op/Internship: ${metadata.CoOpInternship || 'Not specified'}
+- Key Job Roles: ${metadata.KeyJobRoles || 'Not specified'}
+- Eligibility:
+  * GPA: ${metadata.EligibilityMinimumGPA || 'Not specified'}
+  * Work Experience: ${metadata.EligibilityWorkExperience || 'Not specified'}
+  * Background: ${metadata.EligibilityUGBackground || 'Not specified'}
+  * Backlogs: ${metadata.EligibilityBacklogs || 'Not specified'}
+- Application Requirements:
+  * LOR: ${metadata.LOR || 'Not specified'}
+  * SOP: ${metadata.SOP || 'Not specified'}
+  * Application Fee: ${metadata.ApplicationFee || 'Not specified'}
+  * Deposit: ${metadata.Deposit || 'Not specified'}
+Relevance Score: ${match.score ? Math.round(match.score * 100) / 100 : 'Not available'}
+`;
+        });
 
-      if (!response.body) throw new Error('No response body');
+        console.log('Formatted contexts:', contexts);
+        setUsedContexts(contexts);
 
-      const reader = response.body.getReader();
-      const decoder = new TextDecoder();
+        const userMessage: Message = { role: 'user', content: input };
+        setMessages(prev => [...prev, userMessage]);
 
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
+        const botMessage: Message = { role: 'assistant', content: '' };
+        setMessages(prev => [...prev, botMessage]);
+        setIsStreaming(true);
 
-        const chunk = decoder.decode(value, { stream: true });
-        setMessages((prev) =>
+        console.log('Sending to chat API...');
+        const response = await fetch('/api/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            message: input,
+            contexts: contexts,
+            metadata: {
+              totalResults: searchResults.matches.length,
+              queryType: 'program_search',
+            }
+          }),
+        });
+
+        if (!response.ok) {
+          throw new Error(`Chat API returned ${response.status}`);
+        }
+
+        if (!response.body) {
+          throw new Error('No response body');
+        }
+
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder();
+
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+
+          const chunk = decoder.decode(value, { stream: true });
+          setMessages(prev =>
+            prev.map((msg, idx) =>
+              idx === prev.length - 1
+                ? { ...msg, content: msg.content + chunk }
+                : msg
+            )
+          );
+        }
+      } catch (error) {
+        console.error('Error searching Pinecone:', error);
+        toast.error('An error occurred while searching Pinecone');
+        setMessages(prev =>
           prev.map((msg, idx) =>
             idx === prev.length - 1
-              ? { ...msg, content: msg.content + chunk }
+              ? { ...msg, content: 'Sorry, there was an error searching Pinecone.' }
               : msg
           )
         );
       }
     } catch (error) {
-      console.error('Error streaming response:', error);
+      console.error('Error:', error);
+      toast.error('An error occurred while processing your request');
+      setMessages(prev =>
+        prev.map((msg, idx) =>
+          idx === prev.length - 1
+            ? { ...msg, content: 'Sorry, there was an error processing your request.' }
+            : msg
+        )
+      );
     }
 
     setInput('');
@@ -103,8 +173,7 @@ const Page = () => {
   };
 
   return (
-    <div className="flex flex-col h-screen"> {/* Changed to h-screen */}
-      {/* Header */}
+    <div className="flex flex-col h-screen">
       <SidebarTrigger />
       <header className="flex items-center justify-between px-6 py-4 border-b shrink-0">
         <div className="flex items-center gap-2">
@@ -128,15 +197,13 @@ const Page = () => {
         </Button>
       </header>
 
-      {/* Main scrollable container */}
       <div className="flex-1 overflow-hidden flex flex-col">
-        {/* Context Box */}
         {usedContexts.length > 0 && (
           <div className="p-4 bg-muted text-muted-foreground shrink-0">
-            <h2 className="text-sm font-semibold">Used Contexts:</h2>
-            <ul className="list-disc pl-4">
+            <h2 className="text-sm font-semibold">Programs Found:</h2>
+            <ul className="list-disc pl-4 max-h-40 overflow-y-auto">
               {usedContexts.map((context, idx) => (
-                <li key={idx} className="text-sm">
+                <li key={idx} className="text-sm whitespace-pre-wrap">
                   {context}
                 </li>
               ))}
@@ -144,51 +211,59 @@ const Page = () => {
           </div>
         )}
 
-        {/* Chat Area */}
         <ScrollArea className="flex-1 p-4">
           <div className="space-y-4 mb-4">
             {messages.map((message, index) => (
               <div
                 key={index}
-                className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'
-                  }`}
+                className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
               >
                 <div
-                  className={`flex gap-2 max-w-[80%] items-start ${message.role === 'user' ? 'flex-row-reverse' : 'flex-row'
-                    }`}
+                  className={`flex gap-2 max-w-[80%] items-start ${message.role === 'user' ? 'flex-row-reverse' : 'flex-row'}`}
                 >
                   <Avatar className="w-8 h-8">
                     <AvatarFallback>
-                      {message.role === 'user' ? 'S' : 'AI'}
+                      {message.role === 'user' ? 'U' : 'AI'}
                     </AvatarFallback>
                   </Avatar>
                   <div
-                    className={`rounded-lg px-4 py-2 ${message.role === 'user'
+                    className={`rounded-lg px-4 py-2 ${
+                      message.role === 'user'
                         ? 'bg-primary text-primary-foreground'
                         : 'bg-muted'
-                      }`}
+                    }`}
                   >
-                    <p className="text-sm">{message.content}</p>
+                    {message.role === 'assistant' ? (
+                      <div 
+                        className="text-sm prose prose-sm max-w-none prose-headings:mb-2 prose-p:mb-2 prose-ul:my-1 prose-li:my-0"
+                        dangerouslySetInnerHTML={{
+                          __html: message.content
+                            .replace(/\n\n/g, '</p><p>')
+                            .replace(/\n/g, '<br/>')
+                            .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                            .replace(/\*(.*?)\*/g, '<em>$1</em>')
+                            .replace(/- (.*?)(?=\n|$)/g, '<li>$1</li>')
+                            .replace(/((?:<li>.*?<\/li>\n*)+)/g, '<ul>$1</ul>')
+                            .replace(/^(.*?)(?=<|$)/g, '<p>$1</p>')
+                        }}/>
+                    ) : (
+                      <p className="text-sm whitespace-pre-wrap">{message.content}</p>
+                    )}
                   </div>
                 </div>
               </div>
             ))}
-            {isStreaming && (
-              <div className="text-muted-foreground">
-                Program recommender is typing...
-              </div>
-            )}
+            <div ref={messagesEndRef} />
           </div>
         </ScrollArea>
 
-        {/* Input Area - Fixed at bottom */}
         <div className="p-4 border-t mt-auto bg-background">
           <div className="flex gap-2 max-w-[1200px] mx-auto">
             <Input
               placeholder="Type your question about program recommendations..."
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && sendMessage()}
+              onKeyDown={(e) => e.key === 'Enter' && !isStreaming && sendMessage()}
               className="flex-1"
               disabled={isStreaming}
             />
@@ -209,6 +284,6 @@ const Page = () => {
       </div>
     </div>
   );
-}
+};
 
 export default Page;

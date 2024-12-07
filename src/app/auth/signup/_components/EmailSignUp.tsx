@@ -36,7 +36,8 @@ const EmailSignUp = () => {
                 toast.success('Successfully signed up!', {
                     position: 'bottom-right',
                 });
-                router.push('/dashboard');
+                //after plain signup(which means without google or github, we need to send user to student form instead of dashboard)
+                router.push('/student/student-info');
 
             }
         } catch (err) {

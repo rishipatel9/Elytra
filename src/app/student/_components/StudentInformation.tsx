@@ -205,8 +205,8 @@ const StudentDataForm: React.FC = () => {
           </div>
 
           <div className="text-center mt-8">
-            <Button type="submit" className="px-6 py-3 bg-white text-black mx-auto w-full font-semibold hover:bg-[#cac6c6]">
-              Submit
+            <Button variant={'outline'} type="submit" className="px-6 py-3 bg-white text-black mx-auto w-full onHover:bg-white ">
+              Submit 
             </Button>
           </div>
           <Toaster />

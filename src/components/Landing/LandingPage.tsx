@@ -71,7 +71,7 @@ export default function LandingPage() {
             <footer className="bg-[#1C1E2D] py-8">
                 <div className="container mx-auto px-4 text-center">
                     <p className="text-sm text-gray-400">
-                        © 2023 Elytra. Empowering students with AI-driven guidance for global education.
+                        © 2024 Elytra. Empowering students with AI-driven guidance for global education.
                     </p>
                 </div>
             </footer>
