@@ -81,7 +81,7 @@ const Dashboard = () => {
   };
 
   return (
-    <div className="flex flex-col h-screen w-full bg-background">
+    <div className="flex flex-col h-screen w-full bg-background font-sans">
       {/* Header */}
       <header className="flex items-center justify-between px-6 py-4 border-b">
         <div className="flex items-center gap-2">

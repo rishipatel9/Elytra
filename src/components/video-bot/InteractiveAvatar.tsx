@@ -29,7 +29,6 @@ import InteractiveAvatarTextInput from "./InteractiveAvatarTextInput";
 import {AVATARS, STT_LANGUAGE_LIST} from "../../lib/constant";
 import { OpenAIAssistant } from "@/lib/openai-assistant";
 import { useSession } from "next-auth/react";
-import { getStudentById } from "@/app/helper/student";
 import { Session } from "next-auth";
  
 export default function InteractiveAvatar() {
