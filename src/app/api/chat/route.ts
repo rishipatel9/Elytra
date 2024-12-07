@@ -30,6 +30,9 @@ Based on these programs and the user's query, please provide a response that:
 4. Explains why these programs would be good choices
 5. Suggests next steps (like application requirements or deadlines)
 6. If relevant, mentions any unique aspects like internship opportunities or specializations
+7. Organizes information in clear sections
+8. Uses bullet points for lists
+9. Highlights key details in bold
 
 Remember to:
 - Be specific when referencing programs and their features

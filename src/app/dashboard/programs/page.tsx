@@ -233,7 +233,22 @@ Relevance Score: ${match.score ? Math.round(match.score * 100) / 100 : 'Not avai
                         : 'bg-muted'
                     }`}
                   >
-                    <p className="text-sm whitespace-pre-wrap">{message.content}</p>
+                    {message.role === 'assistant' ? (
+                      <div 
+                        className="text-sm prose prose-sm max-w-none prose-headings:mb-2 prose-p:mb-2 prose-ul:my-1 prose-li:my-0"
+                        dangerouslySetInnerHTML={{
+                          __html: message.content
+                            .replace(/\n\n/g, '</p><p>')
+                            .replace(/\n/g, '<br/>')
+                            .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                            .replace(/\*(.*?)\*/g, '<em>$1</em>')
+                            .replace(/- (.*?)(?=\n|$)/g, '<li>$1</li>')
+                            .replace(/((?:<li>.*?<\/li>\n*)+)/g, '<ul>$1</ul>')
+                            .replace(/^(.*?)(?=<|$)/g, '<p>$1</p>')
+                        }}/>
+                    ) : (
+                      <p className="text-sm whitespace-pre-wrap">{message.content}</p>
+                    )}
                   </div>
                 </div>
               </div>
