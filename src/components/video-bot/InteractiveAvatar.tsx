@@ -35,8 +35,6 @@ export default function InteractiveAvatar() {
   const [isLoadingRepeat, setIsLoadingRepeat] = useState(false);
   const [stream, setStream] = useState<MediaStream>();
   const [debug, setDebug] = useState<string>();
-  const [knowledgeId, setKnowledgeId] = useState<string>("");
-  const [avatarId, setAvatarId] = useState<string>("");
   const [language, setLanguage] = useState<string>('en');
 
   const [data, setData] = useState<StartAvatarResponse>();
@@ -80,24 +78,12 @@ export default function InteractiveAvatar() {
 
       // Initialize OpenAI Assistant
       const openaiApiKey = process.env.NEXT_PUBLIC_OPENAI_API_KEY;
-      openaiAssistant.current = new OpenAIAssistant(openaiApiKey);
+      openaiAssistant.current = new OpenAIAssistant();
       await openaiAssistant.current.initialize();
 
       // Set up HeyGen Avatar event listeners
       setupAvatarEventListeners();
-
-      // Start Avatar Session
-      //  const res = await avatar.current.createStartAvatar({
-      //   quality: AvatarQuality.Low,
-      //   avatarName: avatarId,
-      //   knowledgeId: knowledgeId,
-      //   voice: {
-      //     rate: 1.5,
-      //     emotion: VoiceEmotion.EXCITED,
-      //   },
-      //   language: language,
-      //   disableIdleTimeout: true,
-      // });
+ 
 
 
 try {
@@ -172,20 +158,20 @@ try {
       // Get response from OpenAI Assistanst
       console.log(`text is ${text}`)
       //const studentDetails = await getStudentById(userId);
-      const studentDetails = {
-  name: "John Doe",
-  course: "Computer Science",
-  preferredCountry: "Canada",
-  preferredGrade: "A",
-  educationLevel: "Undergraduate",
-  nationality: "American",
-        age: 21,
-  aspiration:"became an entrepreneur later in career "
-};
-      console.log(`student details are :${JSON.stringify(studentDetails)}`)
-      setText(`user query is :${text}   for some context this is some info about student${studentDetails} if it helps  `)
+  //     const studentDetails = {
+  // name: "John Doe",
+  // course: "Computer Science",
+  // preferredCountry: "Canada",
+  // preferredGrade: "A",
+  // educationLevel: "Undergraduate",
+  // nationality: "American",
+  //       age: 21,
+  // aspiration:"became an entrepreneur later in career "
+//};
+      //console.log(`student details are :${JSON.stringify(studentDetails)}`)
+     // setText(`user query is :${text}   for some context this is some info about student${studentDetails} if it helps  `)
       console.log(`new text is ${text}`)
-      const newText = `user query is :${text} for some context this is some info about student ${JSON.stringify(studentDetails)} if it helps`;
+      const newText = `user query is :${text} `;
       console.log(`new text`)
       const response = await openaiAssistant.current.getResponse(newText);
 
@@ -196,7 +182,7 @@ try {
         taskType: TaskType.REPEAT, 
         taskMode: TaskMode.SYNC 
       });
-    } catch (e) {
+    } catch (e:any) {
       setDebug(e.message);
     } finally {
       setIsLoadingRepeat(false);
@@ -297,38 +283,9 @@ try {
           ) : !isLoadingSession ? (
             <div className="h-full justify-center items-center flex flex-col gap-8 w-[500px] self-center">
               <div className="flex flex-col gap-2 w-full">
-                <p className="text-sm font-medium leading-none">
-                  Custom Knowledge ID (optional)
-                </p>
-                <Input
-                  placeholder="Enter a custom knowledge ID"
-                  value={knowledgeId}
-                  onChange={(e) => setKnowledgeId(e.target.value)}
-                />
-                <p className="text-sm font-medium leading-none">
-                  Custom Avatar ID (optional)
-                </p>
-                <Input
-                  placeholder="Enter a custom avatar ID"
-                  value={avatarId}
-                  onChange={(e) => setAvatarId(e.target.value)}
-                />
+                
+                
                  
-                <Select
-                  label="Select language"
-                  placeholder="Select language"
-                  className="max-w-xs"
-                  selectedKeys={[language]}
-                  onChange={(e) => {
-                    setLanguage(e.target.value);
-                  }}
-                >
-                  {STT_LANGUAGE_LIST.map((lang) => (
-                    <SelectItem key={lang.key}>
-                      {lang.label}
-                    </SelectItem>
-                  ))}
-                </Select>
               </div>
               <Button
                 className="bg-gradient-to-tr from-indigo-500 to-indigo-300 w-full text-white"
