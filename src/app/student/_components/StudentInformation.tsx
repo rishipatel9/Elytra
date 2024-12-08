@@ -22,6 +22,7 @@ interface StudentData {
 }
 
 const StudentDataForm: React.FC = () => {
+  const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState<StudentData>({
     name: '',
     phone: '',
@@ -63,6 +64,7 @@ const StudentDataForm: React.FC = () => {
   };
 
   async function handleFormAction(formdata: FormData) {
+    setLoading(true);
     const data = {
       name: formdata.get('name') as string,
       phone: formdata.get('phone') as string,
@@ -82,8 +84,10 @@ const StudentDataForm: React.FC = () => {
     const response = await uploadStudentInfo(data);
     console.log('Response:', response);
     if (response) {
+      setLoading(false)
       toast.success('Student Information Uploaded Successfully');
     } else {
+       setLoading(false)
       toast.error('Error uploading student information');
     }
   }
@@ -206,7 +210,7 @@ const StudentDataForm: React.FC = () => {
 
           <div className="text-center mt-8">
             <Button variant={'outline'} type="submit" className="px-6 py-3 bg-white text-black mx-auto w-full onHover:bg-white ">
-              Submit 
+              {loading ? <div className="animate-spin rounded-full h-4 w-4 border-2 border-t-black border-white"></div>  : 'Submit'}
             </Button>
           </div>
           <Toaster />

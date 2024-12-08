@@ -11,9 +11,9 @@ export default async function StudentInfoPage() {
   }
   const filled = await checkStudentApplicationFilled(session.user.id);
 
-  if (filled) {
-    redirect('/dashboard');
-  }
+  // if (filled) {
+  //   redirect('/dashboard');
+  // }
 
   return <StudentInformationForm  />;
 }

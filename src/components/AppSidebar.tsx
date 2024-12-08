@@ -1,5 +1,5 @@
-import { Calendar, Home, Inbox, Search, Settings, User } from 'lucide-react';
-
+'use client';
+import { Calendar, Home, Inbox, User } from 'lucide-react';
 import {
   Sidebar,
   SidebarContent,
@@ -10,7 +10,8 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from '@/components/ui/sidebar';
-import { title } from 'process';
+import { cn } from '@/lib/utils';
+import { usePathname } from 'next/navigation'; // Use this for getting the current path
 
 // Menu items.
 const items = [
@@ -37,30 +38,56 @@ const items = [
 ];
 
 export function AppSidebar() {
+  const pathname = usePathname(); // Get the current pathname
+
   return (
     <Sidebar>
-      <SidebarContent className="bg-[#F5F5F4] tex-black text-white shadow-lg">
+      <SidebarContent className="bg-[#F5F5F4] text-black shadow-lg">
         {/* Sidebar Group */}
         <SidebarGroup>
-          {/* <SidebarGroupLabel className="text-xl font-bold tracking-wide text-gray-300">
-            Elytra
-          </SidebarGroupLabel> */}
-
+          <SidebarGroupLabel className="text-base font-normal text-black bg-white shadow-sm p-4 mb-6 mt-1 border  text-left">
+            Dashboard
+          </SidebarGroupLabel>
           <SidebarGroupContent>
+            <p className="text-[#888888] text-sm px-4 mb-2">WorkSpace</p>
             <SidebarMenu>
-              {items.map((item) => (
-                <SidebarMenuItem
-                  className="py-3 px-5 font-semibold text-2xl text-black hover:bg-gray-700/50 rounded-md transition duration-150"
-                  key={item.title}
-                >
-                  <SidebarMenuButton asChild>
-                    <a href={item.url} className="flex items-center">
-                      <item.icon className="mr-3 text-black transition" />
-                      <span>{item.title}</span>
-                    </a>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
+              {items.map((item) => {
+                const isActive = pathname === item.url; // Check if the item is active
+                return (
+                  <SidebarMenuItem
+                    key={item.title}
+                    className={cn(
+                      "py-1 rounded-md",
+                      'font-medium text-xl text-black',
+                      'transition-all duration-300 ease-in-out',
+                      'group',
+                      isActive ? 'bg-white border shadow-sm  ' : '' 
+                    )}
+                  >
+                    <SidebarMenuButton asChild className='hover:bg-none'>
+                      <a
+                        href={item.url}
+                        className={cn(
+                          'flex items-center space-x-3 w-full p-3 rounded-lg ',
+                          'text-black' 
+                        )}
+                      >
+                        <item.icon
+                          className={cn(
+                            'text-black ',
+                            'transition-colors duration-300'
+                          )}
+                          strokeWidth={1.5}
+                          size={20}
+                        />
+                        <span className="  transition-colors duration-300">
+                          {item.title}
+                        </span>
+                      </a>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                );
+              })}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>

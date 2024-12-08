@@ -17,7 +17,7 @@ const ErrorPage = ({ statusCode = 500, message = "Something Went Wrong!!" }: { s
         <Button asChild size="lg" className='text-black hover:bg-white'>
           <Link
             href="/"
-            className="inline-flex h-10 items-center justify-center rounded-md text-black bg-[white]  bg-primary px-8 text-sm"
+            className="inline-flex h-10 items-center justify-center rounded-md text-black bg-white hover:bg-[#bfbcbc]  bg-primary px-8 text-sm"
           >
             Go Back Home
           </Link>
