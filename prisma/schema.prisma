@@ -49,21 +49,23 @@ model Account {
 
   @@unique([provider, providerAccountId])
 }
-
 model Session {
   id           String   @id @default(cuid())
-  sessionToken String   @unique
-  expires      DateTime
   userId       String
   user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  chats        Chat[]   
+  summary      String?  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }
 
-model VerificationToken {
-  identifier String
-  token      String   @unique
-  expires    DateTime
-
-  @@unique([identifier, token])
+model Chat {
+  id          String   @id @default(cuid())
+  sessionId   String
+  session     Session  @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  sender      String  
+  message     String  
+  createdAt   DateTime @default(now())
 }
 model Program {
   id                        Int      @id @default(autoincrement())
@@ -73,52 +75,60 @@ model Program {
   duration                  String?
   category                  String?
   fees                      String?
-  eligibility               Json
-  ranking                   String?
-  university                String
+  createdAt                 DateTime @default(now())
+  updatedAt                 DateTime
+  coOpInternship            String?
   college                   String?
+  curriculum                String?
   location                  String?
   publicPrivate             String?
+  ranking                   String?
   specialLocationFeatures   String?
   specialUniversityFeatures String?
   specialization            String?
+  university                String
   usp                       String?
-  curriculum                String?
-  coOpInternship            String?
+  eligibility               Json
+  canFinishIn               String?
+  creditsInIITIIM           String?
+  creditsInUS               String?
   gloveraPricing            String?
+  iitIim                    String?
   originalPricing           String?
   savings                   String?
   savingsPercentage         String?
   totalCredits              String?
-  iitIim                    String?
-  creditsInIITIIM           String?
-  creditsInUS               String?
-  canFinishIn               String?
-
-  // New fields
-  transcriptEvaluation      String?  // Added new field
-  lor                       String?  // Added new field
-  sop                       String?  // Added new field
-  interviews               String?  // Added new field
-  applicationFee            String?  // Added new field
-  deposit                   String?  // Added new field
-  depositRefundableVisa     String?  // Added new field
-  keyCompaniesHiring        String?  // Added new field
-  keyJobRoles               String?  // Added new field
-  quantQualitative          String?  // Added new field
+  applicationFee            String?
+  deposit                   String?
+  depositRefundableVisa     String?
+  interviews                String?
+  keyCompaniesHiring        String?
+  keyJobRoles               String?
+  lor                       String?
+  quantQualitative          String?
+  sop                       String?
+  transcriptEvaluation      String?
 }
 
 model Eligibility {
   id                     Int      @id @default(autoincrement())
   university             String
-  program               String
-  typeOfProgram         String?
-  percentage            String?
-  backlogs              String?
-  workExperience        String?
-  allow3YearDegree      String?
+  program                String
+  typeOfProgram          String?
+  percentage             String?
+  backlogs               String?
+  workExperience         String?
+  allow3YearDegree       String?
   minimumGpaOrPercentage String?
-  decisionFactor        String?
-  createdAt             DateTime @default(now())
-  updatedAt             DateTime @updatedAt
+  decisionFactor         String?
+  createdAt              DateTime @default(now())
+  updatedAt              DateTime @updatedAt
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
 }

@@ -8,8 +8,7 @@
 
 */
 -- AlterTable
-ALTER TABLE "Program" DROP COLUMN "createdAt",
-DROP COLUMN "updatedAt",
+ALTER TABLE "Program" 
 ADD COLUMN     "coOpInternship" TEXT,
 ADD COLUMN     "college" TEXT,
 ADD COLUMN     "curriculum" TEXT,
