@@ -75,8 +75,8 @@ model Program {
   duration                  String?
   category                  String?
   fees                      String?
-  createdAt                 DateTime @default(now())
-  updatedAt                 DateTime
+  createdAt                 DateTime? @default(now())
+  updatedAt                 DateTime? @default(now())
   coOpInternship            String?
   college                   String?
   curriculum                String?

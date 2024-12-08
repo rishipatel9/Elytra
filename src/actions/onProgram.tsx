@@ -356,6 +356,8 @@ export async function bulkImportPrograms(filePath: string) {
               keyCompaniesHiring: validatedData.keyCompaniesHiring || "",
               keyJobRoles: validatedData.keyJobRoles || "",
               quantQualitative: validatedData.quantQualitative || "",
+              createdAt: new Date(),
+              updatedAt: new Date(),
             },
           });
 

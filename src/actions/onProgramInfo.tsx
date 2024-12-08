@@ -81,6 +81,9 @@ export async function createProgram(formData: FormData) {
                 keyCompaniesHiring: formData.get('keyCompaniesHiring') as string || "",
                 keyJobRoles: formData.get('keyJobRoles') as string || "",
                 quantQualitative: formData.get('quantQualitative') as string || "",
+                createdAt: new Date(),
+                updatedAt: new Date(),
+                
             },
         });
 
