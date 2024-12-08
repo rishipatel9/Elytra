@@ -63,9 +63,14 @@ model Chat {
   id          String   @id @default(cuid())
   sessionId   String
   session     Session  @relation(fields: [sessionId], references: [id], onDelete: Cascade)
-  sender      String  
+  sender      SenderType? 
   message     String  
   createdAt   DateTime @default(now())
+}
+
+enum SenderType {
+  AI
+  USER
 }
 model Program {
   id                        Int      @id @default(autoincrement())
