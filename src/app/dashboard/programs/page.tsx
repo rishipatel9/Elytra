@@ -7,9 +7,9 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { LogOut, Send } from 'lucide-react';
 import { SidebarTrigger } from '@/components/ui/sidebar';
-import { GoogleGenerativeAI } from '@google/generative-ai';
 import { Pinecone } from '@pinecone-database/pinecone';
 import { toast } from 'sonner';
+import { genAI } from '@/lib/GeminiClient';
 
 const pc = new Pinecone({
   apiKey: process.env.NEXT_PUBLIC_PINECONE_API_KEY!,
@@ -17,7 +17,6 @@ const pc = new Pinecone({
 
 const index = pc.index('program-recommendations');
 
-const genAI = new GoogleGenerativeAI(process.env.NEXT_PUBLIC_GEMINI_API_KEY || '');
 const model = genAI.getGenerativeModel({ model: 'text-embedding-004' });
 
 interface Message {
