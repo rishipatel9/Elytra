@@ -20,8 +20,8 @@ const items = [
     icon: Home,
   },
   {
-    title: 'Virtual Mentor',
-    url: '/video-bot',
+    title: 'AI Counseling',
+    url: '/dashboard/AI-Counseling',
     icon: User,
   },
   {

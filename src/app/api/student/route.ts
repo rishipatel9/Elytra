@@ -45,40 +45,40 @@ export async function POST(req: NextRequest) {
 }
 
 
-// export async function GET(req: NextRequest) {
-//   const { searchParams } = new URL(req.url);
+export async function GET(req: NextRequest) {
+  const { searchParams } = new URL(req.url);
 
-//   const id = searchParams.get("id");
-//   if (id) {
-//     try {
-//       const student = await prisma.user.findUnique({
-//         where: { id: id },
-//       });
-//       if (!student) {
-//         return NextResponse.json(
-//           { message: "Student not found" },
-//           { status: 404 }
-//         );
-//       }
-//       return NextResponse.json({ student }, { status: 200 });
-//     } catch (error) {
-//       return NextResponse.json(
-//         { message: "Error fetching student", error: error },
-//         { status: 500 }
-//       );
-//     }
-//   }
+  const id = searchParams.get("id");
+  if (id) {
+    try {
+      const student = await prisma.user.findUnique({
+        where: { id: id },
+      });
+      if (!student) {
+        return NextResponse.json(
+          { message: "Student not found" },
+          { status: 404 }
+        );
+      }
+      return NextResponse.json({ student }, { status: 200 });
+    } catch (error) {
+      return NextResponse.json(
+        { message: "Error fetching student", error: error },
+        { status: 500 }
+      );
+    }
+  }
 
-//   try {
-//     const students = await prisma.user.findMany();
-//     return NextResponse.json({ students }, { status: 200 });
-//   } catch (error) {
-//     return NextResponse.json(
-//       { message: "Error fetching students", error: error },
-//       { status: 500 }
-//     );
-//   }
-// }
+  try {
+    const students = await prisma.user.findMany();
+    return NextResponse.json({ students }, { status: 200 });
+  } catch (error) {
+    return NextResponse.json(
+      { message: "Error fetching students", error: error },
+      { status: 500 }
+    );
+  }
+}
 
 export async function PUT(req: NextRequest) {
   try {

@@ -30,6 +30,7 @@ import {AVATARS, STT_LANGUAGE_LIST} from "../../lib/constant";
 import { OpenAIAssistant } from "@/lib/openai-assistant";
 import { useSession } from "next-auth/react";
 import { Session } from "next-auth";
+import { getStudentById } from "@/helper";
  
 export default function InteractiveAvatar() {
   const [isLoadingSession, setIsLoadingSession] = useState(false);
@@ -158,19 +159,10 @@ try {
     try {
       // Get response from OpenAI Assistanst
       console.log(`text is ${text}`)
-      //const studentDetails = await getStudentById(userId);
-  //     const studentDetails = {
-  // name: "John Doe",
-  // course: "Computer Science",
-  // preferredCountry: "Canada",
-  // preferredGrade: "A",
-  // educationLevel: "Undergraduate",
-  // nationality: "American",
-  //       age: 21,
-  // aspiration:"became an entrepreneur later in career "
-//};
-      //console.log(`student details are :${JSON.stringify(studentDetails)}`)
-     // setText(`user query is :${text}   for some context this is some info about student${studentDetails} if it helps  `)
+      // const studentDetails = await getStudentById(userId);
+
+    //   console.log(`student details are :${JSON.stringify(studentDetails)}`)
+    //  setText(`user query is :${text}   for some context this is some info about student${studentDetails} if it helps  `)
       console.log(`new text is ${text}`)
       const newText = `user query is :${text} `;
       console.log(`new text`)

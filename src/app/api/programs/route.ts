@@ -12,19 +12,7 @@ export async function GET() {
       return NextResponse.redirect(new URL("/admin/login", baseUrl));
     }
 
-    // Select meaningful fields for the frontend
-    const programs = await prisma.program.findMany({
-      select: {
-        name: true,
-        university: true,
-        specialization: true,
-        usp: true,
-        ranking: true,
-        location: true,
-        eligibility: true,
-        deposit: true, // Retaining this field in case it gets populated later
-      },
-    });
+    const programs = await prisma.program.findMany();
 
     return NextResponse.json({ programs }, { status: 200 });
   } catch (error) {
