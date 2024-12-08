@@ -51,3 +51,27 @@ export const STT_LANGUAGE_LIST = [
   { label: 'Ukrainian', value: 'uk', key: 'uk' },
   { label: 'Vietnamese', value: 'vi', key: 'vi' },
 ];
+
+
+export function generateStudentDetails(student: any): string {
+  return `
+    Meet **${student.name || "the student"}**, a ${student.age || "N/A"}-year-old aspiring **${
+    student.careerAspirations || "N/A"
+  }**, pursuing **${student.currentEducationLevel || "N/A"}** with grades **${
+    student.grades || "N/A"
+  }** in **${student.previousDegree || "N/A"}**. 
+    
+    A citizen of **${student.nationality || "N/A"}**, ${student.name} prefers **${
+    student.preferredPrograms || "N/A"
+  }** programs in **${student.preferredCountries || "N/A"}**. 
+    
+    Contact: **${student.email || "N/A"}** | **${student.phone || "N/A"}**. ${
+    student.filledApplication ? "Application completed." : "Application pending."
+  } ${
+    student.visaQuestions && student.visaQuestions !== "None"
+      ? `Visa questions: **${student.visaQuestions}**.`
+      : ""
+  }
+    Updated on **${new Date(student.updatedAt).toLocaleDateString()}**.
+  `;
+}
