@@ -15,6 +15,9 @@ import { Chip } from '@nextui-org/chip'
 import { getStudentById } from '@/helper'
 import { useMemoizedFn, usePrevious } from 'ahooks'
 import { Button } from '../ui/button'
+import axios from 'axios'
+import { storeChats, summarizeChat } from '@/lib/db'
+import { toast, Toaster } from 'sonner'
 
 interface User {
     id: string;
@@ -37,15 +40,18 @@ export default function AICounselingChatbot({ user }: { user: User }) {
     const [debug, setDebug] = useState<string>();
     const [loading, setLoading] = useState(false);
     const messagesEndRef = useRef<HTMLDivElement>(null);
+    const [sessionId,setSessionId]=useState<string>("")
 
     async function fetchAccessToken() {
         try {
             setLoading(true);
-            const response = await fetch("/api/get-access-token", { method: "POST" })
-            const token = await response.text()
-            console.log("Access Token:", token)
+            const response = await axios.post("/api/get-access-token",{userId:user.id})
+            console.log('Response:', response.data)
+            setSessionId(response.data.sessionId)
+            const token = response.data.token
             return token
         } catch (error) {
+            toast.error(`Error Creating Session: ${error} Please try again `)
             console.error("Error fetching access token:", error)
             return ""
         }
@@ -67,6 +73,7 @@ export default function AICounselingChatbot({ user }: { user: User }) {
             })
             setData(res)
         } catch (error) {
+            toast.error(`Error starting avatar: ${error} Please try again`)
             console.error('Failed to start avatar:', error)
         }
 
@@ -112,11 +119,11 @@ export default function AICounselingChatbot({ user }: { user: User }) {
     async function handleSpeak() {
         if (!avatar.current || !openaiAssistant.current) return
         try{
+
             setMessages((prev) => [...prev, { text, sender: 'user' }])
-            const userDetails = await getStudentById(user.id)
-            console.log('User Details:', userDetails)
-            const newText = `user query is :${userDetails} `;
-            const response = await openaiAssistant.current.getResponse(JSON.stringify(newText))
+            const res = await getStudentById(user.id)
+            console.log('User Details:', res)
+            const response = await openaiAssistant.current.getResponse(res.message)
             setMessages((prev) => [...prev, { text: response, sender: 'ai' }])
             await avatar.current.speak({
                 text: response,
@@ -124,8 +131,11 @@ export default function AICounselingChatbot({ user }: { user: User }) {
                 taskMode: TaskMode.SYNC
             })
             setText("")
+            storeChats({sessionId:sessionId,message:text,sender:"USER"})
+            storeChats({sessionId:sessionId,message:response,sender:"AI"})
         }
         catch (error) { 
+            toast.error(`Error speaking: ${error} Please try again`)
             console.error('Error speaking:', error)
         }
     }
@@ -139,9 +149,10 @@ export default function AICounselingChatbot({ user }: { user: User }) {
             .interrupt()
             .catch((e) => {
                 setDebug(e.message);
-            });
+        });
     }
     async function endSession() {
+        summarizeChat(sessionId)
         await avatar.current?.stopAvatar();
         setStream(undefined);
     }
@@ -253,12 +264,11 @@ export default function AICounselingChatbot({ user }: { user: User }) {
                                     )}
                                 </div>
                             </div>
+                            <Toaster/>
                         </section>
-
-
                     </main>
                 </div>
-             ) : (
+            ) : (
                 <div className="flex flex-col items-center justify-center h-screen">
                     <h1 className="text-2xl font-bold text-center text-black m-2">AI-Powered Student Counseling</h1>
                     <Button onClick={startSession} className="flex items-center justify-center">
@@ -271,8 +281,9 @@ export default function AICounselingChatbot({ user }: { user: User }) {
                             "Start Session"
                         )}
                     </Button>
+                    <Toaster/>
                 </div>
-            )} 
+            )}  
         </>
     )
 }
