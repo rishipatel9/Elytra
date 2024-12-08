@@ -1,19 +1,22 @@
-import { NextRequest } from "next/server";
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import { NextRequest, NextResponse } from 'next/server';
+import prisma from '@/lib/prisma';
+import { $Enums } from '@prisma/client';
+import { genAI } from '@/lib/GeminiClient';
 
-// Use server-side environment variable
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || process.env.NEXT_PUBLIC_GEMINI_API_KEY || '');
+
 const model = genAI.getGenerativeModel({ model: 'gemini-pro' });
 
 export async function POST(req: NextRequest) {
   try {
     const { message, contexts, metadata } = await req.json();
 
-    if (!process.env.GEMINI_API_KEY && !process.env.NEXT_PUBLIC_GEMINI_API_KEY) {
+    if (
+      !process.env.GEMINI_API_KEY &&
+      !process.env.NEXT_PUBLIC_GEMINI_API_KEY
+    ) {
       throw new Error('Gemini API key is not configured');
     }
 
-    // Construct prompt with context and search metadata
     const prompt = `
 You are an expert educational consultant at Elytra, specializing in program recommendations. 
 I have found ${metadata?.totalResults || 'several'} programs that might be relevant to the user's query.
@@ -44,7 +47,7 @@ Remember to:
 Response:`;
 
     const result = await model.generateContentStream(prompt);
-    
+
     // Create a readable stream
     const encoder = new TextEncoder();
     const readableStream = new ReadableStream({
@@ -62,19 +65,71 @@ Response:`;
     });
 
     return new Response(readableStream, {
-      headers: { 
-        "Content-Type": "text/event-stream",
-        "Cache-Control": "no-cache",
-        "Connection": "keep-alive",
+      headers: {
+        'Content-Type': 'text/event-stream',
+        'Cache-Control': 'no-cache',
+        Connection: 'keep-alive',
       },
     });
   } catch (error) {
-    console.error("Streaming Error:", error);
-    return new Response(JSON.stringify({ 
-      error: error instanceof Error ? error.message : 'An unknown error occurred'
-    }), {
-      status: 500,
-      headers: { "Content-Type": "application/json" },
+    console.error('Streaming Error:', error);
+    return new Response(
+      JSON.stringify({
+        error:
+          error instanceof Error ? error.message : 'An unknown error occurred',
+      }),
+      {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' },
+      }
+    );
+  }
+}
+
+
+
+
+export async function GET(req: NextRequest) {
+  try {
+    const chatmsg = req.nextUrl.searchParams.get('chatmsg');
+    const sender = req.nextUrl.searchParams.get('sender');
+    const sessionId = req.nextUrl.searchParams.get('sessionId');
+    if (!chatmsg || !sender || !sessionId) {
+      return NextResponse.json(
+        { error: 'Missing required parameters: chatmsg, sender, or sessionId' },
+        { status: 400 }
+      );
+    }
+
+    const session = await prisma.session.findUnique({
+      where: { id: sessionId },
+      include: {
+        chats: true, 
+      },
     });
+
+    if (!session) {
+      return NextResponse.json({ error: 'Session not found' }, { status: 404 });
+    }
+    console.log("sender",sender)
+
+    const chat = await prisma.chat.create({
+      data: {
+        sessionId: sessionId,
+        sender: (sender as $Enums.SenderType),
+        message: chatmsg,
+      },
+    });
+
+    return NextResponse.json(
+      { success: true, chat, session },
+      { status: 200 }
+    );
+  } catch (error) {
+    console.error("Error handling GET request:", error);
+    return NextResponse.json(
+      { error: error instanceof Error ? error.message : 'An unknown error occurred' },
+      { status: 500 }
+    );
   }
 }

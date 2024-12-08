@@ -4,12 +4,13 @@ import { z } from "zod";
 import { revalidatePath } from "next/cache";
 import { unstable_noStore as noStore } from "next/cache";
 import prisma from "@/lib/prisma";
-import { GoogleGenerativeAI } from "@google/generative-ai";
+
 import { Pinecone } from '@pinecone-database/pinecone'
 import * as XLSX from "xlsx";
 
 import path from 'path';
 import * as fs from 'fs';
+import { genAI } from "@/lib/GeminiClient";
 
 // Updated program schema
 const programSchema = z.object({
@@ -76,7 +77,7 @@ const eligibilitySchema = z.object({
 });
 
 // Initialize Gemini and Pinecone
-const genAI = new GoogleGenerativeAI(process.env.NEXT_PUBLIC_GEMINI_API_KEY || " ");
+
 const model = genAI.getGenerativeModel({ model: "text-embedding-004" });
 const pinecone = new Pinecone({ apiKey: process.env.NEXT_PUBLIC_PINECONE_API_KEY || " " });
 const programIndex = pinecone.Index("program-recommendations");
