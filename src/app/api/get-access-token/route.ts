@@ -2,6 +2,7 @@ import prisma from "@/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
 
 const HEYGEN_API_KEY = process.env.HEYGEN_API_KEY;
+console.log(`HEYGEN_API_KEY IS ${HEYGEN_API_KEY}`)
 
 export async function POST(req:NextRequest) {
   try {

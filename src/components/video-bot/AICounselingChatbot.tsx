@@ -40,7 +40,11 @@ export default function AICounselingChatbot({ user }: { user: User }) {
     const [debug, setDebug] = useState<string>();
     const [loading, setLoading] = useState(false);
     const messagesEndRef = useRef<HTMLDivElement>(null);
-    const [sessionId,setSessionId]=useState<string>("")
+    const [sessionId, setSessionId] = useState<string>("")
+    const [subtitles, setSubtitles] = useState("") // Array of subtitle parts
+    let sentenceBuffer=""
+
+    const userId=user.id
 
     async function fetchAccessToken() {
         try {
@@ -60,7 +64,7 @@ export default function AICounselingChatbot({ user }: { user: User }) {
     async function startSession() {
         const token = await fetchAccessToken()
         avatar.current = new StreamingAvatar({ token })
-        openaiAssistant.current = new OpenAIAssistant()
+        openaiAssistant.current = new OpenAIAssistant(userId)
         await openaiAssistant.current.initialize()
 
         try {
@@ -70,6 +74,7 @@ export default function AICounselingChatbot({ user }: { user: User }) {
                 language: language,
                 disableIdleTimeout: true,
                 voice: { rate: 2.0, emotion: VoiceEmotion.EXCITED },
+                knowledgeBase:"You are an international student career counsellor"
             })
             setData(res)
         } catch (error) {
@@ -114,31 +119,84 @@ export default function AICounselingChatbot({ user }: { user: User }) {
             console.log(">>>>> User stopped talking:", event);
             setIsUserTalking(false);
         });
+        
+        avatar.current?.on(StreamingEvents.AVATAR_TALKING_MESSAGE, (e) => {
+            const message = e.detail.message;
+           sentenceBuffer += message;
+
+  // Update the subtitle in real time
+         setSubtitles(sentenceBuffer.trim());
+
+            console.log(`Subtule  : ${subtitles}`);
+
+            console.log(`Avatar message: ${message}`);
+        });
+ 
     }
 
-    async function handleSpeak() {
-        if (!avatar.current || !openaiAssistant.current) return
-        try{
+    // async function handleSpeak() {
+    //     if (!avatar.current || !openaiAssistant.current) return
+    //     try{
 
-            setMessages((prev) => [...prev, { text, sender: 'user' }])
-            const res = await getStudentById(user.id)
-            console.log('User Details:', res)
-            const response = await openaiAssistant.current.getResponse(res.message)
-            setMessages((prev) => [...prev, { text: response, sender: 'ai' }])
-            await avatar.current.speak({
-                text: response,
-                taskType: TaskType.REPEAT,
-                taskMode: TaskMode.SYNC
-            })
-            setText("")
-            storeChats({sessionId:sessionId,message:text,sender:"USER"})
-            storeChats({sessionId:sessionId,message:response,sender:"AI"})
-        }
-        catch (error) { 
-            toast.error(`Error speaking: ${error} Please try again`)
-            console.error('Error speaking:', error)
-        }
+    //         setMessages((prev) => [...prev, { text, sender: 'user' }])
+    //         const res = await getStudentById(user.id)
+    //         console.log('User Details:', res)
+    //         const response = await openaiAssistant.current.getResponse(res.message)
+    //         setMessages((prev) => [...prev, { text: response, sender: 'ai' }])
+    //         await avatar.current.speak({
+    //             text: response,
+    //             taskType: TaskType.REPEAT,
+    //             taskMode: TaskMode.SYNC
+    //         })
+    //         setText("")
+    //         storeChats({sessionId:sessionId,message:text,sender:"USER"})
+    //         storeChats({sessionId:sessionId,message:response,sender:"AI"})
+    //     }
+    //     catch (error) {
+    //         toast.error(`Error speaking: ${error} Please try again`)
+    //         console.error('Error speaking:', error)
+    //     }
+    // }
+
+
+    
+  async function handleSpeak() {
+     if (!avatar.current || !openaiAssistant.current) {
+      setDebug("Avatar or OpenAI Assistant not initialized");
+      return;
     }
+    console.log(`in handle speak`)
+    try {
+      // Get response from OpenAI Assistanst
+      console.log(`text is ${text}`)
+      // const studentDetails = await getStudentById(userId);
+
+    //   console.log(`student details are :${JSON.stringify(studentDetails)}`)
+        //  setText(`user query is :${text}   for some context this is some info about student${studentDetails} if it helps  `)
+      setMessages((prev) => [...prev, { text, sender: 'user' }])
+
+      console.log(`new text is ${text}`)
+      const newText = `user query is :${text} `;
+      console.log(`new text is ${newText}`)
+      const response = await openaiAssistant.current.getResponse(newText);
+
+     console.log(`RESP IS :${JSON.stringify(response)}`)
+     setMessages((prev) => [...prev, { text: response, sender: 'ai' }])
+
+      await avatar.current.speak({ 
+        text: response, 
+        taskType: TaskType.TALK, 
+        taskMode: TaskMode.SYNC 
+      });
+        
+        
+           storeChats({sessionId:sessionId,message:text,sender:"USER"})
+           storeChats({sessionId:sessionId,message:response,sender:"AI"})
+    //     }
+    } catch (e:any) {
+      setDebug(e.message);
+    }  
+  }
     async function handleInterrupt() {
         if (!avatar.current) {
             setDebug("Avatar API not initialized");
@@ -206,6 +264,12 @@ export default function AICounselingChatbot({ user }: { user: User }) {
                         <section className="flex-1 bg-white rounded-md shadow-lg overflow-hidden">
                             <div className="aspect-video bg-gray-200 relative">
                                 <video ref={mediaStream} className="w-full h-full object-cover" autoPlay />
+
+                    <div className="absolute bottom-8 w-full text-center">
+                        <p className="text-xl font-bold text-white bg-black bg-opacity-50 px-4 py-2 rounded">
+                            {subtitles || "Waiting for avatar to speak..."}
+                        </p>
+                    </div>
                                 <div className="absolute bottom-4 left-4 right-4 flex justify-center space-x-4">
                                 </div>
                             </div>

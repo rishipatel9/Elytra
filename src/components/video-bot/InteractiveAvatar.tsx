@@ -165,16 +165,16 @@ try {
     //  setText(`user query is :${text}   for some context this is some info about student${studentDetails} if it helps  `)
       console.log(`new text is ${text}`)
       const newText = `user query is :${text} `;
-      console.log(`new text`)
-      const response = await openaiAssistant.current.getResponse(newText);
+      console.log(`new text is ${newText}`)
+    //  const response = await openaiAssistant.current.getResponse(newText);
 
       // Speak the response
-      console.log(`RESP IS :${JSON.stringify(response)}`)
-      await avatar.current.speak({ 
-        text: response, 
-        taskType: TaskType.REPEAT, 
-        taskMode: TaskMode.SYNC 
-      });
+      //console.log(`RESP IS :${JSON.stringify(response)}`)
+      // await avatar.current.speak({ 
+      //   text: response, 
+      //   taskType: TaskType.REPEAT, 
+      //   taskMode: TaskMode.SYNC 
+      // });
     } catch (e:any) {
       setDebug(e.message);
     } finally {
