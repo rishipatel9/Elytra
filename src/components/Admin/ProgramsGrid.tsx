@@ -2,7 +2,6 @@
 import axios from 'axios';
 import { useEffect, useState } from 'react';
 import ProgramCard from './ProgramCard';
-import AddProgram from './AddPrograms'; // Assuming AddProgram is a separate component
 
 export type Program = {
     id: string;
@@ -22,7 +21,6 @@ const ProgramsGrid = ({ searchQuery }: { searchQuery: string }) => {
     const [programs, setPrograms] = useState<Program[]>([]);
     const [isLoading, setIsLoading] = useState<boolean>(true);
     const [selectedProgram, setSelectedProgram] = useState<Program | null>(null);
-    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
     useEffect(() => {
         const fetchPrograms = async () => {
@@ -54,12 +52,7 @@ const ProgramsGrid = ({ searchQuery }: { searchQuery: string }) => {
 
     const handleEdit = (program: Program) => {
         setSelectedProgram(program);
-        setIsEditModalOpen(true);
-    };
-
-    const handleCloseEditModal = () => {
-        setIsEditModalOpen(false);
-        setSelectedProgram(null);
+        // You can implement a modal or navigation to edit form here
     };
 
     const filteredPrograms = programs.filter(program => 
@@ -87,15 +80,6 @@ const ProgramsGrid = ({ searchQuery }: { searchQuery: string }) => {
                     ))
                 )}
             </div>
-
-            {/* Edit Modal */}
-            {selectedProgram && (
-                <AddProgram
-                    isOpen={isEditModalOpen}
-                    onClose={handleCloseEditModal}
-                    program={selectedProgram}
-                />
-            )}
         </div>
     );
 };
