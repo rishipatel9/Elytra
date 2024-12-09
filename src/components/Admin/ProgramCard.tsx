@@ -1,5 +1,9 @@
-import { Program } from "./ProgramsGrid";
-import { useState } from "react";
+import React, { useState } from 'react';
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Program } from './ProgramsGrid';
+import { toast } from 'sonner';
+import EditProgram from './EditPrograms';
 import axios from "axios";
 
 interface ProgramCardProps {
@@ -9,104 +13,102 @@ interface ProgramCardProps {
 }
 
 const ProgramCard = ({ program, onDelete, onEdit }: ProgramCardProps) => {
-    const [showMenu, setShowMenu] = useState(false);
-    // Parse the eligibility JSON string
-    const eligibility = program.eligibility
-        ? JSON.parse(program.eligibility as unknown as string)
-        : null;
+    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
     const handleDelete = async () => {
         try {
             await axios.delete(`/api/programs/${program.id}`);
             onDelete(program.id);
+            toast.success('Program deleted successfully');
         } catch (error) {
             console.error('Error deleting program:', error);
+            toast.error('Failed to delete program');
         }
     };
 
+    const handleEdit = () => {
+        setIsEditModalOpen(true);
+        onEdit(program);
+    };
+
+    // Parse the eligibility JSON string
+    const eligibility = program.eligibility
+        ? JSON.parse(program.eligibility as unknown as string)
+        : null;
+
     return (
-        <div className="bg-gray-800 p-6 rounded-lg shadow-lg flex flex-col justify-between min-h-[250px] relative">
-            {/* Three-dot menu */}
-            <div className="absolute top-4 right-4">
-                <button 
-                    onClick={() => setShowMenu(!showMenu)}
-                    className="text-gray-400 hover:text-white focus:outline-none"
-                >
-                    <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z" />
-                    </svg>
-                </button>
-                
-                {/* Dropdown menu */}
-                {showMenu && (
-                    <div className="absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-gray-700 ring-1 ring-black ring-opacity-5 z-10">
-                        <div className="py-1" role="menu">
-                            <button
-                                onClick={() => {
-                                    onEdit(program);
-                                    setShowMenu(false);
-                                }}
-                                className="block w-full text-left px-4 py-2 text-sm text-gray-300 hover:bg-gray-600"
-                                role="menuitem"
+        <>
+            <Card className="w-full bg-[#151723] border-2 border-[#2D2D2D] rounded-lg overflow-hidden hover:border-[#3D3D3D] transition-all duration-300">
+                <CardContent className="p-6">
+                    <div className="flex justify-between items-start mb-4">
+                        <div>
+                            <h3 className="text-xl font-semibold text-white mb-2">{program.name}</h3>
+                            <p className="text-[#8F8F8F] text-sm">{program.university}</p>
+                        </div>
+                        <div className="flex gap-2">
+                            <Button
+                                onClick={handleEdit}
+                                className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
                             >
                                 Edit
-                            </button>
-                            <button
-                                onClick={() => {
-                                    handleDelete();
-                                    setShowMenu(false);
-                                }}
-                                className="block w-full text-left px-4 py-2 text-sm text-red-400 hover:bg-gray-600"
-                                role="menuitem"
+                            </Button>
+                            <Button
+                                onClick={handleDelete}
+                                className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
                             >
                                 Delete
-                            </button>
+                            </Button>
                         </div>
                     </div>
-                )}
-            </div>
-
-            <div>
-                <h3 className="text-xl font-semibold text-white mb-2 truncate">{program.name}</h3>
-                <p className="text-gray-400 mb-4">{program.university}</p>
-
-                <div className="text-gray-300 text-sm space-y-2">
-                    <div>
-                        <strong>Specialization:</strong>
-                        {Array.isArray(program.specialization) && program.specialization.length > 0 ? (
-                            <ul className="list-disc list-inside">
-                                {program.specialization.map((spec, index) => (
-                                    <li key={index}>{spec}</li>
-                                ))}
-                            </ul>
-                        ) : (
-                            <span>Not Specified</span>
-                        )}
+                    <div className="space-y-2">
+                        <p className="text-[#8F8F8F]">
+                            <span className="font-medium text-white">Location:</span> {program.location || 'N/A'}
+                        </p>
+                        <p className="text-[#8F8F8F]">
+                            <span className="font-medium text-white">Specialization:</span> {Array.isArray(program.specialization) && program.specialization.length > 0 ? (
+                                <ul className="list-disc list-inside">
+                                    {program.specialization.map((spec, index) => (
+                                        <li key={index}>{spec}</li>
+                                    ))}
+                                </ul>
+                            ) : (
+                                <span>N/A</span>
+                            )}
+                        </p>
+                        <p className="text-[#8F8F8F]">
+                            <span className="font-medium text-white">Ranking:</span> {program.ranking || 'N/A'}
+                        </p>
+                        <p className="text-[#8F8F8F]">
+                            <span className="font-medium text-white">Deposit:</span> {program.deposit || 'N/A'}
+                        </p>
+                        <p className="text-[#8F8F8F]">
+                            <span className="font-medium text-white">Eligibility:</span>
+                            {eligibility ? (
+                                <ul className="list-disc list-inside">
+                                    {eligibility.ugBackground && <li><strong>UG Background:</strong> {eligibility.ugBackground}</li>}
+                                    {eligibility.minimumGpa && <li><strong>Minimum GPA:</strong> {eligibility.minimumGpa}</li>}
+                                    {eligibility.backlogs !== undefined && <li><strong>Backlogs:</strong> {eligibility.backlogs}</li>}
+                                    {eligibility.workExperience && <li><strong>Work Experience:</strong> {eligibility.workExperience}</li>}
+                                    {eligibility.allow3YearDegree && (
+                                        <li>
+                                            <strong>Allow 3-Year Degree:</strong> {eligibility.allow3YearDegree}
+                                        </li>
+                                    )}
+                                </ul>
+                            ) : (
+                                <span>N/A</span>
+                            )}
+                        </p>
                     </div>
-                    <div><strong>Location:</strong> {program.location || "Not Specified"}</div>
-                    <div><strong>Ranking:</strong> {program.ranking || "Not Ranked"}</div>
-                    <div><strong>Deposit:</strong> {program.deposit || "Not Mentioned"}</div>
-                    <div>
-                        <strong>Eligibility:</strong>
-                        {eligibility ? (
-                            <ul className="list-disc list-inside">
-                                {eligibility.ugBackground && <li><strong>UG Background:</strong> {eligibility.ugBackground}</li>}
-                                {eligibility.minimumGpa && <li><strong>Minimum GPA:</strong> {eligibility.minimumGpa}</li>}
-                                {eligibility.backlogs !== undefined && <li><strong>Backlogs:</strong> {eligibility.backlogs}</li>}
-                                {eligibility.workExperience && <li><strong>Work Experience:</strong> {eligibility.workExperience}</li>}
-                                {eligibility.allow3YearDegree && (
-                                    <li>
-                                        <strong>Allow 3-Year Degree:</strong> {eligibility.allow3YearDegree}
-                                    </li>
-                                )}
-                            </ul>
-                        ) : (
-                            <span>Not Specified</span>
-                        )}
-                    </div>
-                </div>
-            </div>
-        </div>
+                </CardContent>
+            </Card>
+
+            <EditProgram
+                program={program}
+                isOpen={isEditModalOpen}
+                onClose={() => setIsEditModalOpen(false)}
+            />
+        </>
     );
 };
 
