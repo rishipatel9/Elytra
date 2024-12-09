@@ -5,6 +5,13 @@ import { Program } from './ProgramsGrid';
 import { toast } from 'sonner';
 import EditProgram from './EditPrograms';
 import axios from "axios";
+import { MoreVertical, Pencil, Trash } from "lucide-react";
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 interface ProgramCardProps {
     program: Program;
@@ -45,19 +52,30 @@ const ProgramCard = ({ program, onDelete, onEdit }: ProgramCardProps) => {
                             <h3 className="text-xl font-semibold text-white mb-2">{program.name}</h3>
                             <p className="text-[#8F8F8F] text-sm">{program.university}</p>
                         </div>
-                        <div className="flex gap-2">
-                            <Button
-                                onClick={handleEdit}
-                                className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-                            >
-                                Edit
-                            </Button>
-                            <Button
-                                onClick={handleDelete}
-                                className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
-                            >
-                                Delete
-                            </Button>
+                        <div>
+                            <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                    <Button variant="ghost" className="h-8 w-8 p-0">
+                                        <MoreVertical className="h-4 w-4 text-white" />
+                                    </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent align="end" className="bg-[#1c1e2d] text-white border-[#2D2D2D]">
+                                    <DropdownMenuItem 
+                                        onClick={handleEdit}
+                                        className="cursor-pointer hover:bg-[#2D2D2D] flex items-center gap-2"
+                                    >
+                                        <Pencil className="h-4 w-4" />
+                                        Edit
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem 
+                                        onClick={handleDelete}
+                                        className="cursor-pointer hover:bg-[#2D2D2D] text-red-500 flex items-center gap-2"
+                                    >
+                                        <Trash className="h-4 w-4" />
+                                        Delete
+                                    </DropdownMenuItem>
+                                </DropdownMenuContent>
+                            </DropdownMenu>
                         </div>
                     </div>
                     <div className="space-y-2">
