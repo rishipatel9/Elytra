@@ -93,7 +93,7 @@ const EditProgram = ({ program, isOpen, onClose }: EditProgramProps) => {
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
-        if (['fees', 'applicationFee', 'deposit', 'ranking'].includes(name)) {
+        if (['fees', 'deposit', 'ranking'].includes(name)) {
             const error = validateNumber(value, name);
             setFormErrors(prev => ({
                 ...prev,
@@ -104,7 +104,7 @@ const EditProgram = ({ program, isOpen, onClose }: EditProgramProps) => {
 
     async function handleFormAction(formData: FormData) {
         // Validate all numerical fields before submission
-        const numericalFields = ['fees', 'applicationFee', 'deposit', 'ranking'];
+        const numericalFields = ['fees',  'deposit', 'ranking'];
         const errors: { [key: string]: string } = {};
 
         numericalFields.forEach(field => {
@@ -130,6 +130,9 @@ const EditProgram = ({ program, isOpen, onClose }: EditProgramProps) => {
                 toast.success('Program updated successfully!');
                 onClose();
                 router.refresh();
+                // Trigger a refetch in ProgramsGrid
+                const event = new CustomEvent('programUpdated');
+                window.dispatchEvent(event);
             } else {
                 toast.error(result.error || 'Failed to update program');
             }

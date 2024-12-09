@@ -22,37 +22,50 @@ const ProgramsGrid = ({ searchQuery }: { searchQuery: string }) => {
     const [isLoading, setIsLoading] = useState<boolean>(true);
     const [selectedProgram, setSelectedProgram] = useState<Program | null>(null);
 
+    const fetchPrograms = async () => {
+        try {
+            const response = await axios.get('/api/programs');
+            const formattedPrograms = response.data.programs.map((program: any) => ({
+                ...program,
+                specialization: Array.isArray(program.specialization)
+                    ? program.specialization
+                    : [program.specialization || "N/A"], // Ensure array
+                usp: Array.isArray(program.usp) ? program.usp : [program.usp || "N/A"], // Ensure array
+                eligibility: program.eligibility || { ugBackground: [] },
+                deposit: program.deposit || "Not Specified",
+            }));
+            setPrograms(formattedPrograms);
+            setIsLoading(false);
+        } catch (error) {
+            console.error(error);
+            setIsLoading(false);
+        }
+    };
+
     useEffect(() => {
-        const fetchPrograms = async () => {
-            try {
-                const response = await axios.get('/api/programs');
-                const formattedPrograms = response.data.programs.map((program: any) => ({
-                    ...program,
-                    specialization: Array.isArray(program.specialization)
-                        ? program.specialization
-                        : [program.specialization || "N/A"], // Ensure array
-                    usp: Array.isArray(program.usp) ? program.usp : [program.usp || "N/A"], // Ensure array
-                    eligibility: program.eligibility || { ugBackground: [] },
-                    deposit: program.deposit || "Not Specified",
-                }));
-                setPrograms(formattedPrograms);
-                setIsLoading(false);
-            } catch (error) {
-                console.error(error);
-                setIsLoading(false);
-            }
+        fetchPrograms();
+
+        // Listen for program updates
+        const handleProgramUpdate = () => {
+            fetchPrograms();
         };
 
-        fetchPrograms();
+        window.addEventListener('programUpdated', handleProgramUpdate);
+
+        return () => {
+            window.removeEventListener('programUpdated', handleProgramUpdate);
+        };
     }, []);
 
     const handleDelete = (id: string) => {
         setPrograms(programs.filter(program => program.id !== id));
+        fetchPrograms(); // Refresh programs after delete
     };
 
     const handleEdit = (program: Program) => {
         setSelectedProgram(program);
         // You can implement a modal or navigation to edit form here
+        fetchPrograms(); // Refresh programs after edit
     };
 
     const filteredPrograms = programs.filter(program => 
