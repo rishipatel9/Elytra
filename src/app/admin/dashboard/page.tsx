@@ -9,15 +9,15 @@ const page = async (): Promise<JSX.Element | null> => {
     const cookieStore = await cookies();
     const adminToken = cookieStore.get("adminToken")?.value;
 
-    if (!adminToken) {
-        redirect("/signup");
-        return null; 
-    }
+    // if (!adminToken) {
+    //     redirect("/signup");
+    //     return null; 
+    // }
     try {
-        const decoded = jwt.verify(adminToken, JWT_SECRET) as { role: string };
-        if (decoded.role !== "admin") {
-            redirect("/signup");
-        }
+        //const decoded = jwt.verify(adminToken, JWT_SECRET) as { role: string };
+        // if (decoded.role !== "admin") {
+        //     redirect("/signup");
+      //  }
         return (
             <div>
                 <AdminDashboard />
