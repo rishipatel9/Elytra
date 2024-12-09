@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import ProgramCard from './ProgramCard';
 
 export type Program = {
+    id: string;
     name: string;
     university: string;
     specialization: string[]; 
@@ -19,6 +20,7 @@ export type Program = {
 const ProgramsGrid = ({ searchQuery }: { searchQuery: string }) => {
     const [programs, setPrograms] = useState<Program[]>([]);
     const [isLoading, setIsLoading] = useState<boolean>(true);
+    const [selectedProgram, setSelectedProgram] = useState<Program | null>(null);
 
     useEffect(() => {
         const fetchPrograms = async () => {
@@ -44,6 +46,15 @@ const ProgramsGrid = ({ searchQuery }: { searchQuery: string }) => {
         fetchPrograms();
     }, []);
 
+    const handleDelete = (id: string) => {
+        setPrograms(programs.filter(program => program.id !== id));
+    };
+
+    const handleEdit = (program: Program) => {
+        setSelectedProgram(program);
+        // You can implement a modal or navigation to edit form here
+    };
+
     const filteredPrograms = programs.filter(program => 
         program.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
         program.university.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -60,7 +71,12 @@ const ProgramsGrid = ({ searchQuery }: { searchQuery: string }) => {
                     <div className="text-[#EDEDED] text-lg">Loading Programs...</div>
                 ) : (
                     filteredPrograms.map((program, index) => (
-                        <ProgramCard key={index} program={program} />
+                        <ProgramCard 
+                            key={program.id || index} 
+                            program={program} 
+                            onDelete={handleDelete}
+                            onEdit={handleEdit}
+                        />
                     ))
                 )}
             </div>
