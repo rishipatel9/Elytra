@@ -81,9 +81,6 @@ export async function createProgram(formData: FormData) {
                 keyCompaniesHiring: formData.get('keyCompaniesHiring') as string || "",
                 keyJobRoles: formData.get('keyJobRoles') as string || "",
                 quantQualitative: formData.get('quantQualitative') as string || "",
-                createdAt: new Date(),
-                updatedAt: new Date(),
-                
             },
         });
 
@@ -92,5 +89,64 @@ export async function createProgram(formData: FormData) {
     } catch (error) {
         console.error('Error creating program:', error);
         return { success: false, error: 'Failed to create program' };
+    }
+}
+
+export async function updateProgram(id: string, formData: FormData) {
+    console.log('Starting program update for ID:', id);
+    try {
+        // Helper function to handle "Not Specified" values
+        const getFormValue = (key: string) => {
+            const value = formData.get(key);
+            return value === 'Not Specified' ? null : (value as string || "");
+        };
+
+        const program = await prisma.program.update({
+            where: { id: parseInt(id, 10) },
+            data: {
+                name: formData.get('name') as string,
+                description: getFormValue('description'),
+                mode: getFormValue('mode'),
+                duration: getFormValue('duration'),
+                category: getFormValue('category'),
+                fees: getFormValue('fees'),
+                eligibility: JSON.stringify({
+                    ugBackground: getFormValue('ugBackground'),
+                    minimumGpa: getFormValue('minimumGpa'),
+                    backlogs: Number(getFormValue('backlogs')) || 0,
+                    workExperience: getFormValue('workExperience'),
+                    allow3YearDegree: getFormValue('allow3YearDegree'),
+                    decisionFactor: getFormValue('decisionFactor'),
+                }),
+                ranking: getFormValue('ranking'),
+                university: formData.get('university') as string,
+                college: getFormValue('college'),
+                location: getFormValue('location'),
+                publicPrivate: getFormValue('publicPrivate'),
+                specialLocationFeatures: getFormValue('specialLocationFeatures'),
+                specialUniversityFeatures: getFormValue('specialUniversityFeatures'),
+                specialization: getFormValue('specialization'),
+                usp: getFormValue('usp'),
+                curriculum: getFormValue('curriculum'),
+                coOpInternship: getFormValue('coOpInternship'),
+                transcriptEvaluation: getFormValue('transcriptEvaluation'),
+                lor: getFormValue('lor'),
+                sop: getFormValue('sop'),
+                interviews: getFormValue('interviews'),
+                applicationFee: getFormValue('applicationFee'),
+                deposit: getFormValue('deposit'),
+                depositRefundableVisa: getFormValue('depositRefundableVisa'),
+                keyCompaniesHiring: getFormValue('keyCompaniesHiring'),
+                keyJobRoles: getFormValue('keyJobRoles'),
+                quantQualitative: getFormValue('quantQualitative'),
+            },
+        });
+
+        console.log('Program updated successfully:', program);
+        revalidatePath('/admin/dashboard');
+        return { success: true, program };
+    } catch (error) {
+        console.error('Error updating program:', error);
+        return { success: false, error: 'Failed to update program' };
     }
 }

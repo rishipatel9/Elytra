@@ -87,6 +87,9 @@ const AddProgram = () => {
                 toast.success('Program created successfully!');
                 setIsDialogOpen(false);
                 router.refresh();
+                // Trigger a refetch in ProgramsGrid
+                const event = new CustomEvent('programUpdated');
+                window.dispatchEvent(event);
             } else {
                 toast.error(result.error || 'Failed to create program');
             }
