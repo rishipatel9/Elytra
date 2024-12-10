@@ -79,11 +79,13 @@ const Dashboard = () => {
     setInput('');
     setIsStreaming(false);
   };
-
+  // normal bg-background dark:bg-[#202434] dark:border-[#293040] border-[#E9ECF1]
+  // invert bg-background dark:bg-[#212A39] dark:border-[#293040] border-[#E9ECF1]
+  // light shadow dark:border-[#3B4254]  border-[#E9ECF1]
   return (
-    <div className="flex flex-col h-screen w-full bg-background font-sans">
-      {/* Header */}
-      <header className="flex items-center justify-between px-6 py-4 border-b">
+    <div className="flex flex-col h-full rounded-xl w-full justify-center items-center  bg-background dark:bg-[#202434] font-sans ">
+      <div className='max-w-4xl h-full w-full flex flex-col  '>
+      <header className="flex items-center justify-between px-6 py-4 border-b  dark:border-[#293040] border-[#E9ECF1]">
         <div className="flex items-center gap-2">
           <Avatar>
             <AvatarFallback>A</AvatarFallback>
@@ -145,7 +147,7 @@ const Dashboard = () => {
       </ScrollArea>
 
       {/* Input Area */}
-      <div className="p-4 border-t ">
+      <div className="p-4 border-t dark:border-[#293040] border-[#E9ECF1] ">
         <div className="flex gap-2">
           <Input
             placeholder="Type your question about studying abroad..."
@@ -169,6 +171,7 @@ const Dashboard = () => {
           </Button>
           <Toaster position="top-center"/>
         </div>
+      </div>
       </div>
     </div>
   );

@@ -18,6 +18,8 @@ import { Button } from '../ui/button'
 import axios from 'axios'
 import { storeChats, summarizeChat } from '@/lib/db'
 import { toast, Toaster } from 'sonner'
+import UserDataTable from './UserSessions'
+
 
 interface User {
     id: string;
@@ -236,11 +238,11 @@ export default function AICounselingChatbot({ user }: { user: User }) {
         }
     }, [text, previousText]);
 
-    useEffect(() => {
-        return () => {
-            endSession();
-        };
-    }, []);
+    // useEffect(() => {
+    //     return () => {
+    //         endSession();
+    //     };
+    // }, []);
 
     useEffect(() => {
         if (stream && mediaStream.current) {
@@ -258,8 +260,8 @@ export default function AICounselingChatbot({ user }: { user: User }) {
 
     return (
         <>
-            {stream ? (
-                <div className="min-h-screen bg-gradient-to-b flex flex-col font-sans">
+            {/* {stream ? (
+                <div className="min-h-screen  flex flex-col font-sans">
                     <main className="flex-grow flex flex-col md:flex-row p-4 gap-4  mx-auto w-full">
                         <section className="flex-1 bg-white rounded-md shadow-lg overflow-hidden">
                             <div className="aspect-video bg-gray-200 relative">
@@ -332,22 +334,14 @@ export default function AICounselingChatbot({ user }: { user: User }) {
                         </section>
                     </main>
                 </div>
-            ) : (
-                <div className="flex flex-col items-center justify-center h-screen">
-                    <h1 className="text-2xl font-bold text-center text-black m-2">AI-Powered Student Counseling</h1>
-                    <Button onClick={startSession} className="flex items-center justify-center">
-                        {loading ? (
-                            <div className="flex items-center gap-2">
-                                <div className="animate-spin rounded-full h-4 w-4 border-2 border-t-black border-white"></div>
-                                <span>Starting...</span>
-                            </div>
-                        ) : (
-                            "Start Session"
-                        )}
-                    </Button>
-                    <Toaster/>
+            ) : ( */}
+                <div className="flex flex-col items-center justify-center h-screen  bg-background dark:bg-[#202434] font-sans  dark:border-[#293040] border-[#E9ECF1]">
+                    <div className='max-w-6xl w-full h-full'>
+                    <UserDataTable/>
+                    </div>
+
                 </div>
-            )}  
+            {/* // )}   */}
         </>
     )
 }

@@ -80,13 +80,10 @@ export default function InteractiveAvatar() {
 
       // Initialize OpenAI Assistant
       const openaiApiKey = process.env.NEXT_PUBLIC_OPENAI_API_KEY;
-      openaiAssistant.current = new OpenAIAssistant();
+      openaiAssistant.current = new OpenAIAssistant(openaiApiKey || "");
       await openaiAssistant.current.initialize();
 
-      // Set up HeyGen Avatar event listeners
       setupAvatarEventListeners();
- 
-
 
 try {
   const res = await avatar.current.createStartAvatar({
