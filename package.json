@@ -53,6 +53,7 @@
     "@tanstack/react-table": "^8.20.5",
     "@uiw/codemirror-extensions-langs": "^4.22.1",
     "@uiw/react-codemirror": "^4.22.1",
+    "@uploadthing/react": "^7.1.2",
     "@xyflow/react": "^12.3.5",
     "ahooks": "^3.8.1",
     "ai": "^3.2.15",
@@ -84,6 +85,7 @@
     "sonner": "^1.7.0",
     "tailwind-merge": "^2.5.4",
     "tailwindcss-animate": "^1.0.7",
+    "uploadthing": "^7.4.0",
     "xlsx": "^0.18.5",
     "zod": "^3.23.8"
   },
