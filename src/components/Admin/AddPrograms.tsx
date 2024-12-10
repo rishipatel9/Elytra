@@ -103,14 +103,15 @@ const AddProgram = () => {
         <div className={clsx({ 'blur-background': isDialogOpen })}>
             <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                 <DialogTrigger asChild>
-                    <Button className="flex items-center px-6 py-3 md:px-8 bg-white text-[#2D2D2D] font-medium rounded-md hover:bg-[#f0f0f0] h-[2.5rem]">
+                {/* bg-indigo-100 dark:bg-indigo-500/30 */}
+                    <Button className="flex items-center px-6 py-3 md:px-8 border rounded-xl   dark:border-[#3B4254]  border-[#E9ECF1]   font-medium  hover:bg-[#633fab] h-[2.5rem]">
                         <span className="h-5 w-5 md:hidden">
                             <PlusIcon />
                         </span>
                         <span className="hidden md:inline">Create</span>
                     </Button>
                 </DialogTrigger>
-                <DialogContent className="sm:max-w-[900px] rounded-md bg-[#151723] text-white border-2 border-[#2D2D2D] max-h-[90vh] flex flex-col">
+                <DialogContent className="sm:max-w-[900px] rounded-md bg-[#151723] text-white border-2 border-[#2D2D2D] max-h-[90vh] flex flex-col1">
                     <DialogHeader>
                         <DialogTitle>Create New Program</DialogTitle>
                         <DialogDescription>
@@ -338,3 +339,4 @@ const AddProgram = () => {
 }
 
 export default AddProgram;
+

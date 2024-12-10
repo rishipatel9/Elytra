@@ -1,106 +1,129 @@
-'use client'
-import { GraduationCap, User } from 'lucide-react';
+"use client";
+import React, { use, useState } from "react";
 import {
-    Sidebar,
-    SidebarContent,
-    SidebarGroup,
-    SidebarGroupContent,
-    SidebarGroupLabel,
-    SidebarMenu,
-    SidebarMenuButton,
-    SidebarMenuItem,
-} from '@/components/ui/sidebar';
-import { cn } from '@/lib/utils';
-import { useLocation } from 'react-router-dom';
-import { usePathname } from 'next/navigation';
+    IconBook,
+    IconDeviceAnalytics
+} from "@tabler/icons-react";
+import Link from "next/link";
+import { motion } from "framer-motion";
+import { cn } from "@/lib/utils";
+import { Sidebar, SidebarBody, SidebarLink } from "@/components/ui/sidebar";
+import { usePathname } from "next/navigation";
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { ModeToggle } from "../theme-toggle";
 
-// Menu items.
-const items = [
-    {
-        title: 'Programs',
-        url: '/admin/dashboard',
-        icon: GraduationCap,
-    },
-    {
-        title: 'AI Counseling',
-        url: '/',
-        icon: User,
-    },
-];
 
-export function AdminSidebar() {
-    const pathname = usePathname(); // Get the current pathname
 
-    return (
-        <Sidebar>
-            <SidebarContent
-                className="bg-[#0A0A0A] text-[#888888] shadow-2xl border-r border-[#2D2D2D] w-64"
-            >
-                <SidebarGroup>
-                    <SidebarGroupLabel className="text-base font-semibold text-gray-300 bg-[#000000] shadow-md p-4 mb-4 mt-1 border border-[#2D2D2D]  text-left">
-                        Admin Dashboard
-                    </SidebarGroupLabel>
-
-                    <SidebarGroupContent>
-                        <p className="text-[#888888] text-sm px-4 mb-2">WorkSpace</p>
-                        <SidebarMenu>
-                            {items.map((item) => {
-                               const isActive = pathname === item.url // Check if the item is active
-                                return (
-                                    <SidebarMenuItem
-                                        key={item.title}
-                                        className={cn(
-                                            'font-medium text-lg text-[#888888]',
-                                            // 'hover:shadow-lg hover:scale-[1.03]',
-                                            'transition-all duration-300 ease-in-out',
-                                            'group',
-                                            isActive && 'border-l-4 border-blue-500 bg-[#1A1A1A]' ,
-                                        )}
-                                    >
-                                        <SidebarMenuButton asChild>
-                                            <a
-                                                href={item.url}
-                                                className={cn(
-                                                    'flex items-center space-x-3 w-full p-3 rounded-lg',
-                                                    isActive && 'text-white' // Active text color
-                                                )}
-                                            >
-                                                <item.icon
-                                                    className={cn(
-                                                        'text-[#888888] group-hover:text-white',
-                                                        'transition-colors duration-300',
-                                                        isActive && 'text-blue-500' // Active icon color
-                                                    )}
-                                                    strokeWidth={1.5}
-                                                    size={20}
-                                                />
-                                                <span className="group-hover:text-white transition-colors duration-300">
-                                                    {item.title}
-                                                </span>
-                                            </a>
-                                        </SidebarMenuButton>
-                                    </SidebarMenuItem>
-                                );
-                            })}
-                        </SidebarMenu>
-                    </SidebarGroupContent>
-                </SidebarGroup>
-            </SidebarContent>
-
-            {/* Branding/Footer */}
-            <div className="absolute bottom-4 left-0 right-0 px-4">
-                <div className="flex items-center space-x-3 opacity-70 hover:opacity-100 transition-opacity duration-300">
-                    {/* Circle Avatar */}
-                    <div className="w-10 h-10 bg-gray-700 rounded-full flex items-center justify-center">
-                        <span className="text-white font-semibold text-xl">A</span>
-                    </div>
-                    {/* Text */}
-                    <div>
-                        <p className="text-sm font-medium text-gray-300">Admin Panel</p>
-                        <p className="text-xs text-gray-500">v1.0.0</p>
-                    </div>
-                </div>
-            </div>
-        </Sidebar>
-    );
+export default function AdminSidebar({ children }: { children: React.ReactNode }) {
+    // className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0" 
+    const links = [
+        {
+          label: "Programs",
+          href: "/admin/dashboard/",
+          icon: (
+            <IconBook className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0" />
+          ),
+        },
+        {
+          label: "Analytics", 
+          href: "/admin/dashboard/analytics", 
+          icon: (
+            <IconDeviceAnalytics className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0" />
+          ),
+        },
+      ];
+  const [open, setOpen] = useState(false);
+  const pathname= usePathname();
+  
+  return (
+    <div
+    className={cn(
+      " flex flex-col md:flex-row bg-background dark:bg-[#212A39] dark:border-[#293040] border-[#E9ECF1] w-full flex-1 h-screen  p-2  overflow-hidden font-sans"
+    )}
+  >
+    <Sidebar open={open} setOpen={setOpen} >
+      <SidebarBody className="justify-between gap-10">
+        <div className="flex flex-col flex-1 overflow-y-auto overflow-x-hidden ">
+          {open ? <Logo /> : <LogoIcon />}
+          <div className="mt-8 flex flex-col gap-2  ">
+            {links.map((link, idx) => {
+              const isActive = pathname === link.href; 
+              return (
+                <SidebarLink link={link} key={idx}/>
+              );
+            })}
+          </div>
+        </div>
+        <div className="flex flex-col items-start justify-center mr-2">
+        <ModeToggle/>
+            <SidebarLink
+              link={{
+                label: "Manu Arora",
+                href: "/profile",
+                icon: (
+                    <Avatar>
+                    <AvatarFallback>A</AvatarFallback>
+                  </Avatar>
+                ),
+              }}
+            />
+          </div>
+      </SidebarBody>
+    </Sidebar>
+    <div className="flex-1   bg-background dark:bg-[#202434] dark:border-[#293040] border-[#E9ECF1] shadow-lg rounded-xl overflow-y-auto">{children}</div>
+  </div>
+  );
 }
+export const Logo = () => {
+  return (
+    <Link
+      href="#"
+      className="font-normal flex space-x-2 items-center text-sm text-black py-1 relative z-20"
+    >
+      <div className="h-5 w-6 bg-black dark:bg-white rounded-full flex-shrink-0" />
+      <motion.span
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        className="font-medium text-black dark:text-white whitespace-pre"
+      >
+        Elytra
+      </motion.span>
+    </Link>
+  );
+};
+export const LogoIcon = () => {
+  return (
+    <Link
+      href="#"
+      className="font-normal flex space-x-2 items-center text-sm text-black py-1 relative z-20"
+    >
+      <div className="h-6 w-6 bg-black dark:bg-white rounded-full flex-shrink-0" />
+    </Link>
+  );
+};
+
+const Dashboard = () => {
+    return (
+      <div className="flex flex-1">
+        <div className="p-2 md:p-10 rounded-lg border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-900 flex flex-col gap-2 flex-1 w-full h-full">
+          <div className="flex gap-2">
+            {[...new Array(4)].map((_, index) => (
+              <div
+                key={index} // Use the index as the key
+                className="h-20 w-full rounded-lg bg-gray-100 dark:bg-neutral-800 animate-pulse"
+              ></div>
+            ))}
+          </div>
+          <div className="flex gap-2 flex-1">
+            {[...new Array(2)].map((_, index) => (
+              <div
+                key={index} // Use the index as the key
+                className="h-full w-full rounded-lg bg-gray-100 dark:bg-neutral-800 animate-pulse"
+              ></div>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  };
+  

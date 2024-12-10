@@ -19,9 +19,7 @@ const page = async (): Promise<JSX.Element | null> => {
             redirect("/signup");
         }
         return (
-            <div>
-                <AdminDashboard />
-            </div>
+            <AdminDashboard />
         );
     } catch (error) {
         console.error("Token verification failed:", error);

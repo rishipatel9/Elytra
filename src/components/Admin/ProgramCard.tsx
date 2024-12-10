@@ -21,6 +21,8 @@ interface ProgramCardProps {
 
 const ProgramCard = ({ program, onDelete, onEdit }: ProgramCardProps) => {
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+    const [isExpanded, setIsExpanded] = useState(false);
+
 
     const handleDelete = async () => {
         try {
@@ -44,89 +46,120 @@ const ProgramCard = ({ program, onDelete, onEdit }: ProgramCardProps) => {
         : null;
 
     return (
+ 
         <>
-            <Card className="w-full bg-[#151723] border-2 border-[#2D2D2D] rounded-lg overflow-hidden hover:border-[#3D3D3D] transition-all duration-300">
-                <CardContent className="p-6">
-                    <div className="flex justify-between items-start mb-4">
-                        <div>
-                            <h3 className="text-xl font-semibold text-white mb-2">{program.name}</h3>
-                            <p className="text-[#8F8F8F] text-sm">{program.university}</p>
-                        </div>
-                        <div>
-                            <DropdownMenu>
-                                <DropdownMenuTrigger asChild>
-                                    <Button variant="ghost" className="h-8 w-8 p-0">
-                                        <MoreVertical className="h-4 w-4 text-white" />
-                                    </Button>
-                                </DropdownMenuTrigger>
-                                <DropdownMenuContent align="end" className="bg-[#1c1e2d] text-white border-[#2D2D2D]">
-                                    <DropdownMenuItem 
-                                        onClick={handleEdit}
-                                        className="cursor-pointer hover:bg-[#2D2D2D] flex items-center gap-2"
-                                    >
-                                        <Pencil className="h-4 w-4" />
-                                        Edit
-                                    </DropdownMenuItem>
-                                    <DropdownMenuItem 
-                                        onClick={handleDelete}
-                                        className="cursor-pointer hover:bg-[#2D2D2D] text-red-500 flex items-center gap-2"
-                                    >
-                                        <Trash className="h-4 w-4" />
-                                        Delete
-                                    </DropdownMenuItem>
-                                </DropdownMenuContent>
-                            </DropdownMenu>
-                        </div>
-                    </div>
-                    <div className="space-y-2">
-                        <p className="text-[#8F8F8F]">
-                            <span className="font-medium text-white">Location:</span> {program.location || 'N/A'}
-                        </p>
-                        <p className="text-[#8F8F8F]">
-                            <span className="font-medium text-white">Specialization:</span> {Array.isArray(program.specialization) && program.specialization.length > 0 ? (
-                                <ul className="list-disc list-inside">
-                                    {program.specialization.map((spec, index) => (
-                                        <li key={index}>{spec}</li>
-                                    ))}
-                                </ul>
-                            ) : (
-                                <span>N/A</span>
-                            )}
-                        </p>
-                        <p className="text-[#8F8F8F]">
-                            <span className="font-medium text-white">Ranking:</span> {program.ranking || 'N/A'}
-                        </p>
-                        <p className="text-[#8F8F8F]">
-                            <span className="font-medium text-white">Deposit:</span> {program.deposit || 'N/A'}
-                        </p>
-                        <p className="text-[#8F8F8F]">
-                            <span className="font-medium text-white">Eligibility:</span>
-                            {eligibility ? (
-                                <ul className="list-disc list-inside">
-                                    {eligibility.ugBackground && <li><strong>UG Background:</strong> {eligibility.ugBackground}</li>}
-                                    {eligibility.minimumGpa && <li><strong>Minimum GPA:</strong> {eligibility.minimumGpa}</li>}
-                                    {eligibility.backlogs !== undefined && <li><strong>Backlogs:</strong> {eligibility.backlogs}</li>}
-                                    {eligibility.workExperience && <li><strong>Work Experience:</strong> {eligibility.workExperience}</li>}
-                                    {eligibility.allow3YearDegree && (
-                                        <li>
-                                            <strong>Allow 3-Year Degree:</strong> {eligibility.allow3YearDegree}
-                                        </li>
-                                    )}
-                                </ul>
-                            ) : (
-                                <span>N/A</span>
-                            )}
-                        </p>
-                    </div>
-                </CardContent>
-            </Card>
+        <Card className="w-full border rounded-xl overflow-hidden bg-background dark:bg-[#212A39] hover:border-[rgb(128,50,255)] hover:border-2 dark:border-[#3B4254] border-[#E9ECF1] shadow-sm transition-all duration-300 font-sans">
+      <CardContent className="p-4">
+        {/* Header Section */}
+        <div className="flex justify-between items-center mb-3">
+          <div>
+            <h3 className="text-lg font-semibold text-[#222939] dark:text-white">{program.name}</h3>
+            <p className="text-sm text-gray-500 dark:text-[#8F8F8F]">{program.university}</p>
+          </div>
 
-            <EditProgram
-                program={program}
-                isOpen={isEditModalOpen}
-                onClose={() => setIsEditModalOpen(false)}
-            />
-        </>
+          {/* Dropdown Menu */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" className="h-6 w-6 p-0">
+                <MoreVertical className="h-4 w-4 text-gray-700 dark:text-[#8F8F8F]" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="bg-white text-[#222939] dark:text-white border dark:border-[#3B4254] border-[#E9ECF1] dark:bg-[#212A39]">
+              <DropdownMenuItem className="cursor-pointer hover:bg-[#2D2D2D] flex items-center gap-2">
+                <Pencil className="h-4 w-4" />
+                Edit
+              </DropdownMenuItem>
+              <DropdownMenuItem className="cursor-pointer hover:bg-[#2D2D2D] text-red-500 flex items-center gap-2">
+                <Trash className="h-4 w-4" />
+                Delete
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+
+        {/* Program Details */}
+        <div className="space-y-2 text-gray-700 dark:text-[#8F8F8F]">
+          <p>
+            <span className="font-medium text-[#222939] dark:text-white">Location:</span> {program.location || 'N/A'}
+          </p>
+          <p>
+            <span className="font-medium text-[#222939] dark:text-white">Ranking:</span> {program.ranking || 'N/A'}
+          </p>
+          <p>
+            <span className="font-medium text-gray-900 dark:text-white">Deposit:</span> {program.deposit || 'N/A'}
+          </p>
+
+          {/* Expandable Content */}
+          <div className="text-sm">
+            {isExpanded ? (
+              <>
+                <p>
+                  <span className="font-medium text-[#222939] dark:text-white">Specialization:</span>
+                  {Array.isArray(program.specialization) && program.specialization.length > 0 ? (
+                    <ul className="list-disc list-inside mt-1">
+                      {program.specialization.map((spec, index) => (
+                        <li key={index}>{spec}</li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <span>N/A</span>
+                  )}
+                </p>
+
+                <p>
+                  <span className="font-medium text-[#222939] dark:text-white">Eligibility:</span>
+                  <ul className="list-disc list-inside space-y-1 mt-1">
+                    {eligibility.ugBackground && (
+                      <li>
+                        <strong>UG Background:</strong> {eligibility.ugBackground.replace("\\n", ", ")}
+                      </li>
+                    )}
+                    {eligibility.minimumGpa && (
+                      <li>
+                        <strong>Minimum GPA:</strong> {eligibility.minimumGpa}
+                      </li>
+                    )}
+                    {eligibility.backlogs !== undefined && (
+                      <li>
+                        <strong>Backlogs:</strong> {eligibility.backlogs}
+                      </li>
+                    )}
+                    {eligibility.workExperience && (
+                      <li>
+                        <strong>Work Experience:</strong> {eligibility.workExperience}
+                      </li>
+                    )}
+                    {eligibility.allow3YearDegree && (
+                      <li>
+                        <strong>Allow 3-Year Degree:</strong> {eligibility.allow3YearDegree}
+                      </li>
+                    )}
+                  </ul>
+                </p>
+              </>
+            ) : (
+              <p className="line-clamp-2">
+                <span className="font-medium text-[#222939] dark:text-white">Specialization:</span>{" "}
+                {Array.isArray(program.specialization) && program.specialization.length > 0
+                  ? program.specialization.join(", ")
+                  : "N/A"}
+              </p>
+            )}
+            {/* Toggle Button */}
+            <button
+              onClick={() => setIsExpanded(!isExpanded)}
+              className="text-blue-500 hover:underline mt-1"
+            >
+              {isExpanded ? "Read Less" : "Read More"}
+            </button>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+
+      </>
+  
+
     );
 };
 

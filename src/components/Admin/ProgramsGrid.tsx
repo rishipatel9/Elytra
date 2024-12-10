@@ -78,10 +78,12 @@ const ProgramsGrid = ({ searchQuery }: { searchQuery: string }) => {
 
     return (
         <div>
-            <div className="w-full h-10 text-[#EDEDED] py-4 text-xl font-bold">Programs</div>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-6 py-2">
                 {isLoading ? (
-                    <div className="text-[#EDEDED] text-lg">Loading Programs...</div>
+                    // <div className="text-[#EDEDED] text-lg">Loading Programs...</div>
+                    Array.from({ length: 6 }).map((_, index) => (
+                        <SkeletonCard key={index} />
+                      ))
                 ) : (
                     filteredPrograms.map((program, index) => (
                         <ProgramCard 
@@ -98,3 +100,25 @@ const ProgramsGrid = ({ searchQuery }: { searchQuery: string }) => {
 };
 
 export default ProgramsGrid;
+
+const SkeletonCard = () => (
+    <div className="animate-pulse border rounded-xl overflow-hidden bg-white dark:bg-[#212A39] dark:border-[#3B4254] border-[#E9ECF1] shadow-lg">
+      {/* Card Header Skeleton */}
+      <div className="p-6">
+        <div className="flex justify-between items-start">
+          <div>
+            <div className="h-6 w-48 bg-gray-300 dark:bg-gray-700 rounded"></div>
+            <div className="h-4 w-32 mt-2 bg-gray-300 dark:bg-gray-700 rounded"></div>
+          </div>
+          <div className="h-8 w-8 bg-gray-300 dark:bg-gray-700 rounded-full"></div>
+        </div>
+      </div>
+  
+      {/* Card Body Skeleton */}
+      <div className="space-y-4 px-6 pb-6">
+        <div className="h-4 w-full bg-gray-300 dark:bg-gray-700 rounded"></div>
+        <div className="h-4 w-2/3 bg-gray-300 dark:bg-gray-700 rounded"></div>
+        <div className="h-4 w-1/2 bg-gray-300 dark:bg-gray-700 rounded"></div>
+      </div>
+    </div>
+  );
