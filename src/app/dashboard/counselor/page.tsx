@@ -2,7 +2,6 @@
 import React, { useEffect, useState } from 'react';
 import { Calendar, Clock, User, Video, MessageSquare } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { SidebarTrigger } from '@/components/ui/sidebar';
 import { getSession } from 'next-auth/react';
 import { toast } from 'sonner';
 
@@ -93,12 +92,11 @@ const CounselorScheduling = () => {
   
 
   return (
-    <div className="h-screen overflow-y-auto bg-gray-900 p-6 text-gray-100">
+    <div className="h-screen overflow-y-auto   bg-background dark:bg-[#202434] dark:border-[#293040] border-[#E9ECF1] p-6 text-gray-100">
       
       <div className="max-w-6xl mx-auto space-y-6 pb-6">
       
         <h1 className="text-3xl gap-2 flex font-bold mb-8"><div>
-        <SidebarTrigger  />
           </div> Schedule a Counseling Session</h1>
         
         
@@ -209,6 +207,7 @@ const CounselorScheduling = () => {
               </div>
             </CardContent>
           </Card>
+          
 
           <Card className="bg-gray-800 border-gray-700">
             <CardContent className="pt-6">
