@@ -78,7 +78,7 @@ export default function AICounselingChatbot({ user }: { user: User }) {
                 voice: { rate: 2.0, emotion: VoiceEmotion.EXCITED },
                 knowledgeBase:"You are an international student career counsellor"
             })
-            setData(res)
+           setData(res)
         } catch (error) {
             toast.error(`Error starting avatar: ${error} Please try again`)
             console.error('Failed to start avatar:', error)
@@ -185,11 +185,11 @@ export default function AICounselingChatbot({ user }: { user: User }) {
      console.log(`RESP IS :${JSON.stringify(response)}`)
      setMessages((prev) => [...prev, { text: response, sender: 'ai' }])
 
-      await avatar.current.speak({ 
-        text: response, 
-        taskType: TaskType.TALK, 
-        taskMode: TaskMode.SYNC 
-      });
+    //   await avatar.current.speak({ 
+    //     text: response, 
+    //     taskType: TaskType.REPEAT, 
+    //     taskMode: TaskMode.SYNC 
+    //   });
         
         
            storeChats({sessionId:sessionId,message:text,sender:"USER"})
@@ -292,27 +292,44 @@ export default function AICounselingChatbot({ user }: { user: User }) {
                         </section>
 
                         <section className="flex-1 bg-white shadow-md flex flex-col justify-between">
-                            <div
-                                className="flex-grow overflow-y-auto px-2"
-                                style={{ maxHeight: "calc(100vh - 90px)" }}
+                          <div
+    className="flex-grow overflow-y-auto px-2"
+    style={{ maxHeight: "calc(100vh - 90px)" }}
+>
+    {messages.map((message, index) => (
+        <div
+            key={index}
+            className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}
+        >
+            <div
+                className={`max-w-[80%] p-3 my-2 rounded-lg ${message.sender === 'user'
+                    ? 'bg-blue-500 text-white'
+                    : 'bg-gray-200 text-gray-800'
+                    }`}
+            >
+                <ReactMarkdown
+                    remarkPlugins={[remarkGfm]}
+                    components={{
+                        a: ({ href, children }) => (
+                            <a
+                                href={href}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-blue-500 underline"
                             >
-                                {messages.map((message, index) => (
-                                    <div
-                                        key={index}
-                                        className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}
-                                    >
-                                        <div
-                                            className={`max-w-[80%] p-3 my-2 rounded-lg ${message.sender === 'user'
-                                                ? 'bg-blue-500 text-white'
-                                                : 'bg-gray-200 text-gray-800'
-                                                }`}
-                                        >
-                                            {message.text}
-                                        </div>
-                                    </div>
-                                ))}
-                                <div ref={messagesEndRef} />
-                            </div>
+                                {children}
+                            </a>
+                        ),
+                    }}
+                >
+                    {message.text}
+                </ReactMarkdown>
+            </div>
+        </div>
+    ))}
+    <div ref={messagesEndRef} />
+</div>
+
 
                             <div className="border-t  h-auto relative">
                                 <div className="w-full flex items-center">
