@@ -1,4 +1,5 @@
 "use client";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { signIn } from "next-auth/react";
 import { useRouter } from 'next/navigation';
@@ -44,7 +45,7 @@ const EmailSignIn = () => {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+    <form onSubmit={handleSubmit} className="flex flex-col gap-4 m-2  ">
       <Input
         id="email"
         name="email"
@@ -53,7 +54,8 @@ const EmailSignIn = () => {
         required
         value={formData.email}
         onChange={handleInputChange}
-        className="w-full px-4 py-3 text-white bg-[#1c1e2d] border border-gray-700 rounded-lg placeholder-gray-500 focus:ring-2 focus:ring-[#4220A9] focus:outline-none"
+        style={{borderRadius: '0.6rem'}}
+        className="rounded-lg border border-[#323232] bg-black placeholder:text-[#8F8F8F] px-4  py-5 text-base w-full ring-offset-background focus:ring-2 focus:ring-ring focus:ring-offset-2"
       />
 
       {/* Password Input */}
@@ -65,17 +67,19 @@ const EmailSignIn = () => {
         required
         value={formData.password}
         onChange={handleInputChange}
-        className="w-full px-4 py-3 text-white bg-[#1c1e2d] border border-gray-700 rounded-lg placeholder-gray-500 focus:ring-2 focus:ring-[#4220A9] focus:outline-none"
+        style={{borderRadius: '0.6rem'}}
+        className="rounded-lg border border-[#323232] bg-black placeholder:text-[#8F8F8F] px-4 py-5 text-base w-full ring-offset-background focus:ring-2 focus:ring-ring focus:ring-offset-2"
       />
 
       {/* Submit Button */}
-      <button
+      <Button
         type="submit"
-        className="w-full py-3 font-semibold text-white transition-all transform bg-gradient-to-r from-[#4220A9] to-[#321880] rounded-lg hover:opacity-90 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
-        disabled={loading}
+        className="flex items-center font-semibold justify-center border border-[#323232] bg-white text-black hover:bg-black hover:text-white transition-all  rounded-md h-[2.5rem]"
+          disabled={loading}
+          style={{borderRadius: '0.6rem'}}
       >
         {loading ? "Signing In..." : "Sign In"}
-      </button>
+      </Button>
       <Toaster />
     </form>
   );

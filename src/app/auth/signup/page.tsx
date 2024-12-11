@@ -1,4 +1,4 @@
-import SignUp from '@/components/auth/signup'
+import SignUp from '@/components/auth/signup';
 import { getUserDetails } from '@/utils';
 import { redirect } from 'next/navigation';
 import React from 'react'

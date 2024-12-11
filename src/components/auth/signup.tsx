@@ -1,66 +1,65 @@
-import React from 'react';
-import { Input } from '../ui/input';
-import SignupButtons from '../SignUpButtons';
-import EmailSignUp from '@/app/auth/signup/_components/EmailSignUp';
-import Link from 'next/link';
 
+
+import EmailSignUp from '@/app/auth/signup/_components/EmailSignUp';
+import { TopLeftShine, TopRightShine } from "../ui/Shine";
+import SignupButtons from "../SignUpButtons";
 
 export default function SignUp() {
   return (
-    <div className="relative flex flex-col items-center font-sans justify-center min-h-screen bg-gradient-to-br from-[#1e1e2f] to-[#151723] px-4 overflow-hidden">
-      {/* Background Blur Effects */}
-      <div className="absolute top-1/3 left-1/4 w-[400px] h-[500px] rounded-full bg-gradient-to-r from-[#4220A9] to-[#391a94] blur-3xl opacity-20 animate-pulse"></div>
-      <div className="absolute bottom-0 right-0 w-[500px] h-[500px] rounded-full bg-gradient-to-tl from-[#4220A9]/60 to-[#321880]/60 blur-2xl opacity-20"></div>
+    <div className="flex min-h-screen bg-black md:grid md:grid-cols-5 md:px-0">
+    {/* Left Side - SignUp Form (40% width) */}
+    <div className="md:col-span-2 flex flex-col justify-center p-6 md:p-12 space-y-6 max-w-[450px] mx-auto bg-black">
+      <div className="absolute top-0 left-0 flex justify-start w-screen overflow-hidden pointer-events-none">
+        <TopLeftShine />
+      </div> 
+  
+      <div className="flex flex-col items-center text-start space-y-2">
+        <h1 className="text-2xl font-semibold text-[#807F7F] dark:text-white">
+          Create an account
+        </h1>
+        <p className="text-sm text-[#8F8F8F]">
+          Enter your email below to create your account
+        </p>
+      </div>
+      
+      <SignupButtons/>
 
-      {/* Grid Pattern Overlay */}
-      <div className="absolute inset-0 bg-[linear-gradient(to_right,_rgba(255,255,255,0.05)_1px,_transparent_1px)] bg-[size:80px_80px] opacity-10 pointer-events-none"></div>
-
-      {/* Content */}
-      <div className="relative z-10 w-full max-w-md p-6 bg-[#1a1b25] rounded-lg shadow-lg space-y-8 border border-gray-800">
-        {/* Header */}
-        <div className="text-center">
-          <h1 className="text-4xl font-extrabold text-white tracking-wide">Sign up</h1>
-          <p className="text-gray-400 mt-2">Join us and explore endless possibilities.</p>
+      <div className="relative">
+        <div className="absolute inset-0 flex items-center">
+          <span className="w-full border-t border-[#8F8F8F]" />
         </div>
-
-        {/* Social Signup Buttons */}
-        <div className="space-y-4">
-          <SignupButtons />
-          <div className="relative my-6">
-            <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-gray-700"></div>
-            </div>
-            <div className="relative flex justify-center text-sm">
-              <span className="px-3 bg-[#1a1b25] text-gray-500">Or sign up with</span>
-            </div>
-          </div>
-
-          <EmailSignUp/>
-
-        
-
-          {/* Additional Links */}
-          <div className="text-center text-sm">
-            <span className="text-gray-400">Already have an account? </span>
-            <Link
-              href="/auth/signin"
-              className="text-[#4220A9] font-medium hover:text-[#321880] transition-colors"
-            >
-              Sign In
-            </Link>
-          </div>
-
-          <div className="text-center text-sm mt-4">
-            <span className="text-gray-400">Admin? </span>
-            <a
-              href="/admin/login"
-              className="text-[#4220A9] font-medium hover:text-[#321880] underline transition-colors"
-            >
-              Login as Admin
-            </a>
-          </div>
+        <div className="relative flex justify-center text-xs uppercase">
+          <span className="bg-background px-2  text-[#8F8F8F]">
+            Or continue with
+          </span>
         </div>
       </div>
+  
+      {/* Form */}
+      <form className="space-y-6 bg-black">
+        <div className="space-y-4">
+          <EmailSignUp />
+        </div>
+      </form>
     </div>
+  
+    {/* Right Side - Background Image and Quote (60% width) */}
+    <div className="relative hidden md:inline h-full bg-muted text-white lg:flex flex-col p-10 md:col-span-3">
+      <div className="absolute inset-0 bg-zinc-900 opacity-60" />
+      <div className="relative z-20 flex items-center text-lg font-medium">
+        <div className="mr-2 h-6 w-6" />
+        Elytra Inc
+      </div>
+      <div className="relative z-20 mt-auto">
+        <blockquote className="space-y-2">
+          <p className="text-lg">
+            &ldquo;This platform has saved me countless hours of work and helped me deliver stunning designs to my clients faster than ever before.&rdquo;
+          </p>
+          <footer className="text-sm">Sofia Davis</footer>
+        </blockquote>
+      </div>
+    </div>
+  </div>
+  
   );
 }

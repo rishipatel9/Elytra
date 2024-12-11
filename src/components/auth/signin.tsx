@@ -1,33 +1,46 @@
-import EmailSignIn from "@/app/auth/signin/_components/EmailSignIn";
-import Link from "next/link";
+import SignupButtons from "../SignUpButtons";
+import { TopLeftShine, TopRightShine } from "../ui/Shine";
+import EmailSignIn from '@/app/auth/signin/_components/EmailSignIn';
 
-
-export default async function SignIn() {
-
-
+export default function SignIn() {
   return (
-    <div className="relative flex flex-col items-center justify-center min-h-screen px-4 font-sans bg-gradient-to-br from-[#1e1e2f] to-[#151723] overflow-hidden">
-      <div className="absolute top-1/3 left-1/4 w-[400px] h-[500px] rounded-full bg-gradient-to-r from-[#4220A9] to-[#391a94] blur-3xl opacity-20 animate-pulse"></div>
-      <div className="absolute bottom-0 right-0 w-[500px] h-[500px] rounded-full bg-gradient-to-tl from-[#4220A9]/60 to-[#321880]/60 blur-2xl opacity-20"></div>
-
-      <div className="absolute inset-0 bg-[linear-gradient(to_right,_rgba(255,255,255,0.05)_1px,_transparent_1px)] bg-[size:80px_80px] opacity-10 pointer-events-none"></div>
-
-      <div className="relative z-10 w-full max-w-md p-6 space-y-8 bg-[#1a1b25] border border-gray-800 rounded-lg shadow-lg">
-
-        <div className="text-center">
-          <h1 className="text-4xl font-extrabold tracking-wide text-white">Sign In</h1>
+    <div className="flex min-h-screen bg-black md:grid md:grid-cols-5 md:px-0">
+      {/* Left Side - Sign In Form */}
+      <div className="md:col-span-2 flex flex-col justify-center p-6 md:p-12 mx-auto bg-black ">
+        <div className="absolute top-0 left-0 flex justify-start w-screen overflow-hidden pointer-events-none">
+          <TopLeftShine />
         </div>
 
-        <EmailSignIn />
+        <div className="flex flex-col items-center text-start space-y-2">
+          <h1 className="text-2xl font-semibold text-[#807F7F] dark:text-white">
+            Sign In to your account
+          </h1>
+          <p className="text-sm text-[#8F8F8F]">
+            Enter your email and password to Sign In
+          </p>
+        </div>
 
-        <div className="text-center text-sm">
-          <span className="text-gray-400">Don’t have an account? </span>
-          <Link
-            href="/auth/signup"
-            className="font-medium transition-colors text-[#4220A9] hover:text-[#321880]"
-          >
-            Create one
-          </Link>
+            <EmailSignIn />
+        <div className="space-y-6 bg-black">
+          <div className="space-y-4">
+          </div>
+        </div>
+      </div>
+
+      {/* Right Side - Background Image and Quote (60% width) */}
+      <div className="relative hidden md:inline h-full bg-muted text-white lg:flex flex-col p-10 md:col-span-3">
+        <div className="absolute inset-0 bg-zinc-900 opacity-60" />
+        <div className="relative z-20 flex items-center text-lg font-medium">
+          <div className="mr-2 h-6 w-6" />
+          Elytra Inc
+        </div>
+        <div className="relative z-20 mt-auto">
+          <blockquote className="space-y-2">
+            <p className="text-lg">
+              &ldquo;This platform has saved me countless hours of work and helped me deliver stunning designs to my clients faster than ever before.&rdquo;
+            </p>
+            <footer className="text-sm">Sofia Davis</footer>
+          </blockquote>
         </div>
       </div>
     </div>
