@@ -30,7 +30,7 @@ const UserSessionsTable = () => {
     useEffect(() => {
         const fetchSessions = async () => {
             try {
-                const response = await axios.get('/api/userData');
+                const response = await axios.get('/api/sessions');
                 if (response.data.success) {
                     setSessions(response.data.data);
                 } else {
@@ -63,27 +63,10 @@ const UserSessionsTable = () => {
     };
 
     // Skeleton Placeholder Rows (No external library)
-    const renderSkeletonRows = () => {
-        return Array.from({ length: 5 }).map((_, index) => (
-            <TableRow key={index} className="animate-pulse">
-                <TableCell className="px-4 py-3 border-b dark:border-[#3B4254]">
-                    <div className="h-5 bg-gray-300 dark:bg-gray-600 rounded "></div>
-                </TableCell>
-                <TableCell className="px-4 py-3 border-b dark:border-[#3B4254]">
-                    <div className="h-5 bg-gray-300 dark:bg-gray-600 rounded"></div>
-                </TableCell>
-                <TableCell className="px-4 py-3 border-b dark:border-[#3B4254]">
-                    <div className="h-5 bg-gray-300 dark:bg-gray-600 rounded"></div>
-                </TableCell>
-                <TableCell className="px-4 py-3 text-center border-b dark:border-[#3B4254]">
-                    <div className="h-8 w-16 bg-gray-300 dark:bg-gray-600 rounded"></div>
-                </TableCell>
-            </TableRow>
-        ));
-    };
+   
 
     return (
-        <div className="w-full">
+        <div className="w-full md:mt-10 p-4">
             <div className='flex justify-between items-center '>
                 <h1 className=" scroll-mt-8 text-lg font-semibold text-gray-900 sm:text-xl dark:text-gray-50">
                     Overview
@@ -172,3 +155,22 @@ const UserSessionsTable = () => {
 };
 
 export default UserSessionsTable;
+
+export const renderSkeletonRows = () => {
+    return Array.from({ length: 5 }).map((_, index) => (
+        <TableRow key={index} className="animate-pulse">
+            <TableCell className="px-4 py-3 border-b dark:border-[#3B4254]">
+                <div className="h-5 bg-gray-300 dark:bg-gray-600 rounded "></div>
+            </TableCell>
+            <TableCell className="px-4 py-3 border-b dark:border-[#3B4254]">
+                <div className="h-5 bg-gray-300 dark:bg-gray-600 rounded"></div>
+            </TableCell>
+            <TableCell className="px-4 py-3 border-b dark:border-[#3B4254]">
+                <div className="h-5 bg-gray-300 dark:bg-gray-600 rounded"></div>
+            </TableCell>
+            <TableCell className="px-4 py-3 text-center border-b dark:border-[#3B4254]">
+                <div className="h-8 w-16 bg-gray-300 dark:bg-gray-600 rounded"></div>
+            </TableCell>
+        </TableRow>
+    ));
+};

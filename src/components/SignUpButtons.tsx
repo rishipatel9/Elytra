@@ -1,27 +1,20 @@
 'use client'
 import React from 'react'
-import { signIn } from "next-auth/react";
-import { GithubIcon, GoogleIcon } from '@/icons/icons';
+import { GitHub, Google,  } from '@/icons/icons';
+import { Button } from './ui/button';
+import { signIn } from 'next-auth/react';
 
 const SignupButtons = () => {
     return (
         <>
-            <div className="flex flex-col gap-4">
-                <button
-                type='button'
-                onClick={() => signIn("github")}
-                 className="w-full py-2 px-4 flex items-center justify-center gap-2 bg-[#111827] text-white rounded-lg border border-gray-800 hover:bg-gray-800 transition-colors">
-                    <GithubIcon />
-                    <span>Signup with GitHub</span>
-                </button>
-                <button 
-                 type='button'
-                 onClick={() => signIn('google')}
-                className="w-full py-2 px-4 flex items-center justify-center gap-2 bg-[#111827] text-white rounded-lg border border-gray-800 hover:bg-gray-800 transition-colors">
-                    <GoogleIcon />
-                    <span>Signup with Google</span>
-                </button>
-            </div>
+            <Button variant="outline" type="button"  onClick={() => signIn("github")} className="w-full bg-[#232121] py-5 border border-[#323232]  hover:bg-white hover:text-black transition-all " style={{ borderRadius: "0.6rem" }} >
+                <GitHub className="h-10 w-10 size-10" />
+                GitHub
+            </Button>
+            <Button variant="outline" type="button"  onClick={() => signIn("google")} className="w-full bg-[#232121] py-5 border border-[#323232]  hover:bg-white hover:text-black transition-all " style={{ borderRadius: "0.6rem" }}>
+                <Google className="h-10 w-10" />
+                Google
+            </Button>
         </>
     );
 }

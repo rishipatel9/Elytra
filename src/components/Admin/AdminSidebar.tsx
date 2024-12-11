@@ -2,7 +2,9 @@
 import React, { use, useState } from "react";
 import {
     IconBook,
-    IconDeviceAnalytics
+    IconDeviceAnalytics,
+    IconGraph,
+    IconUser
 } from "@tabler/icons-react";
 import Link from "next/link";
 import { motion } from "framer-motion";
@@ -29,6 +31,20 @@ export default function AdminSidebar({ children }: { children: React.ReactNode }
           href: "/admin/dashboard/analytics", 
           icon: (
             <IconDeviceAnalytics className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0" />
+          ),
+        },
+        {
+          label: "Users", 
+          href: "/admin/dashboard/users", 
+          icon: (
+            <IconUser className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0" />
+          ),
+        },
+        {
+          label: "Metrics", 
+          href: "/admin/dashboard/metrics", 
+          icon: (
+            <IconGraph className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0" />
           ),
         },
       ];
@@ -70,7 +86,7 @@ export default function AdminSidebar({ children }: { children: React.ReactNode }
           </div>
       </SidebarBody>
     </Sidebar>
-    <div className="flex-1   bg-background dark:bg-[#202434] dark:border-[#293040] border-[#E9ECF1] shadow-lg rounded-xl overflow-y-auto">{children}</div>
+    <div className="flex-1 bg-background dark:bg-[#202434] dark:border-[#293040] border-[#E9ECF1] shadow-lg rounded-xl overflow-y-auto">{children}</div>
   </div>
   );
 }

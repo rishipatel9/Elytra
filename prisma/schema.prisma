@@ -28,43 +28,33 @@ model User {
   careerAspirations     String?
   visaQuestions         String?
   filledApplication     Boolean?  @default(false)
-  totalTimeUsed         Int?      @default(0) 
-  plan                  Plan?      @default(FREE) 
+  plan                  Plan?     @default(FREE)
+  totalTimeUsed         Int?      @default(0)
   sessions              Session[]
 }
 
-enum Plan {
-  FREE
-  PRO
-  ENTERPRISE
-}
-
 model Session {
-  id           String   @id @default(cuid())
-  userId       String
-  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  chats        Chat[]   
-  summary      String?  
-  duration     Int?      @default(0)
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  id        String   @id @default(cuid())
+  userId    String
+  createdAt DateTime @default(now())
+  summary   String?
+  updatedAt DateTime @updatedAt
+  duration  Int?     @default(0)
+  chats     Chat[]
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Chat {
-  id          String   @id @default(cuid())
-  sessionId   String
-  session     Session  @relation(fields: [sessionId], references: [id], onDelete: Cascade)
-  sender      SenderType? 
-  message     String  
-  createdAt   DateTime @default(now())
+  id        String      @id @default(cuid())
+  sessionId String
+  message   String
+  createdAt DateTime    @default(now())
+  sender    SenderType?
+  session   Session     @relation(fields: [sessionId], references: [id], onDelete: Cascade)
 }
 
-enum SenderType {
-  AI
-  USER
-}
 model Program {
-  id                        Int      @id @default(autoincrement())
+  id                        Int       @id @default(autoincrement())
   name                      String
   description               String?
   mode                      String?
@@ -127,4 +117,15 @@ model VerificationToken {
   expires    DateTime
 
   @@unique([identifier, token])
+}
+
+enum Plan {
+  FREE
+  PRO
+  ENTERPRISE
+}
+
+enum SenderType {
+  AI
+  USER
 }

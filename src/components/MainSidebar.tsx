@@ -76,7 +76,7 @@ export default function SidebarDemo({ children }: { children: React.ReactNode })
         <ModeToggle/>
             <SidebarLink
               link={{
-                label: "Manu Arora",
+                label: "User",
                 href: "/profile",
                 icon: (
                     <Avatar>

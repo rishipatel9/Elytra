@@ -9,12 +9,12 @@ const CACHE_TTL = 5 * 60 * 1000;
 
 export async function GET() {
   try {
-    const currentTime = Date.now();
+    // const currentTime = Date.now();
 
-    if (cache.data && currentTime - cache.timestamp < CACHE_TTL) {
-      console.log('Using cached data');
-      return new Response(JSON.stringify({ success: true, data: cache.data }), { status: 200 });
-    }
+    // if (cache.data && currentTime - cache.timestamp < CACHE_TTL) {
+    //   console.log('Using cached data');
+    //   return new Response(JSON.stringify({ success: true, data: cache.data }), { status: 200 });
+    // }
     console.log('Fetching fresh data from the database');
     const totalUsers = await prisma.user.count();
 
@@ -61,7 +61,7 @@ export async function GET() {
         recentChats,
         activeSessions,
       },
-      timestamp: currentTime,
+      timestamp: Date.now(),
     };
 
     return new Response(
