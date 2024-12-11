@@ -28,35 +28,26 @@ model User {
   careerAspirations     String?
   visaQuestions         String?
   filledApplication     Boolean?  @default(false)
-  accounts              Account[]
+  totalTimeUsed         Int?      @default(0) 
+  plan                  Plan?      @default(FREE) 
   sessions              Session[]
 }
 
-model Account {
-  id                String  @id @default(cuid())
-  type              String
-  provider          String
-  providerAccountId String
-  refresh_token     String?
-  access_token      String?
-  expires_at        Int?
-  token_type        String?
-  scope             String?
-  id_token          String?
-  session_state     String?
-  userId            String
-  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@unique([provider, providerAccountId])
+enum Plan {
+  FREE
+  PRO
+  ENTERPRISE
 }
+
 model Session {
   id           String   @id @default(cuid())
   userId       String
   user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   chats        Chat[]   
   summary      String?  
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  duration     Int?      @default(0)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 }
 
 model Chat {
