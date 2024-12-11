@@ -44,14 +44,45 @@ export default function AICounselingChatbot({ user }: { user: User }) {
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const [sessionId, setSessionId] = useState<string>("")
     const [subtitles, setSubtitles] = useState("") // Array of subtitle parts
-    let sentenceBuffer=""
+    const [additionalContext, setAdditionalContext] = useState<{
+        resources: string[];
+        suggestedQuestions: string[];
+    }>({
+        resources: [],
+        suggestedQuestions: []
+    });
+    let sentenceBuffer = ""
 
-    const userId=user.id
+    const userId = user.id
+    useEffect(() => {
+        // Define an asynchronous function to initialize OpenAI Assistant
+        const initializeAssistantAndStream = async () => {
+            try {
+                // Access media devices for video and audio streams
+                const mediaStream = await navigator.mediaDevices.getUserMedia({
+                    video: true,
+                    audio: true,
+                });
+                setStream(mediaStream);
+
+                // Initialize OpenAI Assistant
+                openaiAssistant.current = new OpenAIAssistant(userId);
+                await openaiAssistant.current.initialize();
+                console.log("OpenAI Assistant initialized successfully");
+            } catch (error) {
+                console.error("Error during initialization:", error);
+            }
+        };
+
+        // Call the asynchronous function
+        initializeAssistantAndStream();
+    }, [userId]); // Dependency array includes userId
+
 
     async function fetchAccessToken() {
         try {
             setLoading(true);
-            const response = await axios.post("/api/get-access-token",{userId:user.id})
+            const response = await axios.post("/api/get-access-token", { userId: user.id })
             console.log('Response:', response.data)
             setSessionId(response.data.sessionId)
             const token = response.data.token
@@ -63,31 +94,31 @@ export default function AICounselingChatbot({ user }: { user: User }) {
         }
     }
 
-    async function startSession() {
-        const token = await fetchAccessToken()
-        avatar.current = new StreamingAvatar({ token })
-        openaiAssistant.current = new OpenAIAssistant(userId)
-        await openaiAssistant.current.initialize()
+    // async function startSession() {
+    //     const token = await fetchAccessToken()
+    //     avatar.current = new StreamingAvatar({ token })
+    //     openaiAssistant.current = new OpenAIAssistant(userId)
+    //     await openaiAssistant.current.initialize()
 
-        try {
-            const res = await avatar.current.createStartAvatar({
-                quality: AvatarQuality.Medium,
-                avatarName: "Wayne_20240711",
-                language: language,
-                disableIdleTimeout: true,
-                voice: { rate: 2.0, emotion: VoiceEmotion.EXCITED },
-                knowledgeBase:"You are an international student career counsellor"
-            })
-           setData(res)
-        } catch (error) {
-            toast.error(`Error starting avatar: ${error} Please try again`)
-            console.error('Failed to start avatar:', error)
-        }
+    //     try {
+    //         const res = await avatar.current.createStartAvatar({
+    //             quality: AvatarQuality.Medium,
+    //             avatarName: "Wayne_20240711",
+    //             language: language,
+    //             disableIdleTimeout: true,
+    //             voice: { rate: 2.0, emotion: VoiceEmotion.EXCITED },
+    //             knowledgeBase:"You are an international student career counsellor"
+    //         })
+    //        setData(res)
+    //     } catch (error) {
+    //         toast.error(`Error starting avatar: ${error} Please try again`)
+    //         console.error('Failed to start avatar:', error)
+    //     }
 
-        avatar.current?.startVoiceChat({ useSilencePrompt: false })
-        setChatMode("voice_mode")
-        setupAvatarEventListeners()
-    }
+    //     avatar.current?.startVoiceChat({ useSilencePrompt: false })
+    //     setChatMode("voice_mode")
+    //     setupAvatarEventListeners()
+    // }
 
 
     useEffect(() => {
@@ -124,10 +155,10 @@ export default function AICounselingChatbot({ user }: { user: User }) {
         
         avatar.current?.on(StreamingEvents.AVATAR_TALKING_MESSAGE, (e) => {
             const message = e.detail.message;
-           sentenceBuffer += message;
+            sentenceBuffer += message;
 
-  // Update the subtitle in real time
-         setSubtitles(sentenceBuffer.trim());
+            // Update the subtitle in real time
+            setSubtitles(sentenceBuffer.trim());
 
             console.log(`Subtule  : ${subtitles}`);
 
@@ -162,43 +193,49 @@ export default function AICounselingChatbot({ user }: { user: User }) {
 
 
     
-  async function handleSpeak() {
-     if (!avatar.current || !openaiAssistant.current) {
-      setDebug("Avatar or OpenAI Assistant not initialized");
-      return;
+    async function handleSpeak() {
+        if (!openaiAssistant.current) {
+            setDebug("Avatar or OpenAI Assistant not initialized");
+            return;
+        }
+        console.log(`in handle speak`)
+        try {
+            // Get response from OpenAI Assistanst
+            console.log(`text is ${text}`)
+            // const studentDetails = await getStudentById(userId);
+
+            //   console.log(`student details are :${JSON.stringify(studentDetails)}`)
+            //  setText(`user query is :${text}   for some context this is some info about student${studentDetails} if it helps  `)
+            setMessages((prev) => [...prev, { text, sender: 'user' }])
+
+            console.log(`new text is ${text}`)
+            const newText = `user query is :${text} `;
+            console.log(`new text is ${newText}`)
+            const response = await openaiAssistant.current.getResponse(text);
+            const additionalContext = await openaiAssistant.current.getAdditionalContext(text);
+            console.log(`additionalContext is ${JSON.stringify(additionalContext)}`)
+            setAdditionalContext(additionalContext);
+
+
+        
+        
+            console.log(`RESP IS :${JSON.stringify(response)}`)
+            setMessages((prev) => [...prev, { text: response, sender: 'ai' }])
+
+            //   await avatar.current.speak({ 
+            //     text: response, 
+            //     taskType: TaskType.REPEAT, 
+            //     taskMode: TaskMode.SYNC 
+            //   });
+        
+        
+            storeChats({ sessionId: sessionId, message: text, sender: "USER" })
+            storeChats({ sessionId: sessionId, message: response, sender: "AI" })
+            //     }
+        } catch (e: any) {
+            setDebug(e.message);
+        }
     }
-    console.log(`in handle speak`)
-    try {
-      // Get response from OpenAI Assistanst
-      console.log(`text is ${text}`)
-      // const studentDetails = await getStudentById(userId);
-
-    //   console.log(`student details are :${JSON.stringify(studentDetails)}`)
-        //  setText(`user query is :${text}   for some context this is some info about student${studentDetails} if it helps  `)
-      setMessages((prev) => [...prev, { text, sender: 'user' }])
-
-      console.log(`new text is ${text}`)
-      const newText = `user query is :${text} `;
-      console.log(`new text is ${newText}`)
-      const response = await openaiAssistant.current.getResponse(newText);
-
-     console.log(`RESP IS :${JSON.stringify(response)}`)
-     setMessages((prev) => [...prev, { text: response, sender: 'ai' }])
-
-    //   await avatar.current.speak({ 
-    //     text: response, 
-    //     taskType: TaskType.REPEAT, 
-    //     taskMode: TaskMode.SYNC 
-    //   });
-        
-        
-           storeChats({sessionId:sessionId,message:text,sender:"USER"})
-           storeChats({sessionId:sessionId,message:response,sender:"AI"})
-    //     }
-    } catch (e:any) {
-      setDebug(e.message);
-    }  
-  }
     async function handleInterrupt() {
         if (!avatar.current) {
             setDebug("Avatar API not initialized");
@@ -209,7 +246,7 @@ export default function AICounselingChatbot({ user }: { user: User }) {
             .interrupt()
             .catch((e) => {
                 setDebug(e.message);
-        });
+            });
     }
     async function endSession() {
         summarizeChat(sessionId)
@@ -289,6 +326,43 @@ export default function AICounselingChatbot({ user }: { user: User }) {
                                     End session
                                 </Button>
                             </div>
+                         
+                            <div className="p-4 border-t bg-gray-50">
+                                <h2 className="text-lg font-semibold mb-2">Useful Resources</h2>
+                                <ul className="space-y-2">
+                                    {additionalContext.resources.length > 0 ? (
+                                        additionalContext.resources.map((url, index) => (
+                                            <li key={index}>
+                                                <a
+                                                    href={url}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    className="text-blue-500 underline hover:text-blue-700"
+                                                >
+                                                    {url}
+                                                </a>
+                                            </li>
+                                        ))
+                                    ) : (
+                                        <li>No resources available.</li>
+                                    )}
+                                </ul>
+                            </div>
+
+                            <div className="p-4 border-t bg-gray-50">
+                                <h2 className="text-lg font-semibold mb-2">Suggested Questions</h2>
+                                <ul className="space-y-2">
+                                    {additionalContext.suggestedQuestions.length > 0 ? (
+                                        additionalContext.suggestedQuestions.map((question, index) => (
+                                            <li key={index}>
+                                                <p>{question}</p>
+                                            </li>
+                                        ))
+                                    ) : (
+                                        <li>No suggested questions available.</li>
+                                    )}
+                                </ul>
+                            </div>
                         </section>
 
                         <section className="flex-1 bg-white shadow-md flex flex-col justify-between">
@@ -349,16 +423,35 @@ export default function AICounselingChatbot({ user }: { user: User }) {
                             </div>
                             <Toaster/>
                         </section>
-                    </main>
+                    </main> 
                 </div>
+<<<<<<< HEAD
             ) : ( */}
-                <div className="flex flex-col items-center justify-center h-screen  bg-background dark:bg-[#202434] font-sans  dark:border-[#293040] border-[#E9ECF1]">
-                    <div className='max-w-6xl w-full h-full'>
-                    <UserDataTable/>
-                    </div>
-
+                           
+            { /* Keep your conditional rendering logic here, either one or both blocks */}
+            <div className="flex flex-col items-center justify-center h-screen bg-background dark:bg-[#202434] font-sans dark:border-[#293040] border-[#E9ECF1]">
+                <div className='max-w-6xl w-full h-full'>
+                    <UserDataTable />
                 </div>
-            {/* // )}   */}
+            </div>
+            {/* Optionally, keep the second block, or merge it if you need both */}
+            {/* 
+
+                <div className="flex flex-col items-center justify-center h-screen">
+                    <h1 className="text-2xl font-bold text-center text-black m-2">AI-Powered Student Counseling</h1>
+                    <Button onClick={() => console.log(`start session`)} className="flex items-center justify-center">
+                        {loading ? (
+                            <div className="flex items-center gap-2">
+                                <div className="animate-spin rounded-full h-4 w-4 border-2 border-t-black border-white"></div>
+                                <span>Starting...</span>
+                            </div>
+                        ) : (
+                            "Start Session"
+                        )}
+                    </Button>
+                    <Toaster />
+                </div>
+                */}
         </>
     )
 }
