@@ -1,77 +1,59 @@
 'use client';
-import React, { useState } from 'react';
-import { Input } from '../ui/input'; 
-import { useRouter } from 'next/navigation';
-import { loginAdmin } from '@/utils';
-import { toast, Toaster } from "sonner";
+import React from 'react';
+import { TopLeftShine } from '../ui/Shine';
+import AdminLoginButtons from './AdminLoginButtons';
+import Image from 'next/image';
 
 export default function AdminLogin() {
-  const [email, setEmail] = useState<string>('');
-  const [password, setPassword] = useState<string>('');
-  const [error, setError] = useState<string>('');
-  const [loading, setLoading] = useState<boolean>(false);
-  
-  const router = useRouter();
-
-  const handleSubmit = async (e: React.FormEvent):Promise<void> => {
-    e.preventDefault();
-    setLoading(true);
-    setError('');
-    try {
-      const data = await loginAdmin({ email, password });
-      console.log('Login successful:', data);
-      router.push('/admin/dashboard');  
-      toast.success('Login successful');
-    } catch (error) {
-      console.error('Failed to log in:', error);
-      setError('Failed to log in.');
-      toast.error('Failed to log in.');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-
   return (
-    <div className="relative flex flex-col items-center justify-center min-h-screen bg-[#151723] px-4">
-      <div className="absolute top-1/4 right-1/4 w-[500px] h-[500px] rounded-full bg-gradient-to-r from-[#4220A9] via-[#4220A9]/80 to-[#321880] blur-3xl opacity-10 z-0"></div>
-      <div className="absolute inset-0 bg-[linear-gradient(to_right,_rgba(255,255,255,0.1)_1px,_transparent_1px)] bg-[size:70px_70%] opacity-35 z-0"></div>
-
-      <div className="relative z-10 w-full max-w-md space-y-8">
-        <div className="text-center">
-          <h1 className="text-4xl font-bold text-white mb-2">Admin.</h1>
-          <p className="text-gray-400">Login to Admin Dashboard.</p>
+    <div className="flex min-h-screen bg-black md:grid md:grid-cols-5 md:px-0 overflow-hidden">
+      <div className="md:col-span-2 flex flex-col justify-center p-6 md:p-12 mx-auto bg-black  ">
+        <div className="absolute top-0 left-0 flex justify-start w-screen overflow-hidden pointer-events-none">
+          <TopLeftShine />
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <Input
-            type="email"
-            placeholder="email@example.com"
-            value={email}
-            autoComplete='email'
-            onChange={(e) => setEmail(e.target.value)}
-            className="w-full px-4 py-3 bg-[#111827] border border-gray-800 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#4220A9] focus:border-transparent"
-          />
-          <Input
-            type="password"
-            placeholder="Your password"
-            value={password}
-            autoComplete='current-password'
-            onChange={(e) => setPassword(e.target.value)}
-            className="w-full px-4 py-3 bg-[#111827] border border-gray-800 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#4220A9] focus:border-transparent"
-          />
+        <div className="flex flex-col items-center text-start space-y-2 m-2">
+          <h1 className="text-2xl font-semibold text-[#807F7F] dark:text-white">
+            Sign To Admin Dashboard
+          </h1>
+          <p className="text-sm text-[#8F8F8F]">
+            Enter your email and password to Sign In
+          </p>
+        </div>
 
-          <button
-            type="submit"
-            className="w-full py-3 px-4 bg-[#4220A9] text-white rounded-lg hover:bg-[#321880] transition-colors"
-            disabled={loading}
-            onClick={handleSubmit}
-          >
-            {loading ? 'Logging in...' : 'Log in'}
-          </button>
-          <Toaster />
-          {error && <p className="text-red-500 text-sm">{error}</p>}
-        </form>
+        <div className="space-y-6 bg-black">
+          <div className="space-y-4">
+            <AdminLoginButtons />
+          </div>
+        </div>
+      </div>
+
+      {/* Right Side - Background Image and Quote (60% width) */}
+      <div className="relative hidden md:inline h-full bg-muted text-white lg:flex flex-col p-10 md:col-span-3 border-l border-[#323232]">
+        <div className="absolute inset-0 bg-black opacity-60" />
+        <div className="relative z-20 flex items-center text-lg font-medium">
+          <div className="mr-2 h-6 w-6" />
+          Elytra Inc
+        </div>
+        <div className="relative z-20 mt-auto">
+          <blockquote className="space-y-2">
+            <p className="text-lg">
+              &ldquo;Our AI-powered video chatbot is revolutionizing student counseling by providing instant, personalized support. With real-time responses, we empower students to make informed decisions about their academic and career paths.&rdquo;
+            </p>
+            <footer className="text-sm">Admin Dashboard - Powered by AI</footer>
+          </blockquote>
+        </div>
+
+
+        <div className="absolute bottom-40 left-52 w-full h-1/2 overflow-hidden z-10 shadow-lg">
+          <Image
+            src="/admindashboard.jpg"
+            alt="Admin Dashboard"
+            layout="fill"
+            objectFit="cover" // Ensures the image scales and crops correctly
+            className="opacity-80"
+          />
+        </div>
       </div>
     </div>
   );

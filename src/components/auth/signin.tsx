@@ -11,7 +11,7 @@ export default function SignIn() {
           <TopLeftShine />
         </div>
 
-        <div className="flex flex-col items-center text-start space-y-2">
+        <div className="flex flex-col items-center text-start space-y-2 m-2">
           <h1 className="text-2xl font-semibold text-[#807F7F] dark:text-white">
             Sign In to your account
           </h1>
@@ -20,9 +20,9 @@ export default function SignIn() {
           </p>
         </div>
 
-            <EmailSignIn />
         <div className="space-y-6 bg-black">
           <div className="space-y-4">
+            <EmailSignIn />
           </div>
         </div>
       </div>

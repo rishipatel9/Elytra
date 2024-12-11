@@ -14,7 +14,7 @@ export default function SignUp() {
       </div> 
   
       <div className="flex flex-col items-center text-start space-y-2">
-        <h1 className="text-2xl font-semibold text-[#807F7F] dark:text-white">
+        <h1 className="text-2xl font-semibold text-[#807F7F]">
           Create an account
         </h1>
         <p className="text-sm text-[#8F8F8F]">
@@ -29,18 +29,18 @@ export default function SignUp() {
           <span className="w-full border-t border-[#8F8F8F]" />
         </div>
         <div className="relative flex justify-center text-xs uppercase">
-          <span className="bg-background px-2  text-[#8F8F8F]">
+          <span className="bg-black px-2  text-[#8F8F8F]">
             Or continue with
           </span>
         </div>
       </div>
   
       {/* Form */}
-      <form className="space-y-6 bg-black">
+      <div className="space-y-6 bg-black">
         <div className="space-y-4">
           <EmailSignUp />
         </div>
-      </form>
+      </div>
     </div>
   
     {/* Right Side - Background Image and Quote (60% width) */}

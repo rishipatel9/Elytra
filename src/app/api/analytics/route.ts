@@ -1,21 +1,9 @@
 import prisma from '@/lib/prisma';
 
-let cache = {
-  data: {},
-  timestamp: 0,
-};
-
-const CACHE_TTL = 5 * 60 * 1000;
-
 export async function GET() {
   try {
-    // const currentTime = Date.now();
-
-    // if (cache.data && currentTime - cache.timestamp < CACHE_TTL) {
-    //   console.log('Using cached data');
-    //   return new Response(JSON.stringify({ success: true, data: cache.data }), { status: 200 });
-    // }
     console.log('Fetching fresh data from the database');
+    
     const totalUsers = await prisma.user.count();
 
     const usersWithApplications = await prisma.user.count({
@@ -52,26 +40,28 @@ export async function GET() {
     });
 
     const activeSessions = await prisma.session.count();
-    cache = {
-      data: {
-        totalUsers,
-        usersWithApplications,
-        programsByCategory,
-        topPrograms,
-        recentChats,
-        activeSessions,
-      },
-      timestamp: Date.now(),
-    };
 
     return new Response(
-      JSON.stringify({ success: true, data: cache.data }),
+      JSON.stringify({
+        success: true,
+        data: {
+          totalUsers,
+          usersWithApplications,
+          programsByCategory,
+          topPrograms,
+          recentChats,
+          activeSessions,
+        },
+      }),
       { status: 200 }
     );
   } catch (error) {
     console.error('Error fetching data:', error);
     return new Response(
-      JSON.stringify({ success: false, error: 'Failed to fetch admin dashboard data' }),
+      JSON.stringify({
+        success: false,
+        error: 'Failed to fetch admin dashboard data',
+      }),
       { status: 500 }
     );
   } finally {

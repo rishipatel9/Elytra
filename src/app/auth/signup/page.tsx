@@ -5,9 +5,9 @@ import React from 'react'
 
 const page = async () => {
   const session = await getUserDetails();
-  if (session) {
-    redirect("/student/student-info");
-  }
+  // if (session) {
+  //   redirect("/student/student-info");
+  // }
   return (
     <SignUp/>
   )

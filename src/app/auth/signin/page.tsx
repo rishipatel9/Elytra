@@ -4,9 +4,9 @@ import { redirect } from 'next/navigation';
 
 const page =async  () => {
   const session = await getUserDetails();
-  if (session) {
-    redirect("/student/student-info");
-  }
+  // if (session) {
+  //   redirect("/student/student-info");
+  // }
   return (
       <SignIn/>
   )

@@ -7,6 +7,7 @@ import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { toast, Toaster } from 'sonner';
 import { GithubIcon, GoogleIcon } from "@/icons/icons";
+import Link from "next/link";
 // import { GitHubIcon, GoogleIcon } from '@/components/ui/icons'; // Icons component for GitHub & Google
 
 const EmailSignUp = () => {
@@ -53,7 +54,7 @@ const EmailSignUp = () => {
 
   return (
     <>
-      <form onSubmit={handleSubmit} className="flex flex-col gap-4 text-[#8F8F8F]">
+      <form onSubmit={handleSubmit} className="flex flex-col gap-4 text-[#8F8F8F] font-sans">
         {/* Name Input */}
         <Input
           id="name"
@@ -64,7 +65,7 @@ const EmailSignUp = () => {
           value={name}
           style={{borderRadius: '0.6rem'}}
           onChange={(e) => setName(e.target.value)}
-          className="rounded-lg border border-[#323232] bg-black placeholder:text-[#8F8F8F] px-4 py-5 text-base w-full ring-offset-background focus:ring-2 focus:ring-ring focus:ring-offset-2"
+          className="rounded-lg border border-[#323232] bg-black placeholder:text-[#8F8F8F]  px-4 py-5 text-base w-full ring-offset-background focus:ring-2 focus:ring-ring focus:ring-offset-2"
         />
 
         {/* Email Input */}
@@ -77,7 +78,7 @@ const EmailSignUp = () => {
           value={email}
           style={{borderRadius: '0.6rem'}}
           onChange={(e) => setEmail(e.target.value)}
-          className="rounded-lg border border-[#323232] bg-black placeholder:text-[#8F8F8F] px-4 py-5 text-base w-full ring-offset-background focus:ring-2 focus:ring-ring focus:ring-offset-2"
+          className="rounded-lg border border-[#323232] bg-black placeholder:text-[#888888] px-4 py-5 text-base w-full ring-offset-background focus:ring-2 focus:ring-ring focus:ring-offset-2"
         />
 
         {/* Password Input */}
@@ -102,6 +103,10 @@ const EmailSignUp = () => {
         >
           {loading ? 'Signing Up...' : 'Sign Up'}
         </Button>
+
+        <p className="mt-2 text-center text-sm text-[#8F8F8F]">
+          Already have an Account?{" "} <Link href="/auth/signin" className="underline"> SignIn</Link> here
+          </p>
 
         <p className="mt-4 text-center text-sm text-[#8F8F8F]">
           By clicking continue, you agree to our{" "}
