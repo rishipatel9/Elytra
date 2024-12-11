@@ -20,6 +20,8 @@ import { storeChats, summarizeChat } from '@/lib/db'
 import { toast, Toaster } from 'sonner'
 import UserDataTable from './UserSessions'
 
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 
 interface User {
     id: string;
@@ -59,11 +61,13 @@ export default function AICounselingChatbot({ user }: { user: User }) {
         const initializeAssistantAndStream = async () => {
             try {
                 // Access media devices for video and audio streams
-                const mediaStream = await navigator.mediaDevices.getUserMedia({
-                    video: true,
-                    audio: true,
-                });
-                setStream(mediaStream);
+                if (typeof window !== 'undefined') {
+                    const mediaStream = await navigator.mediaDevices.getUserMedia({
+                        video: true,
+                        audio: true,
+                    });
+                    setStream(mediaStream);
+                }
 
                 // Initialize OpenAI Assistant
                 openaiAssistant.current = new OpenAIAssistant(userId);
@@ -294,51 +298,36 @@ export default function AICounselingChatbot({ user }: { user: User }) {
         setMessages((prev) => [...prev, { text, sender: 'user' }, { text: text, sender: 'ai' }])
         setText("")
     }
-
     return (
         <>
-            {/* {stream ? (
-                <div className="min-h-screen  flex flex-col font-sans">
-                    <main className="flex-grow flex flex-col md:flex-row p-4 gap-4  mx-auto w-full">
+            {stream ? (
+                <div className="min-h-screen flex flex-col font-sans">
+                    <main className="flex-grow flex flex-col md:flex-row p-4 gap-4 mx-auto w-full">
                         <section className="flex-1 bg-white rounded-md shadow-lg overflow-hidden">
                             <div className="aspect-video bg-gray-200 relative">
                                 <video ref={mediaStream} className="w-full h-full object-cover" autoPlay />
-
-                    <div className="absolute bottom-8 w-full text-center">
-                        <p className="text-xl font-bold text-white bg-black bg-opacity-50 px-4 py-2 rounded">
-                            {subtitles || "Waiting for avatar to speak..."}
-                        </p>
-                    </div>
-                                <div className="absolute bottom-4 left-4 right-4 flex justify-center space-x-4">
+                                <div className="absolute bottom-8 w-full text-center">
+                                    <p className="text-xl font-bold text-white bg-black bg-opacity-50 px-4 py-2 rounded">
+                                        {subtitles || "Waiting for avatar to speak..."}
+                                    </p>
                                 </div>
+                                <div className="absolute bottom-4 left-4 right-4 flex justify-center space-x-4"></div>
                             </div>
                             <div className="flex flex-col gap-2 mt-2 bottom-3 right-3 p-4">
-                                <Button
-                                    className="bg-gradient-to-tr  text-white rounded-lg"
-                                    onClick={handleInterrupt}
-                                >
+                                <Button className="bg-gradient-to-tr text-white rounded-lg" onClick={handleInterrupt}>
                                     Interrupt task
                                 </Button>
-                                <Button
-                                    className="bg-gradient-to-tr  to-indigo-300  text-white rounded-lg"
-                                    onClick={endSession}
-                                >
+                                <Button className="bg-gradient-to-tr to-indigo-300 text-white rounded-lg" onClick={endSession}>
                                     End session
                                 </Button>
                             </div>
-                         
                             <div className="p-4 border-t bg-gray-50">
                                 <h2 className="text-lg font-semibold mb-2">Useful Resources</h2>
                                 <ul className="space-y-2">
                                     {additionalContext.resources.length > 0 ? (
                                         additionalContext.resources.map((url, index) => (
                                             <li key={index}>
-                                                <a
-                                                    href={url}
-                                                    target="_blank"
-                                                    rel="noopener noreferrer"
-                                                    className="text-blue-500 underline hover:text-blue-700"
-                                                >
+                                                <a href={url} target="_blank" rel="noopener noreferrer" className="text-blue-500 underline hover:text-blue-700">
                                                     {url}
                                                 </a>
                                             </li>
@@ -348,7 +337,6 @@ export default function AICounselingChatbot({ user }: { user: User }) {
                                     )}
                                 </ul>
                             </div>
-
                             <div className="p-4 border-t bg-gray-50">
                                 <h2 className="text-lg font-semibold mb-2">Suggested Questions</h2>
                                 <ul className="space-y-2">
@@ -366,46 +354,29 @@ export default function AICounselingChatbot({ user }: { user: User }) {
                         </section>
 
                         <section className="flex-1 bg-white shadow-md flex flex-col justify-between">
-                          <div
-    className="flex-grow overflow-y-auto px-2"
-    style={{ maxHeight: "calc(100vh - 90px)" }}
->
-    {messages.map((message, index) => (
-        <div
-            key={index}
-            className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}
-        >
-            <div
-                className={`max-w-[80%] p-3 my-2 rounded-lg ${message.sender === 'user'
-                    ? 'bg-blue-500 text-white'
-                    : 'bg-gray-200 text-gray-800'
-                    }`}
-            >
-                <ReactMarkdown
-                    remarkPlugins={[remarkGfm]}
-                    components={{
-                        a: ({ href, children }) => (
-                            <a
-                                href={href}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="text-blue-500 underline"
-                            >
-                                {children}
-                            </a>
-                        ),
-                    }}
-                >
-                    {message.text}
-                </ReactMarkdown>
-            </div>
-        </div>
-    ))}
-    <div ref={messagesEndRef} />
-</div>
+                            <div className="flex-grow overflow-y-auto px-2" style={{ maxHeight: "calc(100vh - 90px)" }}>
+                                {messages.map((message, index) => (
+                                    <div key={index} className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}>
+                                        <div className={`max-w-[80%] p-3 my-2 rounded-lg ${message.sender === 'user' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-800'}`}>
+                                            <ReactMarkdown
+                                                remarkPlugins={[remarkGfm]}
+                                                components={{
+                                                    a: ({ href, children }) => (
+                                                        <a href={href} target="_blank" rel="noopener noreferrer" className="text-blue-500 underline">
+                                                            {children}
+                                                        </a>
+                                                    ),
+                                                }}
+                                            >
+                                                {message.text}
+                                            </ReactMarkdown>
+                                        </div>
+                                    </div>
+                                ))}
+                                <div ref={messagesEndRef} />
+                            </div>
 
-
-                            <div className="border-t  h-auto relative">
+                            <div className="border-t h-auto relative">
                                 <div className="w-full flex items-center">
                                     <InteractiveAvatarTextInput
                                         input={text}
@@ -421,22 +392,19 @@ export default function AICounselingChatbot({ user }: { user: User }) {
                                     )}
                                 </div>
                             </div>
-                            <Toaster/>
+                            <Toaster />
                         </section>
-                    </main> 
+                    </main>
                 </div>
-<<<<<<< HEAD
-            ) : ( */}
-                           
-            { /* Keep your conditional rendering logic here, either one or both blocks */}
-            <div className="flex flex-col items-center justify-center h-screen bg-background dark:bg-[#202434] font-sans dark:border-[#293040] border-[#E9ECF1]">
-                <div className='max-w-6xl w-full h-full'>
-                    <UserDataTable />
+            ) : (
+                <div className="flex flex-col items-center justify-center h-screen bg-background dark:bg-[#202434] font-sans dark:border-[#293040] border-[#E9ECF1]">
+                    <div className="max-w-6xl w-full h-full">
+                        <UserDataTable />
+                    </div>
                 </div>
-            </div>
-            {/* Optionally, keep the second block, or merge it if you need both */}
-            {/* 
-
+            )}
+            {/* Keep the following block for session start if necessary */}
+            {!stream && (
                 <div className="flex flex-col items-center justify-center h-screen">
                     <h1 className="text-2xl font-bold text-center text-black m-2">AI-Powered Student Counseling</h1>
                     <Button onClick={() => console.log(`start session`)} className="flex items-center justify-center">
@@ -451,7 +419,7 @@ export default function AICounselingChatbot({ user }: { user: User }) {
                     </Button>
                     <Toaster />
                 </div>
-                */}
+            )}
         </>
-    )
+    );
 }
