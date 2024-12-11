@@ -3,7 +3,7 @@ import React from 'react'
 import { Input } from '../ui/input'
 import AddProgram from './AddPrograms'
 import { MagnifyingGlassIcon } from '@/icons/icons'
-import { BulkUpload } from './BulkUpload'
+// import { BulkUpload } from './BulkUpload'
 
 const SearchBar = ({ onSearch }: { onSearch: (query: string) => void }) => {
   return (
@@ -27,7 +27,7 @@ const SearchBar = ({ onSearch }: { onSearch: (query: string) => void }) => {
           </div>
         </div>
         <AddProgram />
-        <BulkUpload />
+        {/* <BulkUpload /> */}
       </div>
     </div>
 
