@@ -17,7 +17,7 @@ const Page = async () => {
   }
 
   // Check if the application is filled
-  const filled = await checkStudentApplicationFilled(session.user.id);
+  const filled = await checkStudentApplicationFilled(session.user.email);
 
   // Optionally redirect to fill information
   if (!filled) {

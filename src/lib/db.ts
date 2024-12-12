@@ -31,3 +31,17 @@ export const summarizeChat =async (sessionId:string)=>{
         return null
     }
 }
+
+export const verifyUser = async ()=>{
+    try{
+        const response=await axios.get(`/api/student/verify`)
+        console.log(response)
+        if(response.status===200){
+            console.log("Verified user successfully")
+            return response.data
+        }
+    }catch(error){
+        console.error("Error verifying user:", error);
+        return null
+    }
+}

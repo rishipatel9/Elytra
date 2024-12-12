@@ -2,10 +2,10 @@
 
 import prisma from '@/lib/prisma'; 
 
-export async function checkStudentApplicationFilled(userId: string): Promise<boolean> {
+export async function checkStudentApplicationFilled(email: string): Promise<boolean> {
   try {
     const application = await prisma.user.findUnique({
-      where: {id: userId },
+      where: {email: email },
       select: { filledApplication: true }
     });
 
