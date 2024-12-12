@@ -9,7 +9,7 @@ export default async function StudentInfoPage() {
   if (!session) {
     redirect('/auth/signup');
   }
-  const filled = await checkStudentApplicationFilled(session.user.id);
+  const filled = await checkStudentApplicationFilled(session.user.email);
 
   if (filled) {
     redirect('/dashboard');
