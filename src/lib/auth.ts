@@ -1,12 +1,10 @@
 import GoogleProvider from "next-auth/providers/google";
 import GithubProvider from "next-auth/providers/github";
-import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import prisma from "./prisma";
 import CredentialsProvider from "next-auth/providers/credentials";
 import bcrypt from 'bcryptjs';
 
 const NEXT_AUTH = {
-  adapter: PrismaAdapter(prisma),
   providers: [
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID ?? "",
@@ -98,8 +96,6 @@ const NEXT_AUTH = {
       return token;
     },
     async session({ session, token }: { session: any; token: any }) {
-      // console.log('session:', session);
-      // console.log('token:', token);
       if (token) {
         session.user = {
           id: token.id,
@@ -130,8 +126,13 @@ const NEXT_AUTH = {
       try {
         console.log("signIn event:", user, account);
         if (account.provider !== 'credentials') {
-          const existingUser = await prisma.user.findUnique({
-            where: { email: user.email! },
+          await prisma.user.create({
+            data: {
+              email: user.email,
+              name: user.name,
+              username: user.email.split("@")[0],
+              image: user.image,
+            },
           });
         }
       } catch (error) {
@@ -148,8 +149,7 @@ const NEXT_AUTH = {
     strategy: "jwt",
   },
   redirect:{
-    callbackUrl: '/dashboard',
-    home: '/dashboard',
+    callbackUrl: '/student/student-info',
   },
   debug: process.env.NODE_ENV === "development",
 };

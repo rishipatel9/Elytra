@@ -40,7 +40,7 @@ const AdminLoginButtons = () => {
           id="name"
           name="Email"
           type="text"
-          placeholder="Enter your name"
+          placeholder="Enter your email"
           required
           value={email}
           style={{borderRadius: '0.6rem'}}
@@ -53,11 +53,11 @@ const AdminLoginButtons = () => {
           id="password"
           name="Password"
           type="Password"
-          placeholder="Enter your email"
+          placeholder="Enter your password"
           required
           value={password}
           style={{borderRadius: '0.6rem'}}
-          onChange={(e) => setEmail(e.target.value)}
+          onChange={(e) => setPassword(e.target.value)}
           className="rounded-lg border border-[#323232] bg-black placeholder:text-[#888888] px-4 py-5 text-base w-full ring-offset-background focus:ring-2 focus:ring-ring focus:ring-offset-2"
         />
 

@@ -13,12 +13,14 @@ import { Sidebar, SidebarBody, SidebarLink } from "@/components/ui/sidebar";
 import { usePathname } from "next/navigation";
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { ModeToggle } from "../theme-toggle";
+import { Button } from "../ui/button";
+import AdminLogout from "./AdminLogout";
 
 
 
 export default function AdminSidebar({ children }: { children: React.ReactNode }) {
     // className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0" 
-    const links = [
+    const links= [
         {
           label: "Programs",
           href: "/admin/dashboard/",
@@ -74,8 +76,8 @@ export default function AdminSidebar({ children }: { children: React.ReactNode }
         <ModeToggle/>
             <SidebarLink
               link={{
-                label: "Manu Arora",
-                href: "/profile",
+                label: "Admin",
+                href: "/#",
                 icon: (
                     <Avatar>
                     <AvatarFallback>A</AvatarFallback>
@@ -83,6 +85,7 @@ export default function AdminSidebar({ children }: { children: React.ReactNode }
                 ),
               }}
             />
+           <AdminLogout/>
           </div>
       </SidebarBody>
     </Sidebar>

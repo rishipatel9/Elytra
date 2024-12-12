@@ -2,6 +2,7 @@
 import React from 'react';
 import SearchBar from './SearchBar';
 import ProgramGrid from './ProgramsGrid';
+import { Toaster } from 'sonner';
 
 const user={
   name: "Admin",
@@ -25,6 +26,7 @@ const AdminDashboard = () => {
           <ProgramGrid searchQuery={searchQuery} />
         </div>
       </div>
+      <Toaster></Toaster>
     </div>
   );
 };

@@ -36,7 +36,7 @@ export const InputDemo = ({
         onChange={onChange}
         value={value}
         required
-        className={`bg-[#272727] border-2 border-[#2D2D2D] font-sans  font-semibold text-white hover:transition-all placeholder:text-[#6B6B6B] rounded-lg ${className}`}
+        className={`bg-[#272727] border-2 border-[#2D2D2D] font-sans  font-semibold text-white hover:transition-all placeholder:text-[#6B6B6B] ${className}`}
       />
     </div>
   );
@@ -78,7 +78,8 @@ export function SelectDemo({
       >
         <SelectTrigger
           id={id}
-          className="w-full p-2 bg-[#272727] border border-[#2D2D2D] font-sans text-white rounded-lg"
+          className="w-full p-2 bg-[#272727] border border-[#2D2D2D] font-sans text-white rounded-lg px-2"
+          style={{borderRadius: '0.7rem'}}
         >
           <SelectValue placeholder="Select option" className='font-semibold text-' />
         </SelectTrigger>
@@ -115,7 +116,7 @@ export const TextArea = ({
   label: string;
 }) => {
   return (
-    <div className="space-y-1">
+    <div className="space-y-1 rounded-lg">
       <label htmlFor={id} className="text-[#D8D8D8]">{label}</label>
       <Textarea
         required
@@ -124,6 +125,7 @@ export const TextArea = ({
         onChange={onChange}
         value={value}
         placeholder={placeholder}
+        style={{borderRadius: '0.7rem'}}
         className="w-full p-2 border-2 border-[#2D2D2D] bg-[#272727] text-white placeholder:text-[#6B6B6B] font-semibold  rounded-lg"
       />
     </div>
@@ -215,6 +217,7 @@ export function NationalitySelect({
             variant="outline"
             role="combobox"
             aria-expanded={open}
+            style={{borderRadius: '0.7rem'}}
             className="w-full justify-between h-10 border-2 border-[#2D2D2D] bg-[#272727] text-white placeholder:text-[#6B6B6B]"
           >
             {value ? (
@@ -332,13 +335,14 @@ export const InputTags = ({ id, name, value, label, onChange }: InputTagsProps) 
             container: "gap-1",
           },
           input:
-            "bg-[#272727] border-2 border-[#2D2D2D] font-sans font-normal text-white hover:transition-all placeholder:text-[#6B6B6B]",
+            "bg-[#272727] border-2 border-[#2D2D2D] font-sans font-normal rounded-xl py-2 text-white hover:transition-all placeholder:text-[#6B6B6B]",
           tag: {
-            body: "relative h-7 bg-background border border-input hover:bg-background rounded-lg font-medium text-xs ps-2 pe-7",
+            body: "relative h-7 bg-background border border-input  hover:bg-background rounded-lg font-medium text-xs ps-2 pe-7",
             closeButton:
-              "absolute -inset-y-px -end-px p-0 rounded-s-none rounded-e-lg flex size-7 transition-colors outline-0 focus-visible:outline focus-visible:outline-2 focus-visible:outline-ring/70 text-muted-foreground/80 hover:text-foreground",
+              "absolute -inset-y-px -end-px p-0 rounded-s-none rounded-e-lg flex size-7  transition-colors outline-0 focus-visible:outline focus-visible:outline-2 focus-visible:outline-ring/70 text-muted-foreground/80 hover:text-foreground",
           },
         }}
+        
         inlineTags={false}
         inputFieldPosition="top"
         activeTagIndex={-1}

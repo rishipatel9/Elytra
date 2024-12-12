@@ -6,6 +6,9 @@ import { Label } from '@radix-ui/react-label';
 import { InputDemo, InputTags, NationalitySelect, PhoneInput, PhoneInputComponent, SelectDemo, TextArea } from '@/components/ui/origin';
 import { toast, Toaster } from 'sonner';
 import { uploadStudentInfo } from '@/actions/onStudentInfo';
+import { redirect } from 'next/navigation';
+import { signOut } from 'next-auth/react';
+import { LogOut } from 'lucide-react';
 
 interface StudentData {
   name: string;
@@ -86,6 +89,7 @@ const StudentDataForm: React.FC = () => {
     if (response) {
       setLoading(false)
       toast.success('Student Information Uploaded Successfully');
+      redirect('/dashboard');
     } else {
        setLoading(false)
       toast.error('Error uploading student information');
@@ -95,8 +99,21 @@ const StudentDataForm: React.FC = () => {
   return (
     <div className="w-full h-full  mx-auto p-6 flex items-start md:items-center justify-center bg-[#181818] shadow-lg">
     <div className="container max-w-4xl space-y-6 text-left rounded-lg">
-      <h1 className="text-2xl font-bold mb-6 text-left md:text-3xl  text-white">
-          Student Information Form
+      <h1 className="text-2xl font-bold mb-6 text-left md:text-3xl  text-white w-full flex justify-between items-center">
+          <div>Student Information Form</div>
+          <div className=' '>
+          <Button
+          variant="ghost"
+          size="icon"
+          onClick={() => signOut()}
+          aria-label="Logout"
+          className='hover:bg-[#191919] border border-[#2D2D2D] bg-[#272727] w-10 px-12 h-10' style={{borderRadius: '0.7rem'}}
+        >
+          Logout
+          <LogOut className="w-5 h-5 hover:bg-none" />
+        </Button>
+          </div>
+
         </h1>
         <form action={handleFormAction} className="space-y-6">
           <div className="grid md:grid-cols-2 gap-6">
@@ -109,6 +126,7 @@ const StudentDataForm: React.FC = () => {
                 name="name"
                 value={formData.name}
                 onChange={handleChange}
+                className='rounded-xl'
               />
               <InputDemo
                 id="phone"
@@ -117,6 +135,7 @@ const StudentDataForm: React.FC = () => {
                 name="phone"
                 value={formData.phone}
                 onChange={handleChange}
+                className='rounded-xl'
               />
               <InputDemo
                 id="age"
@@ -125,12 +144,14 @@ const StudentDataForm: React.FC = () => {
                 name="age"
                 value={formData.age.toString()}
                 onChange={handleChange}
+                className='rounded-xl'
               />
               <NationalitySelect
                 id="nationality"
                 name="nationality"
                 value={formData.nationality}
                 onChange={(value) => handleSelectChange("nationality", value)}
+                
               />
             </div>
 
@@ -143,6 +164,7 @@ const StudentDataForm: React.FC = () => {
                 name="previousDegree"
                 value={formData.previousDegree}
                 onChange={handleChange}
+                className='rounded-xl'
               />
               <InputDemo
                 id="grades"
@@ -151,6 +173,7 @@ const StudentDataForm: React.FC = () => {
                 name="grades"
                 value={formData.grades}
                 onChange={handleChange}
+                className='rounded-xl'
               />
               <SelectDemo
                 id="currentEducationLevel"
@@ -159,6 +182,7 @@ const StudentDataForm: React.FC = () => {
                 options={["Bachelor's", "Masters", "PhD", "Other"]}
                 value={formData.currentEducationLevel}
                 onChange={(value) => handleSelectChange("currentEducationLevel", value)}
+                
               />
               <InputTags
                 id="preferredCountries"
@@ -166,6 +190,8 @@ const StudentDataForm: React.FC = () => {
                 label="Preferred Countries"
                 value={formData.preferredCountries}
                 onChange={handleTagsChange}
+                
+                
               />
             </div>
           </div>
@@ -182,6 +208,7 @@ const StudentDataForm: React.FC = () => {
                   value={formData.careerAspirations}
                   onChange={handleChange}
                   placeholder="Describe your career aspirations"
+                  
                 />
               </div>
               <div>
@@ -209,7 +236,7 @@ const StudentDataForm: React.FC = () => {
           </div>
 
           <div className="text-center mt-8">
-            <Button variant={'outline'} type="submit" className="px-6 py-3 bg-white text-black mx-auto w-full onHover:bg-white ">
+            <Button variant={'outline'} type="submit" className="px-6 py-3 bg-white text-black mx-auto w-full onHover:bg-white " style={{borderRadius: '0.7rem'}}>
               {loading ? <div className="animate-spin rounded-full h-4 w-4 border-2 border-t-black border-white"></div>  : 'Submit'}
             </Button>
           </div>

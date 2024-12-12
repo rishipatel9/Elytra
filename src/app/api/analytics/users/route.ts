@@ -1,12 +1,7 @@
 import prisma from "@/lib/prisma";
-import { getUserDetails } from "@/utils";
 
 export  async function GET(){
     try{
-        const session = await getUserDetails();
-        if(!session){
-            return new Response(JSON.stringify({ success: false, error:"Unauthorized user"}), { status: 404 });
-        }
         const users=await prisma.user.findMany({
             select: {
                 id: true,
@@ -16,7 +11,7 @@ export  async function GET(){
                 name: true,
             },
         });
-        // console.log(users)
+        console.log(users)
         return new Response(JSON.stringify({ success: true, data: users }), { status: 200 });
     }catch(error){
         console.error('Error fetching data:', error);
