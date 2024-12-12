@@ -80,7 +80,7 @@ const EmailSignIn = () => {
           disabled={loading}
           style={{borderRadius:"0.6rem"}}
         >
-          {loading ? 'Signing Up...' : 'Sign Up'}
+          {loading ? 'Signing In...' : 'Sign In'}
         </Button>
         <p className="mt-2 text-center text-sm text-[#8F8F8F]">
           Don't have an account?{" "} <Link href="/auth/signup" className="underline"> SignUp</Link> here

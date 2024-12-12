@@ -9,7 +9,7 @@ export async function checkStudentApplicationFilled(userId: string): Promise<boo
       select: { filledApplication: true }
     });
 
-    return !!application?.filledApplication;
+    return application?.filledApplication ?? false;
   } catch (error) {
     console.error('Error checking student application:', error);
     return false;
