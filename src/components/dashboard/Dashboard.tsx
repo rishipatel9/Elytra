@@ -147,14 +147,14 @@ const Dashboard = () => {
       </ScrollArea>
 
       {/* Input Area */}
-      <div className="p-4 border-t dark:border-[#293040] border-[#E9ECF1] ">
+      <div className="p-2 border shadow-xl dark:border-[#293040] rounded-xl bg-[#F3F4F6] dark:bg-[#212A39] border-[#E9ECF1] mb-4">
         <div className="flex gap-2">
           <Input
             placeholder="Type your question about studying abroad..."
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && sendMessage()}
-            className="flex-1"
+            className="flex-1 dark:bg-[#212A39] bg-[#F3F4F6] border-none"
             disabled={isStreaming}
           />
           <Button
@@ -162,6 +162,7 @@ const Dashboard = () => {
             size="icon"
             disabled={isStreaming}
             aria-label="Send message"
+            className='rounded-xl'
           >
             {isStreaming ? (
               <span className="text-sm">...</span>

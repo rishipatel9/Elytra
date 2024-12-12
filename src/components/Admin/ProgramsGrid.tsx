@@ -25,6 +25,7 @@ const ProgramsGrid = ({ searchQuery }: { searchQuery: string }) => {
     const fetchPrograms = async () => {
         try {
             const response = await axios.get('/api/programs');
+            console.log(response)
             const formattedPrograms = response.data.programs.map((program: any) => ({
                 ...program,
                 specialization: Array.isArray(program.specialization)

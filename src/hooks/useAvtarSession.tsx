@@ -1,13 +1,31 @@
-import { getStudentById } from '@/helper';
-import { storeChats, summarizeChat } from '@/lib/db';
-import { OpenAIAssistant } from '@/lib/openai-assistant';
-import StreamingAvatar, { AvatarQuality, StartAvatarResponse, StreamingEvents, TaskMode, TaskType, VoiceEmotion } from '@heygen/streaming-avatar';
-import { useMemoizedFn, usePrevious } from 'ahooks';
-import axios from 'axios';
-import { useEffect, useRef, useState } from 'react'
-import { toast } from 'sonner';
+import React from 'react'
 
-const useAvtarSession = ({ user }: { user: any }) => {
+import { useState, useEffect, useRef } from 'react'
+import StreamingAvatar, {
+    AvatarQuality,
+    StartAvatarResponse,
+    StreamingEvents,
+    TaskMode,
+    TaskType,
+    VoiceEmotion,
+} from "@heygen/streaming-avatar"
+import { OpenAIAssistant } from '@/lib/openai-assistant'
+
+import { Chip } from '@nextui-org/chip'
+import { getStudentById } from '@/helper'
+import { useMemoizedFn, usePrevious } from 'ahooks'
+
+import axios from 'axios'
+import { storeChats, summarizeChat } from '@/lib/db'
+import { toast, Toaster } from 'sonner'
+
+
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
+import { Mic, MicIcon, MicOffIcon } from 'lucide-react'
+import { User } from '@/components/video-bot/AICounselingChatbot'
+
+const useAvtarSession = ({user}:{user:User}) => {
     const [messages, setMessages] = useState<{ text: string; sender: 'user' | 'ai' }[]>([])
     const [stream, setStream] = useState<MediaStream>()
     const [language] = useState<string>('en')
@@ -22,29 +40,80 @@ const useAvtarSession = ({ user }: { user: any }) => {
     const [loading, setLoading] = useState(false);
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const [sessionId, setSessionId] = useState<string>("")
-    const [subtitles, setSubtitles] = useState("")
-    let sentenceBuffer = "";
+    const [subtitles, setSubtitles] = useState("") // Array of subtitle parts
+    const [additionalContext, setAdditionalContext] = useState<{
+        resources: string[];
+        suggestedQuestions: string[];
+    }>({
+        resources: [],
+        suggestedQuestions: []
+    });
+    let sentenceBuffer = ""
+    const [isVoiceMode, setIsVoiceMode] = useState(false); // Voice mode toggle
+    const [endSessionPage, setEndSessionPage] = useState(false);
+    const [startLoading,setStartLoading]=useState(false)
+
+
+    const userId = user.id
+    useEffect(() => {
+        const initializeAssistantAndStream = async () => {
+            try {
+                // Access media devices for video and audio streams
+                // if (typeof window !== 'undefined') {
+                //     const mediaStream = await navigator.mediaDevices.getUserMedia({
+                //         video: true,
+                //         audio: true,
+                //     });
+                //     setStream(mediaStream);
+                // }
+
+                // Initialize OpenAI Assistant
+               // openaiAssistant.current = new OpenAIAssistant(userId);
+                //await openaiAssistant.current.initialize();
+                console.log("OpenAI Assistant initialized successfully");
+            } catch (error) {
+                console.error("Error during initialization:", error);
+            }
+        };
+
+        // Call the asynchronous function
+        initializeAssistantAndStream();
+    }, [userId]); // Dependency array includes userId
+
+
+    useEffect(() => {
+        const handleBeforeUnload = (event:any) => {
+          // Display a custom warning message before the page is unloaded
+          event.preventDefault(); // For modern browsers
+          event.returnValue = '';  // For older browsers
+        };
+      
+        window.addEventListener('beforeunload', handleBeforeUnload);
+      
+        return () => {
+          window.removeEventListener('beforeunload', handleBeforeUnload);
+        };
+      }, []);
+
+    async function fetchAccessToken() {
+        try {
+            const response = await axios.post("/api/get-access-token", { userId: user.id })
+            console.log('Response:', response.data)
+            setSessionId(response.data.sessionId)
+            const token = response.data.token
+            return token
+        } catch (error) {
+            toast.error(`Error Creating Session: ${error} Please try again `)
+            console.error("Error fetching access token:", error)
+            return ""
+        }
+    }
 
     async function startSession() {
-
-        async function fetchAccessToken() {
-            try {
-                setLoading(true);
-                const response = await axios.post("/api/get-access-token", { userId: user.id })
-                console.log('Response:', response.data)
-                setSessionId(response.data.sessionId)
-                const token = response.data.token
-                return token
-            } catch (error) {
-                toast.error(`Error Creating Session: ${error} Please try again `)
-                console.error("Error fetching access token:", error)
-                return ""
-            }
-        }
-
+        setStartLoading(true)
         const token = await fetchAccessToken()
         avatar.current = new StreamingAvatar({ token })
-        openaiAssistant.current = new OpenAIAssistant(user.id)
+        openaiAssistant.current = new OpenAIAssistant(userId)
         await openaiAssistant.current.initialize()
 
         try {
@@ -54,17 +123,18 @@ const useAvtarSession = ({ user }: { user: any }) => {
                 language: language,
                 disableIdleTimeout: true,
                 voice: { rate: 2.0, emotion: VoiceEmotion.EXCITED },
-                knowledgeBase: "You are an international student career counsellor"
+                knowledgeBase:"You are an international student career counsellor"
             })
-            setData(res)
+           setData(res)
         } catch (error) {
             toast.error(`Error starting avatar: ${error} Please try again`)
             console.error('Failed to start avatar:', error)
         }
 
-        avatar.current?.startVoiceChat({ useSilencePrompt: false })
-        setChatMode("voice_mode")
+       // avatar.current?.startVoiceChat({ useSilencePrompt: false })
+       // setChatMode("voice_mode")
         setupAvatarEventListeners()
+        setStartLoading(false)
     }
 
 
@@ -99,7 +169,7 @@ const useAvtarSession = ({ user }: { user: any }) => {
             console.log(">>>>> User stopped talking:", event);
             setIsUserTalking(false);
         });
-
+        
         avatar.current?.on(StreamingEvents.AVATAR_TALKING_MESSAGE, (e) => {
             const message = e.detail.message;
             sentenceBuffer += message;
@@ -111,35 +181,79 @@ const useAvtarSession = ({ user }: { user: any }) => {
 
             console.log(`Avatar message: ${message}`);
         });
-
+ 
     }
 
+    // async function handleSpeak() {
+    //     if (!avatar.current || !openaiAssistant.current) return
+    //     try{
+
+    //         setMessages((prev) => [...prev, { text, sender: 'user' }])
+    //         const res = await getStudentById(user.id)
+    //         console.log('User Details:', res)
+    //         const response = await openaiAssistant.current.getResponse(res.message)
+    //         setMessages((prev) => [...prev, { text: response, sender: 'ai' }])
+    //         await avatar.current.speak({
+    //             text: response,
+    //             taskType: TaskType.REPEAT,
+    //             taskMode: TaskMode.SYNC
+    //         })
+    //         setText("")
+    //         storeChats({sessionId:sessionId,message:text,sender:"USER"})
+    //         storeChats({sessionId:sessionId,message:response,sender:"AI"})
+    //     }
+    //     catch (error) {
+    //         toast.error(`Error speaking: ${error} Please try again`)
+    //         console.error('Error speaking:', error)
+    //     }
+    // }
+
+
+    
     async function handleSpeak() {
-        if (!avatar.current || !openaiAssistant.current) return
-        try{
-
-            setMessages((prev) => [...prev, { text, sender: 'user' }])
-            const res = await getStudentById(user.id)
-            console.log('User Details:', res)
-            const response = await openaiAssistant.current.getResponse(res.message)
-            setMessages((prev) => [...prev, { text: response, sender: 'ai' }])
-            await avatar.current.speak({
-                text: response,
-                taskType: TaskType.REPEAT,
-                taskMode: TaskMode.SYNC
-            })
-            setText("")
-            storeChats({sessionId:sessionId,message:text,sender:"USER"})
-            storeChats({sessionId:sessionId,message:response,sender:"AI"})
+        if (!openaiAssistant.current) {
+            setDebug("Avatar or OpenAI Assistant not initialized");
+            return;
         }
-        catch (error) {
-            toast.error(`Error speaking: ${error} Please try again`)
-            console.error('Error speaking:', error)
+        console.log(`in handle speak`)
+        try {
+            // Get response from OpenAI Assistanst
+            console.log(`text is ${text}`)
+            // const studentDetails = await getStudentById(userId);
+
+            //   console.log(`student details are :${JSON.stringify(studentDetails)}`)
+            //  setText(`user query is :${text}   for some context this is some info about student${studentDetails} if it helps  `)
+            setMessages((prev) => [...prev, { text, sender: 'user' }])
+
+            console.log(`new text is ${text}`)
+            const newText = `user query is :${text} `;
+            console.log(`new text is ${newText}`)
+            const response = await openaiAssistant.current.getResponse(text);
+            const additionalContext = await openaiAssistant.current.getAdditionalContext(text);
+            console.log(`additionalContext is ${JSON.stringify(additionalContext)}`)
+            setAdditionalContext(additionalContext);
+
+
+        
+        
+            console.log(`RESP IS :${JSON.stringify(response)}`)
+            setMessages((prev) => [...prev, { text: response, sender: 'ai' }])
+
+              if(avatar.current){
+                await avatar.current.speak({ 
+                    text: response, 
+                    taskType: TaskType.REPEAT, 
+                    taskMode: TaskMode.SYNC 
+                  });
+              }
+        
+            storeChats({ sessionId: sessionId, message: text, sender: "USER" })
+            storeChats({ sessionId: sessionId, message: response, sender: "AI" })
+            //     }
+        } catch (e: any) {
+            setDebug(e.message);
         }
     }
-
-
-
     async function handleInterrupt() {
         if (!avatar.current) {
             setDebug("Avatar API not initialized");
@@ -156,6 +270,7 @@ const useAvtarSession = ({ user }: { user: any }) => {
         summarizeChat(sessionId)
         await avatar.current?.stopAvatar();
         setStream(undefined);
+        setEndSessionPage(true);
     }
     const handleChangeChatMode = useMemoizedFn(async (v) => {
         if (v === chatMode) {
@@ -171,13 +286,42 @@ const useAvtarSession = ({ user }: { user: any }) => {
 
     const previousText = usePrevious(text);
 
-    useEffect(() => {
-        if (!previousText && text) {
-            avatar.current?.startListening();
-        } else if (previousText && !text) {
-            avatar?.current?.stopListening();
+    // useEffect(() => {
+    //     if (!previousText && text) {
+    //         avatar.current?.startListening();
+    //     } else if (previousText && !text) {
+    //         avatar?.current?.stopListening();
+    //     }
+    // }, [text, previousText]);
+
+
+     const handleVoiceIconClick = async () => {
+        try {
+        console.log(`handlevoiceicon clicked`)
+             if (!isVoiceMode) {
+        if (!avatar.current) {
+          await startSession(); // Your existing session start method
         }
-    }, [text, previousText]);
+                
+        console.log(`inside this if  `)
+
+        await avatar.current?.startVoiceChat({ useSilencePrompt: false });
+        avatar.current?.startListening();
+        setIsVoiceMode(true);
+        setChatMode("voice_mode");
+             } else {
+                         console.log(`inside this else  `)
+
+        avatar.current?.stopListening();
+        avatar.current?.closeVoiceChat();
+        setIsVoiceMode(false);
+        setChatMode("text_mode");
+      }
+    } catch (error) {
+      console.error("Voice mode toggle error:", error);
+      toast.error("Failed to toggle voice mode");
+    }
+  };
 
     // useEffect(() => {
     //     return () => {
@@ -198,18 +342,30 @@ const useAvtarSession = ({ user }: { user: any }) => {
         setMessages((prev) => [...prev, { text, sender: 'user' }, { text: text, sender: 'ai' }])
         setText("")
     }
-    return {
-        handleSend,
-        handleInterrupt,
-        handleSpeak,
-        handleChangeChatMode,
-        endSession,
-        startSession,
-        stream,
-        text,
-        sessionId,
-        subtitles,
-        loading
-    }
+  return {
+    messages,
+    text,
+    setText,
+    handleSend,
+    handleSpeak,
+    handleInterrupt,
+    handleVoiceIconClick,
+    isVoiceMode,
+    mediaStream,
+    chatMode,
+    handleChangeChatMode,
+    endSessionPage,
+    debug,
+    loading,
+    subtitles,
+    additionalContext,
+    endSession,
+    messagesEndRef,
+    startSession,
+    stream,
+    setEndSessionPage,
+    startLoading
+  }
 }
+
 export default useAvtarSession

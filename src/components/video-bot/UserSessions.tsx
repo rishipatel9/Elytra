@@ -7,6 +7,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import SearchSession from './SearchSessions';
 import { PlusIcon } from '@/icons/icons';
 import { Spinner } from '@nextui-org/react';
+import useAvtarSession from '@/hooks/useAvtarSession';
 
 
 export type SessionData = {
@@ -21,7 +22,12 @@ export type SessionData = {
     }[];
 };
 
-const UserSessionsTable = () => {
+interface UserSessionsTableProps {
+    onStartSession: () => void;
+    startLoading: boolean;
+}
+  
+const UserSessionsTable = ({onStartSession,startLoading}:UserSessionsTableProps) => {
     const [sessions, setSessions] = useState<SessionData[]>([]);
     const [loading, setLoading] = useState(true);
     const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set());
@@ -67,18 +73,24 @@ const UserSessionsTable = () => {
 
     return (
         <div className="w-full md:mt-10 p-4">
-            <div className='flex justify-between items-center '>
+            <div className='md:flex  justify-between items-center '>
                 <h1 className=" scroll-mt-8 text-lg font-semibold text-gray-900 sm:text-xl dark:text-gray-50">
                     Overview
                     <div className='text-sm text-[#ffffff64]'>Manager Session and Create</div>
                 </h1>
                 <div className='flex justify-center items-center gap-2'>
                     <SearchSession onSearch={() => { }} />
-                    <Button className="flex items-center px-6 py-3 md:px-8 border rounded-xl   dark:border-[#3B4254]  border-[#E9ECF1]   font-medium  hover:bg-[#633fab] h-[2.5rem]">
+                    <Button  onClick={onStartSession} className="flex items-center px-6 py-3 md:px-8 border rounded-xl   dark:border-[#3B4254]  border-[#E9ECF1]   font-medium  hover:bg-[#633fab] h-[2.5rem]">
                         <span className="h-5 w-5 md:hidden">
                             <PlusIcon />
                         </span>
-                        <span className=" md:inline"> Create </span>
+                        <span className=" md:inline"> {startLoading ? (
+                            <div className="flex items-center gap-2">
+                                <div className="animate-spin rounded-full h-4 w-4 border-2 border-t-black border-white"></div>
+                            </div>
+                        ) : (
+                            "Create"
+                        )}</span>
                     </Button>
                 </div>
             </div>

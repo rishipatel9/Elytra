@@ -4,7 +4,7 @@ import { Manrope } from 'next/font/google';
 import { Toaster } from '@/components/ui/toaster';
 import { Providers } from '@/providers/providers';
 import { ThemeProvider } from 'next-themes';
-
+import { Analytics } from "@vercel/analytics/react"
 
 const manrope = Manrope({ subsets: ['latin'] });
 
@@ -23,7 +23,7 @@ export default function RootLayout({
       <body className={`${manrope.className} `}>
       <Toaster />
       <ThemeProvider attribute="class" defaultTheme="light">
-        <Providers>{children}</Providers>
+        <Providers>{children}<Analytics /></Providers>
       </ThemeProvider>
       </body>
     </html>

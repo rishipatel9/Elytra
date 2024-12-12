@@ -13,6 +13,7 @@ import { Sidebar, SidebarBody, SidebarLink } from "@/components/ui/sidebar";
 import { usePathname } from "next/navigation";
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { ModeToggle } from "./theme-toggle";
+import LogoutButton from "./LogoutButton";
 
 
 
@@ -85,6 +86,7 @@ export default function SidebarDemo({ children }: { children: React.ReactNode })
                 ),
               }}
             />
+          <LogoutButton/>
           </div>
       </SidebarBody>
     </Sidebar>

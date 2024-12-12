@@ -7,14 +7,13 @@
     "build": "npx prisma generate && next build",
     "start": "next start",
     "start:prisma": "npx prisma migrate dev && npx prisma generate",
-    "lint": "eslint .",
+    "lint": "eslint . --use-eslintrc --extensions .js,.ts,.jsx,.tsx",
     "format": "prettier --write ."
   },
   "prisma": {
     "seed": "ts-node prisma/seed.ts"
   },
   "dependencies": {
-    "@ai-sdk/openai": "^0.0.34",
     "@faker-js/faker": "^9.3.0",
     "@google/generative-ai": "^0.21.0",
     "@heygen/streaming-avatar": "^2.0.8",
@@ -58,6 +57,7 @@
     "@uiw/codemirror-extensions-langs": "^4.22.1",
     "@uiw/react-codemirror": "^4.22.1",
     "@uploadthing/react": "^7.1.2",
+    "@vercel/analytics": "^1.4.1",
     "@xyflow/react": "^12.3.5",
     "ahooks": "^3.8.1",
     "ai": "^3.2.15",
@@ -85,9 +85,9 @@
     "react-markdown": "^9.0.1",
     "react-phone-number-input": "^3.4.10",
     "react-router-dom": "^7.0.2",
-     "recharts": "^2.14.1",
-     "remark-gfm": "^4.0.0",
-     "simli-client": "^1.2.1",
+    "recharts": "^2.14.1",
+    "remark-gfm": "^4.0.0",
+    "simli-client": "^1.2.1",
     "sonner": "^1.7.0",
     "tailwind-merge": "^2.5.4",
     "tailwindcss-animate": "^1.0.7",

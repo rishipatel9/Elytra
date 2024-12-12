@@ -269,7 +269,7 @@ Relevance Score: ${match.score ? Math.round(match.score * 100) / 100 : 'Not avai
 
         {/* Input Area */}
         <div className="border dark:border-[#3A3F4B] border-[#E9ECF1] bg-background dark:bg-[#222939] shadow-md rounded-xl m-4">
-          <div className="flex items-center gap-2 max-w-[1200px] mx-auto p-4">
+          <div className="flex items-center gap-2 max-w-[1200px] mx-auto p-2">
             <div className="relative flex-1">
               <Input
                 placeholder="Type your question about program recommendations..."
@@ -287,7 +287,7 @@ Relevance Score: ${match.score ? Math.round(match.score * 100) / 100 : 'Not avai
                 size="icon"
                 disabled={isStreaming}
                 aria-label="Send message"
-                className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-[#6BA4FF] hover:bg-[#528BE8] text-white rounded-full"
+                className="absolute right-2 top-1/2 transform -translate-y-1/2    text-white rounded-xl"
               >
                 {isStreaming ? (
                   <span className="text-sm animate-pulse">...</span>
