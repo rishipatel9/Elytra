@@ -22,6 +22,7 @@ import UserDataTable from './UserSessions'
 
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import { Mic, MicIcon, MicOffIcon } from 'lucide-react'
 
 interface User {
     id: string;
@@ -54,6 +55,8 @@ export default function AICounselingChatbot({ user }: { user: User }) {
         suggestedQuestions: []
     });
     let sentenceBuffer = ""
+    const [isVoiceMode, setIsVoiceMode] = useState(false); // Voice mode toggle
+
 
     const userId = user.id
     useEffect(() => {
@@ -61,17 +64,17 @@ export default function AICounselingChatbot({ user }: { user: User }) {
         const initializeAssistantAndStream = async () => {
             try {
                 // Access media devices for video and audio streams
-                if (typeof window !== 'undefined') {
-                    const mediaStream = await navigator.mediaDevices.getUserMedia({
-                        video: true,
-                        audio: true,
-                    });
-                    setStream(mediaStream);
-                }
+                // if (typeof window !== 'undefined') {
+                //     const mediaStream = await navigator.mediaDevices.getUserMedia({
+                //         video: true,
+                //         audio: true,
+                //     });
+                //     setStream(mediaStream);
+                // }
 
                 // Initialize OpenAI Assistant
-                openaiAssistant.current = new OpenAIAssistant(userId);
-                await openaiAssistant.current.initialize();
+               // openaiAssistant.current = new OpenAIAssistant(userId);
+                //await openaiAssistant.current.initialize();
                 console.log("OpenAI Assistant initialized successfully");
             } catch (error) {
                 console.error("Error during initialization:", error);
@@ -98,31 +101,31 @@ export default function AICounselingChatbot({ user }: { user: User }) {
         }
     }
 
-    // async function startSession() {
-    //     const token = await fetchAccessToken()
-    //     avatar.current = new StreamingAvatar({ token })
-    //     openaiAssistant.current = new OpenAIAssistant(userId)
-    //     await openaiAssistant.current.initialize()
+    async function startSession() {
+        const token = await fetchAccessToken()
+        avatar.current = new StreamingAvatar({ token })
+        openaiAssistant.current = new OpenAIAssistant(userId)
+        await openaiAssistant.current.initialize()
 
-    //     try {
-    //         const res = await avatar.current.createStartAvatar({
-    //             quality: AvatarQuality.Medium,
-    //             avatarName: "Wayne_20240711",
-    //             language: language,
-    //             disableIdleTimeout: true,
-    //             voice: { rate: 2.0, emotion: VoiceEmotion.EXCITED },
-    //             knowledgeBase:"You are an international student career counsellor"
-    //         })
-    //        setData(res)
-    //     } catch (error) {
-    //         toast.error(`Error starting avatar: ${error} Please try again`)
-    //         console.error('Failed to start avatar:', error)
-    //     }
+        try {
+            const res = await avatar.current.createStartAvatar({
+                quality: AvatarQuality.Medium,
+                avatarName: "Wayne_20240711",
+                language: language,
+                disableIdleTimeout: true,
+                voice: { rate: 2.0, emotion: VoiceEmotion.EXCITED },
+                knowledgeBase:"You are an international student career counsellor"
+            })
+           setData(res)
+        } catch (error) {
+            toast.error(`Error starting avatar: ${error} Please try again`)
+            console.error('Failed to start avatar:', error)
+        }
 
-    //     avatar.current?.startVoiceChat({ useSilencePrompt: false })
-    //     setChatMode("voice_mode")
-    //     setupAvatarEventListeners()
-    // }
+       // avatar.current?.startVoiceChat({ useSilencePrompt: false })
+       // setChatMode("voice_mode")
+        setupAvatarEventListeners()
+    }
 
 
     useEffect(() => {
@@ -226,11 +229,11 @@ export default function AICounselingChatbot({ user }: { user: User }) {
             console.log(`RESP IS :${JSON.stringify(response)}`)
             setMessages((prev) => [...prev, { text: response, sender: 'ai' }])
 
-            //   await avatar.current.speak({ 
-            //     text: response, 
-            //     taskType: TaskType.REPEAT, 
-            //     taskMode: TaskMode.SYNC 
-            //   });
+              await avatar.current.speak({ 
+                text: response, 
+                taskType: TaskType.REPEAT, 
+                taskMode: TaskMode.SYNC 
+              });
         
         
             storeChats({ sessionId: sessionId, message: text, sender: "USER" })
@@ -271,13 +274,42 @@ export default function AICounselingChatbot({ user }: { user: User }) {
 
     const previousText = usePrevious(text);
 
-    useEffect(() => {
-        if (!previousText && text) {
-            avatar.current?.startListening();
-        } else if (previousText && !text) {
-            avatar?.current?.stopListening();
+    // useEffect(() => {
+    //     if (!previousText && text) {
+    //         avatar.current?.startListening();
+    //     } else if (previousText && !text) {
+    //         avatar?.current?.stopListening();
+    //     }
+    // }, [text, previousText]);
+
+
+     const handleVoiceIconClick = async () => {
+        try {
+        console.log(`handlevoiceicon clicked`)
+             if (!isVoiceMode) {
+        if (!avatar.current) {
+          await startSession(); // Your existing session start method
         }
-    }, [text, previousText]);
+                
+        console.log(`inside this if  `)
+
+        await avatar.current?.startVoiceChat({ useSilencePrompt: false });
+        avatar.current?.startListening();
+        setIsVoiceMode(true);
+        setChatMode("voice_mode");
+             } else {
+                         console.log(`inside this else  `)
+
+        avatar.current?.stopListening();
+        avatar.current?.closeVoiceChat();
+        setIsVoiceMode(false);
+        setChatMode("text_mode");
+      }
+    } catch (error) {
+      console.error("Voice mode toggle error:", error);
+      toast.error("Failed to toggle voice mode");
+    }
+  };
 
     // useEffect(() => {
     //     return () => {
@@ -378,13 +410,15 @@ export default function AICounselingChatbot({ user }: { user: User }) {
 
                             <div className="border-t h-auto relative">
                                 <div className="w-full flex items-center">
-                                    <InteractiveAvatarTextInput
+      <InteractiveAvatarTextInput
                                         input={text}
                                         label=" "
                                         placeholder="Type a message..."
                                         setInput={setText}
                                         onSubmit={handleSpeak}
-                                    />
+                                       handleVoiceIconClick={handleVoiceIconClick}
+      isVoiceMode={isVoiceMode}/>
+
                                     {text && (
                                         <Chip className="absolute right-16 top-1/2 -translate-y-1/2">
                                             Listening
@@ -392,6 +426,7 @@ export default function AICounselingChatbot({ user }: { user: User }) {
                                     )}
                                 </div>
                             </div>
+                            <Mic />
                             <Toaster />
                         </section>
                     </main>
@@ -399,7 +434,7 @@ export default function AICounselingChatbot({ user }: { user: User }) {
             ) : (
                 <div className="flex flex-col items-center justify-center h-screen bg-background dark:bg-[#202434] font-sans dark:border-[#293040] border-[#E9ECF1]">
                     <div className="max-w-6xl w-full h-full">
-                        <UserDataTable />
+ 
                     </div>
                 </div>
             )}
@@ -407,7 +442,7 @@ export default function AICounselingChatbot({ user }: { user: User }) {
             {!stream && (
                 <div className="flex flex-col items-center justify-center h-screen">
                     <h1 className="text-2xl font-bold text-center text-black m-2">AI-Powered Student Counseling</h1>
-                    <Button onClick={() => console.log(`start session`)} className="flex items-center justify-center">
+                    <Button onClick= {startSession} className="flex items-center justify-center">
                         {loading ? (
                             <div className="flex items-center gap-2">
                                 <div className="animate-spin rounded-full h-4 w-4 border-2 border-t-black border-white"></div>
