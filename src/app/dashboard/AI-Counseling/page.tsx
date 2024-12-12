@@ -9,6 +9,7 @@ const page = async () => {
     if(!user){
         redirect('/auth/signup');
     }
+    redirect('/dashboard/programs')
     return (
         <AICounselingChatbot user={user} />
     )

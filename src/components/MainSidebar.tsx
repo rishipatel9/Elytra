@@ -29,13 +29,6 @@ export default function SidebarDemo({ children }: { children: React.ReactNode })
           ),
         },
         {
-          label: "AI Counseling", // changed from title to label
-          href: "/dashboard/AI-Counseling", // changed key to href
-          icon: (
-            <IconUser className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0" />
-          ),
-        },
-        {
           label: "Program Finder",
           href: "/dashboard/programs", // changed key to href
           icon: (

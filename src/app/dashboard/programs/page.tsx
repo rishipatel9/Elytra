@@ -197,7 +197,7 @@ Relevance Score: ${match.score ? Math.round(match.score * 100) / 100 : 'Not avai
         </header>
 
         {/* Used Contexts */}
-        {usedContexts?.length > 0 && (
+        {/* {usedContexts?.length > 0 && (
           <div className="p-4 bg-muted text-muted-foreground">
             <h2 className="text-sm font-semibold mb-1">Programs Found:</h2>
             <ul className="list-disc pl-4 max-h-40 overflow-y-auto">
@@ -208,7 +208,7 @@ Relevance Score: ${match.score ? Math.round(match.score * 100) / 100 : 'Not avai
               ))}
             </ul>
           </div>
-        )}
+        )} */}
 
         {/* Messages Section */}
         <ScrollArea className="flex-1 p-4">

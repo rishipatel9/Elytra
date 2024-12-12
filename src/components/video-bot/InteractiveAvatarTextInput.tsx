@@ -29,9 +29,11 @@ export default function InteractiveAvatarTextInput({
   loading = false,
 }: StreamingAvatarTextInputProps) {
   function handleSubmit() {
+    console.log(`in handle submit`)
     if (input.trim() === "") {
       return;
     }
+    console.log(`calling on submit`)
     onSubmit();
     setInput("");
   }
@@ -58,6 +60,7 @@ export default function InteractiveAvatarTextInput({
                 />
               )}
             </button>
+ 
           </Tooltip>
 
           {/* Existing Send Button */}
