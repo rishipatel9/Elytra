@@ -15,6 +15,7 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { ModeToggle } from "../theme-toggle";
 import { Button } from "../ui/button";
 import AdminLogout from "./AdminLogout";
+import { Brain } from "lucide-react";
 
 
 
@@ -99,11 +100,11 @@ export const Logo = () => {
       href="#"
       className="font-normal flex space-x-2 items-center text-sm text-black py-1 relative z-20"
     >
-      <div className="h-5 w-6 bg-black dark:bg-white rounded-full flex-shrink-0" />
+       <Brain className="h-6 w-6 text-purple-500" />
       <motion.span
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        className="font-medium text-black dark:text-white whitespace-pre"
+        className=" text-black dark:text-white whitespace-pre text-lg font-bold"
       >
         Elytra
       </motion.span>
@@ -112,12 +113,7 @@ export const Logo = () => {
 };
 export const LogoIcon = () => {
   return (
-    <Link
-      href="#"
-      className="font-normal flex space-x-2 items-center text-sm text-black py-1 relative z-20"
-    >
-      <div className="h-6 w-6 bg-black dark:bg-white rounded-full flex-shrink-0" />
-    </Link>
+    <Brain className="h-6 w-6 text-purple-500" />
   );
 };
 
