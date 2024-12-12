@@ -304,6 +304,7 @@ try {
           </Tabs>
           {chatMode === "text_mode" ? (
             <div className="w-full flex relative">
+              {/* @ts-ignore */}
               <InteractiveAvatarTextInput
                 disabled={!stream}
                 input={text}

@@ -229,12 +229,13 @@ export default function AICounselingChatbot({ user }: { user: User }) {
             console.log(`RESP IS :${JSON.stringify(response)}`)
             setMessages((prev) => [...prev, { text: response, sender: 'ai' }])
 
-              await avatar.current.speak({ 
-                text: response, 
-                taskType: TaskType.REPEAT, 
-                taskMode: TaskMode.SYNC 
-              });
-        
+              if(avatar.current){
+                await avatar.current.speak({ 
+                    text: response, 
+                    taskType: TaskType.REPEAT, 
+                    taskMode: TaskMode.SYNC 
+                  });
+              }
         
             storeChats({ sessionId: sessionId, message: text, sender: "USER" })
             storeChats({ sessionId: sessionId, message: response, sender: "AI" })
