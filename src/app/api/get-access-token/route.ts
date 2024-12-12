@@ -8,11 +8,11 @@ export async function POST(req:NextRequest) {
   try {
     const body = await req.json();
     console.log('body:', body)
+    console.log(`HEYGEN API KEY : ${HEYGEN_API_KEY}`)
     if (!HEYGEN_API_KEY) {
       throw new Error("API key is missing from .env");
     }
-
-    const res = await fetch(
+     const res = await fetch(
       "https://api.heygen.com/v1/streaming.create_token",
       {
         method: "POST",
@@ -27,7 +27,9 @@ export async function POST(req:NextRequest) {
     }
 
     const data = await res.json();
-    const session= await prisma.session.create({
+    console.log(`${JSON.stringify(data)}`)
+    const session =
+       await prisma.session.create({
       data: {
           userId:body.userId,
       },
@@ -35,12 +37,17 @@ export async function POST(req:NextRequest) {
     console.log('session:', session)
     console.log('token:', data.data.token)
 
-    return NextResponse.json({ token:data.data.token,sessionId:session.id }, { status: 200 });
+    return NextResponse.json({ token:data.data.token, sessionId:session.id }, { status: 200 });
   } catch (error) {
-    console.error("Error retrieving access token:", error);
-
-    return new Response("Failed to retrieve access token", {
-      status: 500,
+    // Improved error logging
+    console.error("Error details:", {
+      message: error instanceof Error ? error.message : 'Unknown error',
+      stack: error instanceof Error ? error.stack : null
     });
+
+    // Return a more informative error response
+    return NextResponse.json({ 
+      error: error instanceof Error ? error.message : 'An unexpected error occurred' 
+    }, { status: 500 });
   }
 }

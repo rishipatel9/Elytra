@@ -55,30 +55,30 @@ const useAvtarSession = ({user}:{user:User}) => {
 
 
     const userId = user.id
-    useEffect(() => {
-        const initializeAssistantAndStream = async () => {
-            try {
-                // Access media devices for video and audio streams
-                // if (typeof window !== 'undefined') {
-                //     const mediaStream = await navigator.mediaDevices.getUserMedia({
-                //         video: true,
-                //         audio: true,
-                //     });
-                //     setStream(mediaStream);
-                // }
+    // useEffect(() => {
+    //     const initializeAssistantAndStream = async () => {
+    //         try {
+    //             // Access media devices for video and audio streams
+    //             // if (typeof window !== 'undefined') {
+    //             //     const mediaStream = await navigator.mediaDevices.getUserMedia({
+    //             //         video: true,
+    //             //         audio: true,
+    //             //     });
+    //             //     setStream(mediaStream);
+    //             // }
 
-                // Initialize OpenAI Assistant
-               // openaiAssistant.current = new OpenAIAssistant(userId);
-                //await openaiAssistant.current.initialize();
-                console.log("OpenAI Assistant initialized successfully");
-            } catch (error) {
-                console.error("Error during initialization:", error);
-            }
-        };
+    //             // Initialize OpenAI Assistant
+    //            // openaiAssistant.current = new OpenAIAssistant(userId);
+    //             //await openaiAssistant.current.initialize();
+    //             console.log("OpenAI Assistant initialized successfully");
+    //         } catch (error) {
+    //             console.error("Error during initialization:", error);
+    //         }
+    //     };
 
-        // Call the asynchronous function
-        initializeAssistantAndStream();
-    }, [userId]); // Dependency array includes userId
+    //     // Call the asynchronous function
+    //     initializeAssistantAndStream();
+    // }, [userId]); // Dependency array includes userId
 
 
     useEffect(() => {
@@ -175,7 +175,7 @@ const useAvtarSession = ({user}:{user:User}) => {
             sentenceBuffer += message;
 
             // Update the subtitle in real time
-            setSubtitles(sentenceBuffer.trim());
+         //   setSubtitles(sentenceBuffer.trim());
 
             console.log(`Subtule  : ${subtitles}`);
 
@@ -211,9 +211,13 @@ const useAvtarSession = ({user}:{user:User}) => {
 
     
     async function handleSpeak() {
+        console.log(`handle speak triggerd`)
         if (!openaiAssistant.current) {
             setDebug("Avatar or OpenAI Assistant not initialized");
-            return;
+            openaiAssistant.current = new OpenAIAssistant(userId);
+            await openaiAssistant.current.initialize();
+            console.log(`openai initialized`)
+ 
         }
         console.log(`in handle speak`)
         try {
