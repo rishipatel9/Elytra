@@ -15,10 +15,10 @@ import { useMemoizedFn, usePrevious } from 'ahooks'
 
 import axios from 'axios'
 import { storeChats, summarizeChat } from '@/lib/db'
-import { toast} from 'sonner'
+import { toast } from 'sonner'
 import { User } from '@/components/video-bot/AICounselingChatbot'
 
-const useAvtarSession = ({user}:{user:User}) => {
+const useAvtarSession = ({ user }: { user: User }) => {
     const [messages, setMessages] = useState<{ text: string; sender: 'user' | 'ai' }[]>([])
     const [stream, setStream] = useState<MediaStream>()
     const [language] = useState<string>('en')
@@ -44,8 +44,8 @@ const useAvtarSession = ({user}:{user:User}) => {
     let sentenceBuffer = ""
     const [isVoiceMode, setIsVoiceMode] = useState(false); // Voice mode toggle
     const [endSessionPage, setEndSessionPage] = useState(false);
-    const [startLoading,setStartLoading]=useState(false)
-
+    const [startLoading, setStartLoading] = useState(false)
+    const [isTyping , setIsTyping]=useState(false)
 
     const userId = user.id
     // useEffect(() => {
@@ -75,18 +75,18 @@ const useAvtarSession = ({user}:{user:User}) => {
 
 
     useEffect(() => {
-        const handleBeforeUnload = (event:any) => {
-          // Display a custom warning message before the page is unloaded
-          event.preventDefault(); // For modern browsers
-          event.returnValue = '';  // For older browsers
+        const handleBeforeUnload = (event: any) => {
+            // Display a custom warning message before the page is unloaded
+            event.preventDefault(); // For modern browsers
+            event.returnValue = '';  // For older browsers
         };
-      
+
         window.addEventListener('beforeunload', handleBeforeUnload);
-      
+
         return () => {
-          window.removeEventListener('beforeunload', handleBeforeUnload);
+            window.removeEventListener('beforeunload', handleBeforeUnload);
         };
-      }, []);
+    }, []);
 
     async function fetchAccessToken() {
         try {
@@ -116,16 +116,16 @@ const useAvtarSession = ({user}:{user:User}) => {
                 language: language,
                 disableIdleTimeout: true,
                 voice: { rate: 2.0, emotion: VoiceEmotion.EXCITED },
-                knowledgeBase:"You are an international student career counsellor"
+                knowledgeBase: "You are an international student career counsellor"
             })
-           setData(res)
+            setData(res)
         } catch (error) {
             toast.error(`Error starting avatar: ${error} Please try again`)
             console.error('Failed to start avatar:', error)
         }
 
-       // avatar.current?.startVoiceChat({ useSilencePrompt: false })
-       // setChatMode("voice_mode")
+        // avatar.current?.startVoiceChat({ useSilencePrompt: false })
+        // setChatMode("voice_mode")
         setupAvatarEventListeners()
         setStartLoading(false)
     }
@@ -162,19 +162,19 @@ const useAvtarSession = ({user}:{user:User}) => {
             console.log(">>>>> User stopped talking:", event);
             setIsUserTalking(false);
         });
-        
+
         avatar.current?.on(StreamingEvents.AVATAR_TALKING_MESSAGE, (e) => {
             const message = e.detail.message;
             sentenceBuffer += message;
 
             // Update the subtitle in real time
-         //   setSubtitles(sentenceBuffer.trim());
+            //   setSubtitles(sentenceBuffer.trim());
 
             console.log(`Subtule  : ${subtitles}`);
 
             console.log(`Avatar message: ${message}`);
         });
- 
+
     }
 
     // async function handleSpeak() {
@@ -202,10 +202,12 @@ const useAvtarSession = ({user}:{user:User}) => {
     // }
 
 
-    
+
     async function handleSpeak(question?: string) {
         console.log(`handle speak triggered`);
-        const userQuery = question || text || ""; 
+        const userQuery = question || text || "";
+        setMessages((prev) => [...prev, { text: userQuery, sender: 'user' }]);
+        setIsTyping(true)
 
         if (!openaiAssistant.current) {
             setDebug("Avatar or OpenAI Assistant not initialized");
@@ -217,19 +219,19 @@ const useAvtarSession = ({user}:{user:User}) => {
         console.log(`in handle speak`);
         try {
             console.log(`text is ${userQuery}`);
-            setMessages((prev) => [...prev, { text: userQuery, sender: 'user' }]);
-    
+
             const newText = `user query is: ${userQuery}`;
             console.log(`new text is ${newText}`);
-    
+
             const response = await openaiAssistant.current.getResponse(userQuery);
             const additionalContext = await openaiAssistant.current.getAdditionalContext(userQuery);
             console.log(`additionalContext is ${JSON.stringify(additionalContext)}`);
             setAdditionalContext(additionalContext);
-    
+
             console.log(`RESP IS: ${JSON.stringify(response)}`);
+            setIsTyping(false)
             setMessages((prev) => [...prev, { text: response, sender: 'ai' }]);
-    
+
             if (avatar.current) {
                 await avatar.current.speak({
                     text: response,
@@ -237,15 +239,16 @@ const useAvtarSession = ({user}:{user:User}) => {
                     taskMode: TaskMode.SYNC,
                 });
             }
-    
+
             // Store the chat history
             storeChats({ sessionId: sessionId, message: userQuery, sender: "USER" });
             storeChats({ sessionId: sessionId, message: response, sender: "AI" });
         } catch (e: any) {
+            setIsTyping(false)
             setDebug(e.message);
             console.error(`Error in handleSpeak: ${e.message}`);
         }
-    }    
+    }
 
     async function handleInterrupt() {
         if (!avatar.current) {
@@ -288,33 +291,33 @@ const useAvtarSession = ({user}:{user:User}) => {
     // }, [text, previousText]);
 
 
-     const handleVoiceIconClick = async () => {
+    const handleVoiceIconClick = async () => {
         try {
-        console.log(`handlevoiceicon clicked`)
-             if (!isVoiceMode) {
-        if (!avatar.current) {
-          await startSession(); // Your existing session start method
+            console.log(`handlevoiceicon clicked`)
+            if (!isVoiceMode) {
+                if (!avatar.current) {
+                    await startSession(); // Your existing session start method
+                }
+
+                console.log(`inside this if  `)
+
+                await avatar.current?.startVoiceChat({ useSilencePrompt: false });
+                avatar.current?.startListening();
+                setIsVoiceMode(true);
+                setChatMode("voice_mode");
+            } else {
+                console.log(`inside this else  `)
+
+                avatar.current?.stopListening();
+                avatar.current?.closeVoiceChat();
+                setIsVoiceMode(false);
+                setChatMode("text_mode");
+            }
+        } catch (error) {
+            console.error("Voice mode toggle error:", error);
+            toast.error("Failed to toggle voice mode");
         }
-                
-        console.log(`inside this if  `)
-
-        await avatar.current?.startVoiceChat({ useSilencePrompt: false });
-        avatar.current?.startListening();
-        setIsVoiceMode(true);
-        setChatMode("voice_mode");
-             } else {
-                         console.log(`inside this else  `)
-
-        avatar.current?.stopListening();
-        avatar.current?.closeVoiceChat();
-        setIsVoiceMode(false);
-        setChatMode("text_mode");
-      }
-    } catch (error) {
-      console.error("Voice mode toggle error:", error);
-      toast.error("Failed to toggle voice mode");
-    }
-  };
+    };
 
     // useEffect(() => {
     //     return () => {
@@ -335,31 +338,32 @@ const useAvtarSession = ({user}:{user:User}) => {
         setMessages((prev) => [...prev, { text, sender: 'user' }, { text: text, sender: 'ai' }])
         setText("")
     }
-  return {
-    messages,
-    text,
-    setText,
-    handleSend,
-    handleSpeak,
-    handleInterrupt,
-    handleVoiceIconClick,
-    isVoiceMode,
-    mediaStream,
-    chatMode,
-    handleChangeChatMode,
-    endSessionPage,
-    debug,
-    loading,
-    subtitles,
-    additionalContext,
-    endSession,
-    messagesEndRef,
-    startSession,
-    stream,
-    setEndSessionPage,
-    startLoading,
-    setMessages
-  }
+    return {
+        messages,
+        text,
+        setText,
+        handleSend,
+        handleSpeak,
+        handleInterrupt,
+        handleVoiceIconClick,
+        isVoiceMode,
+        mediaStream,
+        chatMode,
+        handleChangeChatMode,
+        endSessionPage,
+        debug,
+        loading,
+        subtitles,
+        additionalContext,
+        endSession,
+        messagesEndRef,
+        startSession,
+        stream,
+        setEndSessionPage,
+        startLoading,
+        setMessages,
+        isTyping
+    }
 }
 
 export default useAvtarSession

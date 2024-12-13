@@ -25,7 +25,7 @@ const VoiceToggleButton = ({
   isVoiceMode: boolean;
   onClick: () => void;
 }) => (
-  <Tooltip content={isVoiceMode ? "Disable Voice Mode" : "Enable Voice Mode"} className="bg-black">
+  <Tooltip content={isVoiceMode ? "Disable Voice Mode" : "Enable Voice Mode"} className="bg-black  text-white">
     <button
       onClick={onClick}
       aria-label={isVoiceMode ? "Disable Voice Mode" : "Enable Voice Mode"}
@@ -50,7 +50,7 @@ const SendButton = ({
   loading: boolean;
   disabled: boolean;
 }) => (
-  <Tooltip content="Send message" className="bg-black">
+  <Tooltip content="Send message" className="bg-black text-white">
     {loading ? (
       <Spinner size="sm" className="text-indigo-300" />
     ) : (
@@ -77,7 +77,7 @@ const FileUploadButton = ({
 }: {
   onChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
 }) => (
-  <Tooltip content="Upload a file" className="font-sans  bg-black">
+  <Tooltip content="Upload a file" className="font-sans  bg-black text-white">
     <label className="focus:outline-none p-2 rounded-lg  transition cursor-pointer">
       <Paperclip className="text-gray-400" size={24} />
       <input
