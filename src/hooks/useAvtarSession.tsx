@@ -203,54 +203,50 @@ const useAvtarSession = ({user}:{user:User}) => {
 
 
     
-    async function handleSpeak() {
-        console.log(`handle speak triggerd`)
+    async function handleSpeak(question?: string) {
+        console.log(`handle speak triggered`);
+        const userQuery = question || text || ""; 
+
         if (!openaiAssistant.current) {
             setDebug("Avatar or OpenAI Assistant not initialized");
             openaiAssistant.current = new OpenAIAssistant(userId);
             await openaiAssistant.current.initialize();
-            console.log(`openai initialized`)
- 
+            console.log(`openai initialized`);
         }
-        console.log(`in handle speak`)
+
+        console.log(`in handle speak`);
         try {
-            // Get response from OpenAI Assistanst
-            console.log(`text is ${text}`)
-            // const studentDetails = await getStudentById(userId);
-
-            //   console.log(`student details are :${JSON.stringify(studentDetails)}`)
-            //  setText(`user query is :${text}   for some context this is some info about student${studentDetails} if it helps  `)
-            setMessages((prev) => [...prev, { text, sender: 'user' }])
-
-            console.log(`new text is ${text}`)
-            const newText = `user query is :${text} `;
-            console.log(`new text is ${newText}`)
-            const response = await openaiAssistant.current.getResponse(text);
-            const additionalContext = await openaiAssistant.current.getAdditionalContext(text);
-            console.log(`additionalContext is ${JSON.stringify(additionalContext)}`)
+            console.log(`text is ${userQuery}`);
+            setMessages((prev) => [...prev, { text: userQuery, sender: 'user' }]);
+    
+            const newText = `user query is: ${userQuery}`;
+            console.log(`new text is ${newText}`);
+    
+            const response = await openaiAssistant.current.getResponse(userQuery);
+            const additionalContext = await openaiAssistant.current.getAdditionalContext(userQuery);
+            console.log(`additionalContext is ${JSON.stringify(additionalContext)}`);
             setAdditionalContext(additionalContext);
-
-
-        
-        
-            console.log(`RESP IS :${JSON.stringify(response)}`)
-            setMessages((prev) => [...prev, { text: response, sender: 'ai' }])
-
-              if(avatar.current){
-                await avatar.current.speak({ 
-                    text: response, 
-                    taskType: TaskType.REPEAT, 
-                    taskMode: TaskMode.SYNC 
-                  });
-              }
-        
-            storeChats({ sessionId: sessionId, message: text, sender: "USER" })
-            storeChats({ sessionId: sessionId, message: response, sender: "AI" })
-            //     }
+    
+            console.log(`RESP IS: ${JSON.stringify(response)}`);
+            setMessages((prev) => [...prev, { text: response, sender: 'ai' }]);
+    
+            if (avatar.current) {
+                await avatar.current.speak({
+                    text: response,
+                    taskType: TaskType.REPEAT,
+                    taskMode: TaskMode.SYNC,
+                });
+            }
+    
+            // Store the chat history
+            storeChats({ sessionId: sessionId, message: userQuery, sender: "USER" });
+            storeChats({ sessionId: sessionId, message: response, sender: "AI" });
         } catch (e: any) {
             setDebug(e.message);
+            console.error(`Error in handleSpeak: ${e.message}`);
         }
-    }
+    }    
+
     async function handleInterrupt() {
         if (!avatar.current) {
             setDebug("Avatar API not initialized");

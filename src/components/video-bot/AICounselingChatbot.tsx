@@ -41,7 +41,7 @@ export default function AICounselingChatbot({ user }: { user: User }) {
     } = useAvtarSession({ user });
     return (
         <>
-            {stream && !endSessionPage ? (
+            {/* {stream && !endSessionPage ? ( */}
                 <div className="min-h-screen flex flex-col font-sans">
                     <main className="flex-grow flex flex-col md:flex-row p-4 gap-4 mx-auto w-full dark:bg-[#202434] bg-background">
                         <section className="flex-1 bg-gray-100 dark:bg-[#212A39] rounded-xl border dark:border-[#3B4254] border-[#E9ECF1] shadow-lg overflow-hidden">
@@ -102,7 +102,7 @@ export default function AICounselingChatbot({ user }: { user: User }) {
                                         additionalContext.suggestedQuestions.map((question, index) => (
                                             <li key={index} className='flex justify-between w-full'>
                                                 <div>{question}</div>
-                                                <div><Button className='bg-gradient-to-tr to-indigo-300 w-full text-white ' style={{ borderRadius: "0.6rem" }} onClick={() => setMessages((prev) => [...prev, { text: question, sender: 'user' }])} >Ask</Button></div>
+                                                <div><Button className='bg-gradient-to-tr to-indigo-300 w-full text-white ' style={{ borderRadius: "0.6rem" }} onClick={()=>handleSpeak(question)} >Ask</Button></div>
                                             </li>
                                         ))
                                     ) : (
@@ -200,14 +200,14 @@ export default function AICounselingChatbot({ user }: { user: User }) {
                         </section>
                     </main>
                 </div>
-            ) : (
+            {/* ) : (
                 <div className="flex flex-col items-center justify-center h-screen bg-background dark:bg-[#202434] font-sans dark:border-[#293040] border-[#E9ECF1]">
                     <div className="max-w-6xl w-full h-full">
                         {<UserSessionsTable onStartSession={startSession} startLoading={startLoading} />}
 
                     </div>
                 </div>
-            )}
+            )} */}
             {endSessionPage && (
                 <div className="flex flex-col items-center justify-center h-screen">
                     <h1 className="text-2xl font-bold text-center text-white m-2">Session Ended</h1>
