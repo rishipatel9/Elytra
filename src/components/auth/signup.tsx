@@ -14,7 +14,7 @@ export default function SignUp() {
       </div> 
   
       <div className="flex flex-col items-center text-start space-y-2">
-        <h1 className="text-2xl font-semibold text-[#807F7F]">
+        <h1 className="text-2xl font-semibold text-white">
           Create an account
         </h1>
         <p className="text-sm text-[#8F8F8F]">
@@ -22,9 +22,9 @@ export default function SignUp() {
         </p>
       </div>
       
-      <SignupButtons/>
+      {/* <SignupButtons/> */}
 
-      <div className="relative">
+      {/* <div className="relative">
         <div className="absolute inset-0 flex items-center">
           <span className="w-full border-t border-[#8F8F8F]" />
         </div>
@@ -33,7 +33,7 @@ export default function SignUp() {
             Or continue with
           </span>
         </div>
-      </div>
+      </div> */}
   
       {/* Form */}
       <div className="space-y-6 bg-black">
