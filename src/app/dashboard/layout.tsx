@@ -1,16 +1,16 @@
-"use client";
-
 import SidebarDemo from "@/components/MainSidebar";
+import { getUserDetails } from "@/utils";
 import React from "react";
 
-export default function DashboardLayout({
+export default async function DashboardLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const session= await getUserDetails();
   return (
     <div className="flex h-screen w-full">
-      <SidebarDemo children={children} />
+      <SidebarDemo user={session.user} children={children} />
     </div>
   );
 }

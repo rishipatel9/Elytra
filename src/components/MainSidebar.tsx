@@ -15,10 +15,11 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { ModeToggle } from "./theme-toggle";
 import LogoutButton from "./LogoutButton";
 import { Brain } from "lucide-react";
+import { User } from "./video-bot/AICounselingChatbot";
 
 
 
-export default function SidebarDemo({ children }: { children: React.ReactNode }) {
+export default function SidebarDemo({ children,user }: { children: React.ReactNode,user:User }) {
     // className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0" 
     const links = [
         {
@@ -71,11 +72,11 @@ export default function SidebarDemo({ children }: { children: React.ReactNode })
         <ModeToggle/>
             <SidebarLink
               link={{
-                label: "User",
-                href: "/profile",
+                label: user.name,
+                href: "/#",
                 icon: (
                     <Avatar>
-                    <AvatarFallback>A</AvatarFallback>
+                    <AvatarFallback className="borde-2 shadow-lg dark:bg-[#202434] bg-white dark:border-[#293040] border-[#E9ECF1]">{user.name[0]}</AvatarFallback>
                   </Avatar>
                 ),
               }}

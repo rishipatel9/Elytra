@@ -26,8 +26,8 @@ interface UserSessionsTableProps {
     onStartSession: () => void;
     startLoading: boolean;
 }
-  
-const UserSessionsTable = ({onStartSession,startLoading}:UserSessionsTableProps) => {
+
+const UserSessionsTable = ({ onStartSession, startLoading }: UserSessionsTableProps) => {
     const [sessions, setSessions] = useState<SessionData[]>([]);
     const [loading, setLoading] = useState(true);
     const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set());
@@ -69,7 +69,7 @@ const UserSessionsTable = ({onStartSession,startLoading}:UserSessionsTableProps)
     };
 
     // Skeleton Placeholder Rows (No external library)
-   
+
 
     return (
         <div className="w-full md:mt-10 p-4">
@@ -80,7 +80,7 @@ const UserSessionsTable = ({onStartSession,startLoading}:UserSessionsTableProps)
                 </h1>
                 <div className='flex justify-center items-center gap-2'>
                     <SearchSession onSearch={() => { }} />
-                    <Button  onClick={onStartSession} className="flex items-center px-6 py-3 md:px-8 border rounded-xl   dark:border-[#3B4254]  border-[#E9ECF1]   font-medium  hover:bg-[#633fab] h-[2.5rem]">
+                    <Button onClick={onStartSession} className="flex items-center px-6 py-3 md:px-8 border rounded-xl   dark:border-[#3B4254]  border-[#E9ECF1]   font-medium  hover:bg-[#633fab] h-[2.5rem]">
                         <span className="h-5 w-5 md:hidden">
                             <PlusIcon />
                         </span>
@@ -98,9 +98,9 @@ const UserSessionsTable = ({onStartSession,startLoading}:UserSessionsTableProps)
                 <Table>
                     <TableHeader>
                         <TableRow className="bg-gray-100 dark:bg-[#212A39] rounded-t-xl">
-                            <TableHead className="border-b dark:border-[#3B4254] px-4 py-3 text-sm font-semibold text-gray-700 dark:text-gray-300 ">
+                            {/* <TableHead className="border-b dark:border-[#3B4254] px-4 py-3 text-sm font-semibold text-gray-700 dark:text-gray-300 ">
                                 Session ID
-                            </TableHead>
+                            </TableHead> */}
                             <TableHead className="border-b dark:border-[#3B4254] px-4 py-3 text-sm font-semibold text-gray-700 dark:text-gray-300">
                                 Summary
                             </TableHead>
@@ -118,7 +118,7 @@ const UserSessionsTable = ({onStartSession,startLoading}:UserSessionsTableProps)
                         ) : sessions.length > 0 ? (
                             sessions.map((session) => (
                                 <TableRow key={session.id} className="hover:bg-gray-100 dark:hover:bg-[#2C3545] border-b dark:border-[#3B4254]">
-                                    <TableCell className="px-4 py-3">{session.id}</TableCell>
+                                    {/* <TableCell className="px-4 py-3">{session.id}</TableCell> */}
                                     <TableCell className="px-4 py-3">
                                         {expandedRows.has(session.id) ? (
                                             <>
@@ -144,10 +144,21 @@ const UserSessionsTable = ({onStartSession,startLoading}:UserSessionsTableProps)
                                             </>
                                         )}
                                     </TableCell>
-                                    <TableCell className="px-4 py-3">{new Date(session.createdAt).toLocaleString()}</TableCell>
+                                    <TableCell className="px-4 py-3">
+                                        {new Date(session.createdAt).toLocaleDateString(undefined, {
+                                            year: "numeric",
+                                            month: "2-digit",
+                                            day: "2-digit",
+                                        })}{" "}
+                                        {new Date(session.createdAt).toLocaleTimeString(undefined, {
+                                            hour: "2-digit",
+                                            minute: "2-digit",
+                                            hour12: true,
+                                        })}
+                                    </TableCell>
                                     <TableCell className="px-4 py-3 text-center">
                                         <Button variant="outline" className="text-blue-500 hover:text-blue-700">
-                                            Continue
+                                            Comming Soon
                                         </Button>
                                     </TableCell>
                                 </TableRow>
@@ -171,9 +182,9 @@ export default UserSessionsTable;
 export const renderSkeletonRows = () => {
     return Array.from({ length: 5 }).map((_, index) => (
         <TableRow key={index} className="animate-pulse">
-            <TableCell className="px-4 py-3 border-b dark:border-[#3B4254]">
+            {/* <TableCell className="px-4 py-3 border-b dark:border-[#3B4254]">
                 <div className="h-5 bg-gray-300 dark:bg-gray-600 rounded "></div>
-            </TableCell>
+            </TableCell> */}
             <TableCell className="px-4 py-3 border-b dark:border-[#3B4254]">
                 <div className="h-5 bg-gray-300 dark:bg-gray-600 rounded"></div>
             </TableCell>

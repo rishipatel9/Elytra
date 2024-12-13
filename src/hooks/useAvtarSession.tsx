@@ -10,19 +10,12 @@ import StreamingAvatar, {
     VoiceEmotion,
 } from "@heygen/streaming-avatar"
 import { OpenAIAssistant } from '@/lib/openai-assistant'
-
-import { Chip } from '@nextui-org/chip'
 import { getStudentById } from '@/helper'
 import { useMemoizedFn, usePrevious } from 'ahooks'
 
 import axios from 'axios'
 import { storeChats, summarizeChat } from '@/lib/db'
-import { toast, Toaster } from 'sonner'
-
-
-import ReactMarkdown from 'react-markdown';
-import remarkGfm from 'remark-gfm';
-import { Mic, MicIcon, MicOffIcon } from 'lucide-react'
+import { toast} from 'sonner'
 import { User } from '@/components/video-bot/AICounselingChatbot'
 
 const useAvtarSession = ({user}:{user:User}) => {
@@ -368,7 +361,8 @@ const useAvtarSession = ({user}:{user:User}) => {
     startSession,
     stream,
     setEndSessionPage,
-    startLoading
+    startLoading,
+    setMessages
   }
 }
 
