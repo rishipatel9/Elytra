@@ -33,6 +33,7 @@ export async function uploadStudentInfo(formData: StudentDataFormType) {
     }
 
     const userEmail = session.user?.email;
+    
 
     if (!userEmail) {
       throw new Error("User email not found in session.");

@@ -242,7 +242,7 @@ export default function AICounselingChatbot({ user }: { user: User }) {
                     </div>
                 </div>
             )}
-            {endSessionPage && (
+            {endSessionPage==true && (
                 <div className="flex flex-col items-center justify-center h-screen">
                     <h1 className="text-2xl font-bold text-center text-white m-2">Session Ended</h1>
                     <Button onClick={() => setEndSessionPage(false)} className="flex items-center justify-center">
