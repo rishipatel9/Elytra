@@ -17,6 +17,8 @@ import axios from 'axios'
 import { storeChats, summarizeChat } from '@/lib/db'
 import { toast } from 'sonner'
 import { User } from '@/components/video-bot/AICounselingChatbot'
+import { Pinecone } from '@pinecone-database/pinecone'
+import { genAI } from '@/lib/GeminiClient'
 
 const useAvtarSession = ({ user }: { user: User }) => {
     const [messages, setMessages] = useState<{ text: string; sender: 'user' | 'ai' }[]>([])
@@ -51,18 +53,18 @@ const useAvtarSession = ({ user }: { user: User }) => {
     // useEffect(() => {
     //     const initializeAssistantAndStream = async () => {
     //         try {
-    //             // Access media devices for video and audio streams
-    //             // if (typeof window !== 'undefined') {
-    //             //     const mediaStream = await navigator.mediaDevices.getUserMedia({
-    //             //         video: true,
-    //             //         audio: true,
-    //             //     });
-    //             //     setStream(mediaStream);
-    //             // }
+    //           //  Access media devices for video and audio streams
+    //             if (typeof window !== 'undefined') {
+    //                 const mediaStream = await navigator.mediaDevices.getUserMedia({
+    //                     video: true,
+    //                     audio: true,
+    //                 });
+    //                 setStream(mediaStream);
+    //             }
 
-    //             // Initialize OpenAI Assistant
-    //            // openaiAssistant.current = new OpenAIAssistant(userId);
-    //             //await openaiAssistant.current.initialize();
+    //            // Initialize OpenAI Assistant
+    //            openaiAssistant.current = new OpenAIAssistant(userId);
+    //             await openaiAssistant.current.initialize();
     //             console.log("OpenAI Assistant initialized successfully");
     //         } catch (error) {
     //             console.error("Error during initialization:", error);
@@ -247,7 +249,15 @@ console.log(`our keys are ${HEYGEN_API_KEYS}`)
     //     }
     // }
 
+    /* ***Trying to give assistant program context */
+    const pc = new Pinecone({
+  apiKey: process.env.NEXT_PUBLIC_PINECONE_API_KEY!,
+});
 
+const index = pc.index('program-recommendations');
+const model = genAI.getGenerativeModel({ model: 'text-embedding-004' });
+    //initialized pinecone and gemini embedding 
+    
 
     async function handleSpeak(question?: string) {
         console.log(`handle speak triggered`);
@@ -263,13 +273,43 @@ console.log(`our keys are ${HEYGEN_API_KEYS}`)
         }
 
         console.log(`in handle speak`);
+        //
+
+        // Fetch program recommendations if the query is related to programs
+        let programContexts:any = [];
+        const embeddingResult = await model.embedContent(userQuery);
+        const embeddingVector = embeddingResult.embedding.values;
+        
+        // Search Pinecone for relevant programs
+        const searchResults = await index.query({
+            vector: embeddingVector,
+            topK: 3,
+            includeMetadata: true,
+        });
+
+        if (searchResults.matches && searchResults.matches.length > 0) {
+            programContexts = searchResults.matches.map((match: any) => {
+                const metadata = match.metadata;
+                return `
+                Program Details:
+                - Name: ${metadata.Program || 'Unknown'}
+                - University: ${metadata.University || 'Unknown'}
+                - Location: ${metadata.Location || 'Not specified'}
+                - Specialization: ${metadata.Specialization || 'Not specified'}
+                - Curriculum: ${metadata.Curriculum || 'Not specified'}
+                - Key Job Roles: ${metadata.KeyJobRoles || 'Not specified'}
+                `;
+            });
+            console.log('Program contexts:', programContexts);
+        }
+        console.log(`matching program contexts ${programContexts}`)
         try {
             console.log(`text is ${userQuery}`);
 
             const newText = `user query is: ${userQuery}`;
             console.log(`new text is ${newText}`);
 
-            const response = await openaiAssistant.current.getResponse(userQuery);
+            const response = await openaiAssistant.current.getResponse(userQuery,programContexts);
             const additionalContext = await openaiAssistant.current.getAdditionalContext(userQuery);
             console.log(`additionalContext is ${JSON.stringify(additionalContext)}`);
             setAdditionalContext(additionalContext);

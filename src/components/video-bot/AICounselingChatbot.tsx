@@ -96,21 +96,32 @@ export default function AICounselingChatbot({ user }: { user: User }) {
                                 )}
                             </ul>
                         </div>
-                        <div className="p-4 border-t dark:border-[#3B4254] bg-gray-100 dark:bg-[#212A39]">
-                            <h2 className="text-lg font-semibold mb-2">Suggested Questions</h2>
-                            <ul className="space-y-2">
-                                {additionalContext.suggestedQuestions.length > 0 ? (
-                                    additionalContext.suggestedQuestions.map((question, index) => (
-                                        <li key={index} className='flex justify-between w-full'>
-                                            <div>{question}</div>
-                                            <div><Button className='bg-gradient-to-tr to-indigo-300 w-full text-white ' style={{ borderRadius: "0.6rem" }} onClick={() => handleSpeak(question)} >Ask</Button></div>
-                                        </li>
-                                    ))
-                                ) : (
-                                    <li>No suggested questions available.</li>
-                                )}
-                            </ul>
-                        </div>
+                      <div className="p-4 border-t dark:border-[#3B4254] bg-gray-100 dark:bg-[#212A39]">
+  <h2 className="text-lg font-semibold mb-2">Suggested Questions</h2>
+  <ul className="space-y-2">
+    {additionalContext.suggestedQuestions.filter(question => question !== "").length > 0 ? (
+      additionalContext.suggestedQuestions
+        .filter(question => question !== "") // Filter out empty strings
+        .map((question, index) => (
+          <li key={index} className="flex justify-between w-full">
+            <div>{question}</div>
+            <div>
+              <Button
+                className="bg-gradient-to-tr to-indigo-300 w-full text-white"
+                style={{ borderRadius: "0.6rem" }}
+                onClick={() => handleSpeak(question)}
+              >
+                Ask
+              </Button>
+            </div>
+          </li>
+        ))
+    ) : (
+      <li>No suggested questions available.</li>
+    )}
+  </ul>
+</div>
+
                     </section>
 
                     <section className="flex-1 bg-gray-100 dark:bg-[#212A39] bg-background shadow-md flex flex-col justify-between rounded-xl border dark:border-[#3B4254] border-[#E9ECF1]">
