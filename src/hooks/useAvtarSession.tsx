@@ -102,13 +102,49 @@ const useAvtarSession = ({ user }: { user: User }) => {
         }
     }
 
-    async function startSession() {
-        setStartLoading(true)
-        const token = await fetchAccessToken()
-        avatar.current = new StreamingAvatar({ token })
-        openaiAssistant.current = new OpenAIAssistant(userId)
-        await openaiAssistant.current.initialize()
+    async function fetchAccessTokenWithSpecificKey(apiKey:any) {
+  try {
+    const response = await axios.post("/api/get-access-token", { userId: user.id }, {
+      headers: { "x-api-key": apiKey },
+    });
+    console.log('Response:', response.data);
+    setSessionId(response.data.sessionId);
+    return response.data.token;
+  } catch (error) {
+    console.error(`Error fetching token with key ${apiKey}:`, error);
+    throw new Error(`Token fetch failed with key: ${apiKey}`);
+  }
+}
 
+const HEYGEN_API_KEYS = [
+    process.env.NEXT_PUBLIC_HEYGEN_API_KEY1,
+    process.env.NEXT_PUBLIC_HEYGEN_API_KEY2,
+    process.env.NEXT_PUBLIC_HEYGEN_API_KEY2,
+
+].filter(Boolean);
+    
+console.log(  process.env.HEYGEN_API_KEY1)
+
+
+console.log(`our keys are ${HEYGEN_API_KEYS}`)
+   async function startSession() {
+  let currentKeyIndex = 0;
+  const MAX_RETRIES = HEYGEN_API_KEYS.length;
+
+  while (currentKeyIndex < MAX_RETRIES) {
+    try {
+      setStartLoading(true);
+      
+      // Fetch token using the current API key
+      const currentApiKey = HEYGEN_API_KEYS[currentKeyIndex];
+      const token = await fetchAccessTokenWithSpecificKey(currentApiKey);
+
+      // Initialize avatar and assistant
+      avatar.current = new StreamingAvatar({ token });
+      openaiAssistant.current = new OpenAIAssistant(userId);
+      await openaiAssistant.current.initialize();
+
+      // Try to create and start avatar
         try {
             const res = await avatar.current.createStartAvatar({
                 quality: AvatarQuality.Medium,
@@ -116,19 +152,29 @@ const useAvtarSession = ({ user }: { user: User }) => {
                 language: language,
                 disableIdleTimeout: true,
                 voice: { rate: 2.0, emotion: VoiceEmotion.EXCITED },
-                knowledgeBase: "You are an international student career counsellor"
-            })
-            setData(res)
-        } catch (error) {
-            toast.error(`Error starting avatar: ${error} Please try again`)
-            console.error('Failed to start avatar:', error)
-        }
+                knowledgeBase: "You are an international student career counsellor",
+            });
 
-        // avatar.current?.startVoiceChat({ useSilencePrompt: false })
-        // setChatMode("voice_mode")
-        setupAvatarEventListeners()
-        setStartLoading(false)
+            setData(res);
+            setupAvatarEventListeners();
+            setStartLoading(false);
+            return; // Exit successfully
+        } catch (avatarError) {
+            console.error(`Avatar creation failed with key index ${currentKeyIndex}:`, avatarError);
+            currentKeyIndex++; // Move to next key if available
+            console.log(`trying with new keys index ${currentKeyIndex} key is ${HEYGEN_API_KEYS[currentKeyIndex]};`)
+      }
+    } catch (tokenError) {
+      console.error(`Token fetch failed with key index ${currentKeyIndex}:`, tokenError);
+      currentKeyIndex++; // Move to next key if available
     }
+  }
+
+  // If we exhaust retries
+  toast.error('Failed to create avatar with all available API keys');
+  setStartLoading(false);
+}
+
 
 
     useEffect(() => {

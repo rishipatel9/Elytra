@@ -1,25 +1,26 @@
 import prisma from "@/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
 
-const HEYGEN_API_KEY = process.env.HEYGEN_API_KEY;
-console.log(`HEYGEN_API_KEY IS ${HEYGEN_API_KEY}`)
-
-export async function POST(req:NextRequest) {
+export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    console.log('body:', body)
-    console.log(`HEYGEN API KEY : ${HEYGEN_API_KEY}`)
-    if (!HEYGEN_API_KEY) {
-      throw new Error("API key is missing from .env");
+    const apiKey = req.headers.get("x-api-key"); // Retrieve the API key from the request headers
+
+    console.log('body:', body);
+    console.log(`Received API Key: ${apiKey}`);
+
+    if (!apiKey) {
+      throw new Error("API key is missing from the request headers");
     }
-     const res = await fetch(
+
+    const res = await fetch(
       "https://api.heygen.com/v1/streaming.create_token",
       {
         method: "POST",
         headers: {
-          "x-api-key": HEYGEN_API_KEY,
+          "x-api-key": apiKey, // Use the API key from headers
         },
-      },
+      }
     );
 
     if (!res.ok) {
@@ -27,27 +28,28 @@ export async function POST(req:NextRequest) {
     }
 
     const data = await res.json();
-    console.log(`${JSON.stringify(data)}`)
-    const session =
-       await prisma.session.create({
+    console.log(`${JSON.stringify(data)}`);
+    
+    const session = await prisma.session.create({
       data: {
-          userId:body.userId,
+        userId: body.userId,
       },
-    })
-    console.log('session:', session)
-    console.log('token:', data.data.token)
+    });
 
-    return NextResponse.json({ token:data.data.token, sessionId:session.id }, { status: 200 });
+    console.log('session:', session);
+    console.log('token:', data.data.token);
+
+    return NextResponse.json({ token: data.data.token, sessionId: session.id }, { status: 200 });
   } catch (error) {
     // Improved error logging
     console.error("Error details:", {
       message: error instanceof Error ? error.message : 'Unknown error',
-      stack: error instanceof Error ? error.stack : null
+      stack: error instanceof Error ? error.stack : null,
     });
 
     // Return a more informative error response
-    return NextResponse.json({ 
-      error: error instanceof Error ? error.message : 'An unexpected error occurred' 
+    return NextResponse.json({
+      error: error instanceof Error ? error.message : 'An unexpected error occurred',
     }, { status: 500 });
   }
 }
