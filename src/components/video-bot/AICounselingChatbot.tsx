@@ -9,7 +9,16 @@ import useAvtarSession from '../../hooks/useAvtarSession'
 import UserSessionsTable from './UserSessions'
 import { Logo, LogoIcon } from '../MainSidebar'
 import { Brain } from 'lucide-react'
-
+import { ModalContent } from '@nextui-org/react'
+import { 
+  Modal, 
+ 
+  ModalHeader, 
+  ModalBody, 
+  ModalFooter,  
+  Input 
+} from "@nextui-org/react";
+import { useState } from 'react'
 export interface User {
     id: string;
     name: string;
@@ -40,8 +49,93 @@ export default function AICounselingChatbot({ user }: { user: User }) {
         setMessages,
         isTyping
     } = useAvtarSession({ user });
-    return (
-        <>
+
+    
+
+     const [isAPIKeyModalOpen, setIsAPIKeyModalOpen] = useState(true);
+    const [heygenAPIKey, setHeygenAPIKey] = useState('');
+    const [apiKeyError, setApiKeyError] = useState('');
+
+    const validateAndSaveAPIKey = async () => {
+        // Basic validation
+        console.log(`clicked`)
+        if (!heygenAPIKey.trim()) {
+            setApiKeyError('API Key cannot be empty');
+            return;
+        }
+
+        try {
+            // Optional: Add a validation call to Heygen API
+            // const response = await fetch('https://api.heygen.com/v1/test', {
+            //     method: 'GET',
+            //     headers: {
+            //         'x-api-key': heygenAPIKey,
+            //         'Content-Type': 'application/json'
+            //     }
+            // });
+
+            // if (!response.ok) {
+            //     setApiKeyError('Invalid Heygen API Key');
+            //     return;
+            // }
+
+            // Save API key to environment or local storage
+            localStorage.setItem('HEYGEN_API_KEY', heygenAPIKey);
+            
+            // Close modal
+            setIsAPIKeyModalOpen(false);
+        } catch (error) {
+            setApiKeyError('Error validating API Key');
+        }
+    };
+
+    
+  return (
+      <>
+          <div >
+            <Modal 
+                isOpen={isAPIKeyModalOpen} 
+                onOpenChange={setIsAPIKeyModalOpen}
+                isDismissable={false}
+            >
+                <ModalContent   className="bg-opacity-90 dark:bg-black bg-red-500	 rounded-xl">
+                    <ModalHeader>
+                        Enter Heygen API Key
+                    </ModalHeader>
+                    <ModalBody>
+                        <p className="text-sm text-gray-600">
+                            To use the AI Avatar feature, please provide your Heygen API Key.
+                        </p>
+                        <Input
+                             value={heygenAPIKey}
+                            onValueChange={setHeygenAPIKey}
+                            errorMessage={apiKeyError}
+                            isInvalid={!!apiKeyError}
+                        />
+                        <div className="text-xs text-gray-500">
+                            <p>🔒 Your API key will be stored locally and not shared.</p>
+                            <a 
+                                href="https://www.heygen.com/api" 
+                                target="_blank" 
+                                rel="noopener noreferrer"
+                                className="text-blue-500 hover:underline"
+                            >
+                                Get a Heygen API Key
+                            </a>
+                        </div>
+                    </ModalBody>
+                    <ModalFooter>
+                        <Button 
+                            color="primary" 
+                            onClick={validateAndSaveAPIKey}
+                            
+                        >
+                            Save API Key
+                        </Button>
+                    </ModalFooter>
+                </ModalContent>
+              </Modal>
+              </div>
             {stream && !endSessionPage ? (
             <div className="min-h-screen flex flex-col font-sans">
                 <main className="flex-grow flex flex-col md:flex-row p-4 gap-4 mx-auto w-full dark:bg-[#202434] bg-background">
@@ -253,7 +347,7 @@ export default function AICounselingChatbot({ user }: { user: User }) {
                     </div>
                 </div>
             )}
-            {endSessionPage==true && (
+            {endSessionPage && (
                 <div className="flex flex-col items-center justify-center h-screen">
                     <h1 className="text-2xl font-bold text-center text-white m-2">Session Ended</h1>
                     <Button onClick={() => setEndSessionPage(false)} className="flex items-center justify-center">
